@@ -1,0 +1,137 @@
+DROP TABLE doc_delete_info;
+DROP TABLE env_license;
+DROP TABLE env_log;
+DROP TABLE env_log_unit;
+DROP TABLE env_notify_info;
+DROP TABLE env_policy;
+DROP TABLE env_self_protect_agt;
+DROP TABLE env_sorg_link;
+DROP TABLE env_trust_subject;
+DROP TABLE error_code;
+DROP TABLE host;
+DROP TABLE host_hw;
+DROP TABLE host_key;
+DROP TABLE host_policy;
+DROP TABLE host_status_po;
+DROP TABLE host_sw;
+DROP TABLE host_sys;
+DROP TABLE link_license;
+DROP TABLE local_env_auth;
+DROP TABLE local_env_log;
+DROP TABLE log_deploy_file;
+DROP TABLE log_doc;
+DROP TABLE log_doc_dscan;
+DROP TABLE log_doc_host;
+DROP TABLE log_event;
+DROP TABLE log_secu;
+DROP TABLE os_type;
+DROP TABLE po_ctl_media;
+DROP TABLE po_ctl_panel;
+DROP TABLE po_ctl_panel_pkg;
+DROP TABLE po_ctl_panel_unit;
+DROP TABLE po_deploy_file;
+DROP TABLE po_deploy_file_chk_unit;
+DROP TABLE po_deploy_file_info_unit;
+DROP TABLE po_deploy_file_pkg;
+DROP TABLE po_deploy_file_sch_unit;
+DROP TABLE po_deploy_file_tar_unit;
+DROP TABLE po_deploy_file_unit;
+DROP TABLE po_deploy_file_unit_info_pkg;
+DROP TABLE po_deploy_file_unit_sch_pkg;
+DROP TABLE po_deploy_file_unit_tar_pkg;
+DROP TABLE po_fa_bk;
+DROP TABLE po_fa_clear;
+DROP TABLE po_fa_clear_pkg;
+DROP TABLE po_fa_clear_unit;
+DROP TABLE po_fa_notify;
+DROP TABLE po_fa_notify_pkg;
+DROP TABLE po_fa_op;
+DROP TABLE po_fa_op_obj_unit;
+DROP TABLE po_fa_op_pkg;
+DROP TABLE po_fa_op_sch_unit;
+DROP TABLE po_fa_op_sub_unit;
+DROP TABLE po_fa_clear_unit;
+DROP TABLE po_fa_op_unit;
+DROP TABLE po_fa_op_unit_sub_pkg;
+DROP TABLE po_fa_op_unit_obj_pkg;
+DROP TABLE po_fa_op_unit_rul_pkg;
+DROP TABLE po_fa_op_unit_sch_pkg;
+DROP TABLE po_fa_op_unit_sub_pkg;
+DROP TABLE po_fa_proc;
+DROP TABLE po_fa_proc_pkg;
+DROP TABLE po_fa_proc_unit;
+DROP TABLE po_fe_exclude;
+DROP TABLE po_fe_exclude_pkg;
+DROP TABLE po_fe_exclude_unit;
+DROP TABLE po_fe_notify;
+DROP TABLE po_fe_notify_pkg;
+DROP TABLE po_fe_ptn_bl;
+DROP TABLE po_fe_ptn_lo;
+DROP TABLE po_fe_ptn_op;
+DROP TABLE po_fe_ptn_wl;
+DROP TABLE po_fe_ptn_ptn;
+DROP TABLE po_fe_ptn_ptn_unit;
+DROP TABLE po_host_notify;
+DROP TABLE po_host_notify_pkg;
+DROP TABLE po_host_notify_unit;
+DROP TABLE po_host_rm_info;
+DROP TABLE po_host_run;
+DROP TABLE po_in_ac_doc;
+DROP TABLE po_in_ac_doc_obj_unit;
+DROP TABLE po_in_ac_doc_pkg;
+DROP TABLE po_in_ac_doc_sub_unit;
+DROP TABLE po_in_ac_doc_unit;
+DROP TABLE po_in_ac_doc_unit_obj_pkg;
+DROP TABLE po_in_ac_doc_unit_sub_pkg;
+DROP TABLE po_in_ac_sf;
+DROP TABLE po_in_ac_sf_obj_unit;
+DROP TABLE po_in_ac_sf_pkg;
+DROP TABLE po_in_ac_sf_sub_unit;
+DROP TABLE po_in_ac_sf_unit;
+DROP TABLE po_in_ac_sf_unit_obj_pkg;
+DROP TABLE po_in_ac_sf_unit_sub_pkg;
+DROP TABLE po_in_ptn_bl;
+DROP TABLE po_in_ptn_bl_pkg;
+DROP TABLE po_in_ptn_bl_unit;
+DROP TABLE po_in_ptn_ex;
+DROP TABLE po_in_ptn_ex_pkg;
+DROP TABLE po_in_ptn_ex_trust;
+DROP TABLE po_in_ptn_ex_unit;
+DROP TABLE po_in_ptn_no;
+DROP TABLE po_in_ptn_no_pkg;
+DROP TABLE po_in_ptn_op;
+DROP TABLE po_in_ptn_op_pkg;
+DROP TABLE po_in_ptn_sp;
+DROP TABLE po_in_ptn_sp_pkg;
+DROP TABLE po_in_ptn_sp_rule;
+DROP TABLE po_in_ptn_sp_unit;
+DROP TABLE po_in_ptn_wl;
+DROP TABLE po_in_ptn_wl_pkg;
+DROP TABLE po_in_ptn_wl_unit;
+DROP TABLE po_in_vuln_op;
+DROP TABLE po_in_vuln_op_pkg;
+DROP TABLE po_in_vuln_scan;
+DROP TABLE po_in_vuln_scan_pkg;
+DROP TABLE po_in_vuln_scan_unit;
+DROP TABLE po_in_vuln_scan_unit_pkg;
+DROP TABLE po_power;
+DROP TABLE po_power_pkg;
+DROP TABLE po_power_unit;
+DROP TABLE po_sch;
+DROP TABLE po_sch_pkg;
+DROP TABLE po_sch_unit;
+DROP TABLE po_self_protect;
+DROP TABLE po_self_protect_pkg;
+DROP TABLE po_self_protect_unit;
+DROP TABLE po_svr_info_lgn;
+DROP TABLE po_svr_info_mgr;
+DROP TABLE po_svr_info_udt;
+DROP TABLE po_win_run;
+DROP TABLE schema_info;
+DROP TABLE site_file;
+DROP TABLE site_vuln;
+DROP TABLE site_vuln_lock;
+DROP TABLE site_vuln_repair;
+DROP TABLE site_vuln_scan;
+DROP TABLE user;
+DROP TABLE user_policy;

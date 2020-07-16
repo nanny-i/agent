@@ -1,0 +1,15 @@
+include ../../../../build.config
+
+CFLAGS = $(DEFINES) $(INCLUDES)
+
+CPPFILES = ManagePoInVulnOp.cpp ManagePoInVulnOpPkg.cpp ManagePoInVulnScan.cpp ManagePoInVulnScanPkg.cpp ManagePoInVulnScanUnit.cpp ManagePoInVulnScanUnitPkg.cpp
+
+OBJ = $(CPPFILES:.cpp=.o)
+
+all: $(OBJ)
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $*.cpp
+
+clean:
+	/bin/rm -f ./*.o

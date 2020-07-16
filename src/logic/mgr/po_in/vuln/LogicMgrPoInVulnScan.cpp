@@ -1,0 +1,160 @@
+/*
+ * Copyright (C) 2020-2025 ASHINi corp. 
+ * 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ * 
+ * You should have received a copy of the GNU Lesser General Public 
+ * License along with this library; if not, write to the Free Software 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
+ * 
+ */
+
+//---------------------------------------------------------------------------
+
+
+#include "stdafx.h"
+#include "com_struct.h"
+#include "LogicMgrPoInVulnScan.h"
+
+//---------------------------------------------------------------------------
+
+CLogicMgrPoInVulnScan*		t_LogicMgrPoInVulnScan = NULL;
+
+//---------------------------------------------------------------------------
+
+CLogicMgrPoInVulnScan::CLogicMgrPoInVulnScan()
+{
+	t_ManagePoInVulnScan		= new CManagePoInVulnScan();
+	t_ManagePoInVulnScanPkg		= new CManagePoInVulnScanPkg();
+	t_ManagePoInVulnScanUnit	= new CManagePoInVulnScanUnit();
+	t_ManagePoInVulnScanUnitPkg	= new CManagePoInVulnScanUnitPkg();
+
+	t_ManagePoInVulnScan->LoadDBMS();
+	t_ManagePoInVulnScanPkg->LoadDBMS();
+	t_ManagePoInVulnScanUnit->LoadDBMS();
+	t_ManagePoInVulnScanUnitPkg->LoadDBMS();
+
+	t_ManagePoInVulnScan->InitHash();
+
+	m_strLogicName		= "mgr agt po in vuln scan";
+	
+	m_nPolicyType		= SS_POLICY_TYPE_IN_VULN_SCAN;
+	m_nSSPoSeqIdx		= SS_POLICY_INDEX_IN_VULN_SCAN;
+	m_nAgtPktEditCode	= G_CODE_COMMON_EDIT;	
+	
+	m_nEvtObjType		= EVENT_OBJECT_TYPE_POLICY;
+	m_nEvtObjCode		= EVENT_OBJECT_CODE_POLICY_IN_VULN_SCAN;
+}
+//---------------------------------------------------------------------------
+
+CLogicMgrPoInVulnScan::~CLogicMgrPoInVulnScan()
+{
+	SAFE_DELETE(t_ManagePoInVulnScan);
+	SAFE_DELETE(t_ManagePoInVulnScanPkg);
+	SAFE_DELETE(t_ManagePoInVulnScanUnit);
+	SAFE_DELETE(t_ManagePoInVulnScanUnitPkg);
+}
+//---------------------------------------------------------------------------
+INT32		CLogicMgrPoInVulnScan::AnalyzePkt_FromMgr_Ext()
+{
+	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrPoInVulnScan::AnalyzePkt_FromMgr_Edit_Ext()
+{
+	PDB_PO_IN_VULN_SCAN pdata = NULL;
+	DB_PO_IN_VULN_SCAN data;
+
+	m_tDPH = &(data.tDPH);
+
+	TListDBPoInVulnScanPkg	tPkgList;
+	TListDBPoInVulnScanUnit	tUnitList;
+
+	if( t_ManagePoInVulnScan->GetPkt(RecvToken, data))					return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);
+	if(!RecvToken.TokenDel_32(m_nRecvNum))								return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);
+	while(m_nRecvNum--)
+	{
+		DB_PO_IN_VULN_SCAN_PKG		data_pkg;		
+		DB_PO_IN_VULN_SCAN_UNIT	data_unit;
+
+		if( t_ManagePoInVulnScanPkg->GetPkt(RecvToken, data_pkg))		return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);
+		if( t_ManagePoInVulnScanUnit->GetPkt(RecvToken, data_unit))		return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);
+
+		tPkgList.push_back(data_pkg);
+		tUnitList.push_back(data_unit);
+
+		data.tDPH._add_id(data_pkg.tDPH.nID);
+	}
+
+	pdata = (PDB_PO_IN_VULN_SCAN)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(pdata)
+	{
+		t_ManagePoInVulnScanPkg->ClearItemByPolicyID(pdata->tDPH.nID);		
+		t_ManagePoInVulnScan->DelPoInVulnScan(pdata->tDPH.nID);
+	}
+
+	{
+		{
+			TListDBPoInVulnScanUnitItor begin, end;
+			begin = tUnitList.begin();	end = tUnitList.end();
+			for(begin; begin != end; begin++)
+			{
+				if(t_ManagePoInVulnScanUnit->ApplyPoInVulnScanUnit(*begin))
+				{
+					SetDLEA_EC(g_nErrRtn);
+					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+					continue;
+				}				
+			}
+		}
+
+		{
+			TListDBPoInVulnScanPkgItor begin, end;
+			begin = tPkgList.begin();	end = tPkgList.end();
+			for(begin; begin != end; begin++)
+			{
+				if(t_ManagePoInVulnScanPkg->FindItem(begin->tDPH.nID))
+				{
+					SetDLEA_EC(g_nErrRtn);
+					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+					continue;
+				}
+
+				t_ManagePoInVulnScanPkg->AddPoInVulnScanPkg(*begin);
+			}
+		}
+
+		if(SetER(t_ManagePoInVulnScan->ApplyPoInVulnScan(data)))
+		{
+			SetDLEA_EC(g_nErrRtn);
+			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
+		}
+	}
+
+	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
