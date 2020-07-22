@@ -97,10 +97,10 @@
 
 #ifdef _X86_64	
 #define STR_MODULE_RUN_PATH				"/x64"
-#define BIN_MODULE_RUN_TYPE				1
+#define BIN_MODULE_RUN_TYPE				101
 #else
 #define STR_MODULE_RUN_PATH				"/x86"
-#define BIN_MODULE_RUN_TYPE				0
+#define BIN_MODULE_RUN_TYPE				100
 #endif
 
 //------------------------------------------------------------------------------
