@@ -110,6 +110,8 @@ INT32       CEnvironment::LoadEnv_Local()
 
 	m_strRootPath = SPrintf("%s/%s", m_pszBuf, NANNY_AGENT_DIR);
 
+	m_strUtilPath = SPrintf("%s/%s", m_pszBuf, NANNY_UTIL_DIR);
+
 	{
 		m_strLogPath = SPrintf("%s/log", m_strRootPath.c_str());
 		CreateDirectory(m_strLogPath.c_str(), NULL);

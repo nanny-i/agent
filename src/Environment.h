@@ -32,6 +32,7 @@ private:
 
 public:
 	String     	m_strRootPath;
+	String     	m_strUtilPath;
 	String		m_strInsPath;
 	String		m_strLogPath;
 	String		m_strDLLPath;

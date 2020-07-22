@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2020-2025 ASHINi corp. 
- * 
- * This library is free software; you can redistribute it and/or 
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
- * version 2.1 of the License, or (at your option) any later version. 
- * 
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * Lesser General Public License for more details. 
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this library; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
- * 
+ * Copyright (C) 2020-2025 ASHINi corp.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  */
 
 //---------------------------------------------------------------------------
@@ -99,11 +99,11 @@ int set_opt(int argc, char *argv[])
 		{
 			case 'v':
 				print_version();
-				nRetVal = TRUE;		
+				nRetVal = TRUE;
 				break;
 			case 'h':
 				print_usage(argv[0]);
-				nRetVal = TRUE;		
+				nRetVal = TRUE;
 				break;
 			default:
 				nRetVal = FALSE;
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 			exit(1);
 		}
 	}
-	
+
 #ifdef MAKE_DAEMON
 	if (make_daemon() != 0)
 	{
@@ -139,9 +139,9 @@ int main(int argc, char* argv[])
 	sigfillset(&sigact.sa_mask);
 	sigaction(SIGINT, &sigact, NULL);
 	sigaction(SIGTERM, &sigact, NULL);
-	signal(SIGPIPE, SIG_IGN);  
-	
-	// Starting Application Class	
+	signal(SIGPIPE, SIG_IGN);
+
+	// Starting Application Class
 	t_MainDlg = new CMainDlg();
 	if(t_MainDlg == NULL)
 	{

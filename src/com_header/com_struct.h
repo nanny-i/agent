@@ -90,6 +90,7 @@
 #include 	"PowerUtil.h"
 #include 	"ValidTimeUtil.h"
 #include 	"TokenString.h"
+#include 	"DownLoadFile.h"
 #include 	"EncodeUtil.h"
 
 
@@ -120,7 +121,7 @@
 #include	"ResInfoDLLUtil.h"
 #include	"CompDLLUtil.h"
 #include	"DeviceInfoDLLUtil.h"
-#include	"DownloadFileDLLUtil.h"
+//#include	"DownloadFileDLLUtil.h"
 #include	"RemoveLogDLLUtil.h"
 #include	"FindFileDLLUtil.h"
 #include	"SeedDLLUtil.h"

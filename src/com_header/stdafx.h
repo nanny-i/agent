@@ -182,7 +182,9 @@ typedef wstring StringW;
 
 #define NANNY_AGENT_VERSION		"1.0.0.1"
 #define NANNY_AGENT_IDENT		"nannysvc"
+#define NANNY_UPDATE_IDENT		"update"
 #define NANNY_AGENT_DIR			"nanny"
+#define NANNY_UTIL_DIR			".tools"
 
 
 #define	safe_free(x)   if(x != NULL) { free(x);x=NULL; }

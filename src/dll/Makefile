@@ -27,7 +27,7 @@ INSTDIR := network res_info rm_log seed socket proc_info device_info doc_fmt fil
 
 .PHONY:	all
 
-CPPFILES = ClientSocketDLLUtil.cpp CompDLLUtil.cpp DeviceInfoDLLUtil.cpp DownloadFileDLLUtil.cpp FindFileDLLUtil.cpp NetworkDLLUtil.cpp ProcInfoDLLUtil.cpp RemoveLogDLLUtil.cpp ResInfoDLLUtil.cpp SeedDLLUtil.cpp ServerSocketDLLUtil.cpp
+CPPFILES = ClientSocketDLLUtil.cpp CompDLLUtil.cpp DeviceInfoDLLUtil.cpp FindFileDLLUtil.cpp NetworkDLLUtil.cpp ProcInfoDLLUtil.cpp RemoveLogDLLUtil.cpp ResInfoDLLUtil.cpp SeedDLLUtil.cpp ServerSocketDLLUtil.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 

@@ -1,21 +1,19 @@
 include ../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
-CPPFILES = update.cpp 
+CPPFILES = mz_ioapi.cpp mz_unzip.cpp mz_zip.cpp zip.cpp update.cpp 
 OBJ = $(CPPFILES:.cpp=.o)
 
-all:
-	rm -f $(OBJ)
-	rm -f update
+all: $(OBJ)
+	$(CC) $(CFLAGS) -g -o update $(OBJ) ../../lib/as_lib/src/libascomm.a -lz -ldl
+
+.cpp.o:
 	$(CC) $(CFLAGS) -c $(CPPFILES)
-	make build
+
 clean:
 	/bin/rm -f $(OBJ)
 	/bin/rm -f update
 
 install:
 	/usr/bin/cp -f update /usr/local/ashin/.tools
-	/usr/bin/cp -f update /home/share/install/media/tool	
-
-build:
-	$(CC) $(CFLAGS) -g -o update update.o ../../lib/as_lib/src/libascomm.a -lz -ldl
+	/usr/bin/cp -f update /home/share/install/media/tool

@@ -746,11 +746,16 @@ INT32		CLogicMgrPoDeployFile::AddDpDownInfo(UINT32 nPoID, UINT32 nUnitID, TListI
 
 		tAFI.nID = t_EnvInfoOp->GetGlobalID();
 		WriteLogN("start deploy file download : [%d][%d][%d][%s]:[%s]", tAFI.nID, tAFI.nItemID, tSchPkgIDList.size(), tAFI.szFileName, pdpsiu->strDataSvrInfoList.c_str());
+/*
 		if(t_ASIFDLDLLUtil)
 		{
 			t_ASIFDLDLLUtil->SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, pdpsiu->strDataSvrInfoList.c_str());
 			t_ASIFDLDLLUtil->AddDLInfo(&tAFI);
 		}
+*/
+		SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, pdpsiu->strDataSvrInfoList.c_str());
+		AddDLInfo(&tAFI);
+
 		t_ManageFileDown->AddDFInfo(tAFI, tSchPkgIDList);
 	}
 	return 0;

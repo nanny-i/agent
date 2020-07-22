@@ -157,13 +157,18 @@ DWORD		CMainDlg::OnThreadTimer(WPARAM wParam, LPARAM lParam)
 				}
 				
 				WriteLogN("start up file download : [%s]:[%s]", tAFI.szFileName, strSvrInfo.c_str());
+/*
 				if (t_ASIFDLDLLUtil)	
 				{
 					t_ASIFDLDLLUtil->SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, strSvrInfo.c_str());
 					t_ASIFDLDLLUtil->AddDLInfo(&tAFI);
 				}
+*/
+				SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, strSvrInfo.c_str());
+				AddDLInfo(&tAFI);
 
-				if (t_ManageFileDown)	t_ManageFileDown->AddItem(tAFI);
+				if (t_ManageFileDown)
+					t_ManageFileDown->AddItem(tAFI);
 			}
 			
 			break;

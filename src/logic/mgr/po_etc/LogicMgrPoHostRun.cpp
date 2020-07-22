@@ -231,8 +231,11 @@ INT32		CLogicMgrPoHostRun::ApplyPolicy()
 		{
 			nDLMethod += ASIFDL_DL_SVR_TYPE_PUBLIC;
 		}
+/*
 		if(t_ASIFDLDLLUtil)
 			t_ASIFDLDLLUtil->SetDLSvrType(nDLMethod);
+*/
+		SetDLSvrType(nDLMethod);
 		WriteLogN("[%s] set file download mode : [%x]", m_strLogicName.c_str(), nDLMethod);
 	}
 

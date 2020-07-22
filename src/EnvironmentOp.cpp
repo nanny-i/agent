@@ -318,9 +318,10 @@ ASI_FDL_INFO	CEnvironmentOp::GetAgtUpFileInfo()
 	tAFI.nID = GetGlobalID();
 	tAFI.nItemType = ASIFDL_DL_FILE_TYPE_UPDATE;
 	tAFI.nItemID = 1;	
-	tAFI.nDLSvrUsedFlag	= (ASIFDL_DL_SVR_TYPE_LOCAL | ASIFDL_DL_SVR_TYPE_PTOP | ASIFDL_DL_SVR_TYPE_SITE | ASIFDL_DL_SVR_TYPE_PUBLIC);
+	//tAFI.nDLSvrUsedFlag	= (ASIFDL_DL_SVR_TYPE_LOCAL | ASIFDL_DL_SVR_TYPE_PTOP | ASIFDL_DL_SVR_TYPE_SITE | ASIFDL_DL_SVR_TYPE_PUBLIC);
+	tAFI.nDLSvrUsedFlag	= (ASIFDL_DL_SVR_TYPE_LOCAL | ASIFDL_DL_SVR_TYPE_SITE | ASIFDL_DL_SVR_TYPE_PUBLIC);
 
-	strncpy(tAFI.szDLPath, STR_DEPLOY_FILE_HOME_AGT_UP, MAX_PATH);
+	strncpy(tAFI.szDLPath, STR_DEPLOY_FILE_HOME_AGT_UP, MAX_PATH-1);
 	
 	{
 		TMapMemAgtUpFileInfoRItor begin, end;
@@ -329,8 +330,8 @@ ASI_FDL_INFO	CEnvironmentOp::GetAgtUpFileInfo()
 		{
 			if(begin->second.nFileType == SS_PO_UPDATE_SUPPORT_FILE_TYPE_NORMAL || begin->second.nFileType == 0)
 			{
-				strncpy(tAFI.szFileName, begin->second.strFileName.c_str(), MAX_PATH);
-				strncpy(tAFI.szFileHash, begin->second.strFileHash.c_str(), MAX_PATH);
+				strncpy(tAFI.szFileName, begin->second.strFileName.c_str(), MAX_PATH-1);
+				strncpy(tAFI.szFileHash, begin->second.strFileHash.c_str(), MAX_PATH-1);
 				break;
 			}
 		}
@@ -609,7 +610,6 @@ SOCK_INIT_DATA	CEnvironmentOp::GetSvrLinkSID(INT32 nSSLMode)
 
 void	CEnvironmentOp::GetDLFileInitData(ASI_FDL_INIT& tAFI)
 {
-	CFileUtil fu;
 	memset(&tAFI, 0, sizeof(ASI_FDL_INIT));
 	tAFI.hOwner				= m_hMainDlg;
 	tAFI.nNotifyMsgID		= WM_GLOBAL_FDL_NOTIFY;
@@ -621,10 +621,10 @@ void	CEnvironmentOp::GetDLFileInitData(ASI_FDL_INIT& tAFI)
 	snprintf(tAFI.szHomePath, MAX_PATH-1, "%s/%s", t_EnvInfo->m_strRootPath.c_str(), STR_DEPLOY_FILE_LOCAL_DOWN);
 	snprintf(tAFI.szTempPath, MAX_PATH-1, "%s/%s", t_EnvInfo->m_strRootPath.c_str(), STR_DEPLOY_FILE_LOCAL_TEMP);
 
-	if(fu.DirectoryExists(tAFI.szHomePath) == FALSE)
-		fu.ForceDirectory(tAFI.szHomePath);
-	if(fu.DirectoryExists(tAFI.szTempPath) == FALSE)
-		fu.ForceDirectory(tAFI.szTempPath);
+	if(DirectoryExists(tAFI.szHomePath) == FALSE)
+		ForceDirectories(tAFI.szHomePath);
+	if(DirectoryExists(tAFI.szTempPath) == FALSE)
+		ForceDirectories(tAFI.szTempPath);
 
 	strncpy(tAFI.szLogPath, t_EnvInfo->m_strLogPath.c_str(), MAX_PATH-1);
 	strncpy(tAFI.szLogFile, "/nanny_agt_fdl_sys_", MAX_PATH-1);

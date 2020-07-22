@@ -19,7 +19,6 @@
 
 #include "stdafx.h"
 #include "com_struct.h"
-#include "as_zip.h"
 #include "ExecuteFileUtil.h"
 
 CExecuteFileUtil*		t_ExecuteFileUtil = NULL;
@@ -95,8 +94,10 @@ INT32		CExecuteFileUtil::ExecuteFile_Udt()
 	INT32 nRtn = 0;
 	TListID tIDList;
 	TListIDItor begin, end;
-	char acFile[MAX_PATH] = {0,};
+	char acZipFile[MAX_PATH] = {0,};
+	char acUdtExePath[MAX_PATH] = {0,};
 	char acUpdatePath[MAX_PATH] = {0,};
+	char acCommand[CHAR_MAX_SIZE] = {0,};
 	t_ManageFileDown->GetIDListByType(ASIFDL_DL_FILE_TYPE_UPDATE, tIDList);
 
 	if(tIDList.size() == 0)
@@ -109,12 +110,14 @@ INT32		CExecuteFileUtil::ExecuteFile_Udt()
 		if(!pafi)
 			continue;
 		
-		snprintf(acFile, MAX_PATH-1, "%s/%s/%s", (char *)t_EnvInfo->m_strRootPath.c_str(), STR_DEPLOY_FILE_LOCAL_DOWN, pafi->szFileName);
+		snprintf(acUdtExePath, MAX_PATH-1, "%s/%s", (char *)t_EnvInfo->m_strUtilPath.c_str(), NANNY_UPDATE_IDENT);
+		snprintf(acZipFile, MAX_PATH-1, "%s/%s/%s", (char *)t_EnvInfo->m_strRootPath.c_str(), STR_DEPLOY_FILE_LOCAL_DOWN, pafi->szFileName);
 		snprintf(acUpdatePath, MAX_PATH-1, "%s/%s", (char *)t_EnvInfo->m_strRootPath.c_str(), STR_UNZIP_PATH_FOR_UPDATE);
+		snprintf(acCommand, MAX_PATH-1, "-u -f %s -d %s", acZipFile, acUpdatePath);
 
-		if(ChkFileHash(acFile, pafi->szFileHash))
+		if(ChkFileHash(acZipFile, pafi->szFileHash))
 		{
-			WriteLogE("[%s] execute file udt invalid hash : [%s][%s]", (char *)m_strUtilName.c_str(), acFile, pafi->szFileHash);
+			WriteLogE("[%s] execute file udt invalid hash : [%s][%s]", (char *)m_strUtilName.c_str(), acZipFile, pafi->szFileHash);
 			continue;
 		}
 	
@@ -127,27 +130,7 @@ INT32		CExecuteFileUtil::ExecuteFile_Udt()
 			}
 		}
 
-		nRtn = as_unzip_file(acFile, acUpdatePath, AS_ZIP_UNZIP_PASS);
-		if(nRtn != 0)
-		{
-			WriteLogE("[%s] fail to unzip file (%s) (%d)", (char *)m_strUtilName.c_str(), acFile, nRtn);
-			nRtn = 0;
-			continue;
-		}
-
-		unlink(acFile);
-
-		snprintf(acFile, MAX_PATH-1, "%s/update.sh", acUpdatePath);
-		acFile[MAX_PATH-1] = 0;
-
-		if(chmod(acFile, 0755) == -1)
-		{
-			WriteLogE("[%s] fail to chmod file (%s) (%d)", (char *)m_strUtilName.c_str(), acFile, nRtn);
-			nRtn = 0;
-			continue;
-		}
-
-		if(m_tProcUtil.ProcessStart(acFile, NULL))
+		if(m_tProcUtil.ProcessStart(acUdtExePath, acCommand))
 		{
 			WriteLogN("[%s] start agent update file .. ", (char *)m_strUtilName.c_str());
 			nRtn = 1;

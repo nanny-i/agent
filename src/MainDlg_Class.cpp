@@ -105,13 +105,14 @@ INT32		CMainDlg::CreateLoadLibrary()
 			nRetVal = -11;
 			break;
 		}
-
+		/*
 		t_ASIFDLDLLUtil				= new CASIFDLDLLUtil();
 		if(t_ASIFDLDLLUtil == NULL)
 		{
 			nRetVal = -12;
 			break;
 		}
+		*/
 
 		t_NetworkDLLUtil			= new CNetworkDLLUtil();
 		if(t_NetworkDLLUtil == NULL)
@@ -951,13 +952,14 @@ INT32		CMainDlg::InitLoadLibrary()
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
 			return -14;
 		}
-
+/*
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_fdl.so", t_EnvInfo->m_strDLLPath.c_str());
 		if(t_ASIFDLDLLUtil->LoadLibraryExt(szDLLName)) 
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, errno);
 			return -15;
 		}
+*/
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_network.so", t_EnvInfo->m_strDLLPath.c_str());
 		nRetVal = t_NetworkDLLUtil->LoadLibraryExt(szDLLName);
@@ -1035,8 +1037,11 @@ INT32		CMainDlg::InitSubClass()
 	{
 		ASI_FDL_INIT tAFI;
 		t_EnvInfoOp->GetDLFileInitData(tAFI);
+		SetDLInit(&tAFI);
+/*
 		if(t_ASIFDLDLLUtil)
 			t_ASIFDLDLLUtil->SetDLInit(&tAFI);		
+*/
 	}
 
 	{
@@ -1224,6 +1229,7 @@ INT32		CMainDlg::StartSubClass()
 	}
 
 	{
+/*
 		if(t_ASIFDLDLLUtil)
 		{
 			if(t_ASIFDLDLLUtil->RunDL())
@@ -1231,6 +1237,12 @@ INT32		CMainDlg::StartSubClass()
 				WriteLogE("start file download thread result : fail");
 			}
 		}
+*/
+		if(RunDL())
+		{
+			WriteLogE("start file download thread result : fail");
+		}
+
 	}
 
 	{
@@ -1295,7 +1307,8 @@ INT32		CMainDlg::StopSubClass()
 	}
 
 	{
-		if(t_ASIFDLDLLUtil)		t_ASIFDLDLLUtil->StopDL();
+		StopDL();
+		//if(t_ASIFDLDLLUtil)		t_ASIFDLDLLUtil->StopDL();
 //		if(t_ASIEPSAPPDLLUtil)	t_ASIEPSAPPDLLUtil->Stop();
 	}
 
@@ -1522,7 +1535,7 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_ASICOMPDLLUtil);
 		SAFE_DELETE(t_RemoveLogDLLUtil);
 		SAFE_DELETE(t_ASIFFDLLUtil);
-		SAFE_DELETE(t_ASIFDLDLLUtil);
+//		SAFE_DELETE(t_ASIFDLDLLUtil);
 		SAFE_DELETE(t_NetworkDLLUtil);
 		SAFE_DELETE(t_SeedDLLUtil);
 //		SAFE_DELETE(t_ASIEPSAPPDLLUtil);

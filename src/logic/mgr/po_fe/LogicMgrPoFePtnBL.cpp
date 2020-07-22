@@ -202,11 +202,16 @@ INT32		CLogicMgrPoFePtnBL::AddDpDownInfo()
 		}
 
 		WriteLogN("start fe ptn bl download : [%d][%d][%s]:[%s]", tAFI.nID, tAFI.nItemID, tAFI.szFileName, pdpsiu->strDataSvrInfoList.c_str());
+/*
 		if(t_ASIFDLDLLUtil)
 		{
 			t_ASIFDLDLLUtil->SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, pdpsiu->strDataSvrInfoList.c_str());
 			t_ASIFDLDLLUtil->AddDLInfo(&tAFI);
 		}
+*/
+		SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, pdpsiu->strDataSvrInfoList.c_str());
+		AddDLInfo(&tAFI);
+
 		t_ManageFileDown->AddItem(tAFI);
 	}
 	return 0;
