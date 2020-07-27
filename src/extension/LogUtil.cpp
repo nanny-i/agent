@@ -35,7 +35,6 @@ void	WriteLogN(char* fmt,...)
 	va_list args;
 	char acSaveFile[MAX_PATH] = {0, };
 	char acTimeBuf[MAX_TIME_STR] = {0, };
-	return;
 /*
 	if(!glbm_nRemainLog)
 		return;

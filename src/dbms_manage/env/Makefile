@@ -12,4 +12,4 @@ all: $(OBJ)
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 clean:
-	/bin/rm -f ./*.o
+	rm -f ./*.o

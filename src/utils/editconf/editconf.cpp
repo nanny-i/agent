@@ -255,7 +255,7 @@ BOOL SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 			break;
 		}
 			
-		strLgnSvrInfo = SPrintf("%s;%s;", pcLgnSvrIp, pcLgnSvrPort);
+		strLgnSvrInfo = SPrintf("%s:%s;", pcLgnSvrIp, pcLgnSvrPort);
 
 		if(RegSetValueEx(hSubKey,  "lgn_svr_list", 0, REG_SZ, (PBYTE)strLgnSvrInfo.c_str(), strLgnSvrInfo.length()+1, acLogMsg) != 0)
 		{

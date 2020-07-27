@@ -11,9 +11,9 @@ all: $(OBJ)
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 clean:
-	/bin/rm -f $(OBJ)
-	/bin/rm -f update
+	rm -f $(OBJ)
+	rm -f update
 
 install:
-	/usr/bin/cp -f update /usr/local/ashin/.tools
-	/usr/bin/cp -f update /home/share/install/media/tool
+	cp -f update /usr/local/ashin/.tools
+	cp -f update $(AS_PKG_HOME)/tool

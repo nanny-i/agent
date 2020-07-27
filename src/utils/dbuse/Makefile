@@ -11,12 +11,12 @@ all:
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 	make build
 clean:
-	/bin/rm -f $(OBJ)
-	/bin/rm -f dbuse
+	rm -f $(OBJ)
+	rm -f dbuse
 
 install:
-	/usr/bin/cp -f dbuse /usr/local/ashin/.tools
-	/usr/bin/cp -f dbuse /home/share/install/media/tool
+	cp -f dbuse /usr/local/ashin/.tools
+	cp -f dbuse $(AS_PKG_HOME)/tool
 	
 build:
 	$(CC) $(CFLAGS) -g -o dbuse dbuse.o ../../lib/as_lib/src/libascomm.a -lodbc -ldl

@@ -12,5 +12,5 @@ all: $(OBJ)
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 clean:
-	/bin/rm -f $(OBJ)
+	rm -f $(OBJ)
 

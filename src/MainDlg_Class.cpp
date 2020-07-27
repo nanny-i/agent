@@ -28,7 +28,7 @@
 INT32		CMainDlg::PreCreateSubClass()
 {
 	INT32 nRetVal = 0;
-	CSystemInfo tSysInfo;
+//	CSystemInfo tSysInfo;
 
 	do
 	{

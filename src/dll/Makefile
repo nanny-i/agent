@@ -42,4 +42,4 @@ install:
 
 clean:
 	@$(make_sub_dir)
-	/bin/rm -f $(OBJ)
+	rm -f $(OBJ)
