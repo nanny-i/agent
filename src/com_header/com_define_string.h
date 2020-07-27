@@ -86,7 +86,7 @@
 #define		STR_BACKUP_MBR_FILE				"inven/_md"
 #define		STR_WENG_PTN_FILE				"inven/_wptn"
 #define		STR_BIN_CAPTURE_FILE			"inven/_bc"
-#define		STR_UNZIP_PATH_FOR_UPDATE		"inven/_udt"
+#define		STR_UNZIP_PATH_FOR_UPDATE		"inven/_update"
 #define		STR_BACKUP_CRC_FILE				"crc"
 #define		STR_BIN_CAPTURE_FILE_NAME		"bc.info"
 

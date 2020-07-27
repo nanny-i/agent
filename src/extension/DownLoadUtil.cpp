@@ -473,8 +473,7 @@ INT32 CDownLoadUtil::ChgDLSvrType(PASI_FDL_INFO pafi)
         
 	pafi->nDLSvrType = nCurChkDLSvrType;
 		
-    WriteLogN("Change download svr type (%d) : id[%d],type[%d],id[%d],ref[%d]",
-		pafi->nDLSvrType, pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt);
+    WriteLogN("Change download svr type (%d) : id[%d],type[%d],id[%d],ref[%d]", pafi->nDLSvrType, pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt);
 	return (nCurChkDLSvrType == ASIFDL_DL_SVR_TYPE_UNKNOWN ? 2 : 1);
 }
 //--------------------------------------------------------------------
@@ -520,18 +519,15 @@ INT32			CDownLoadUtil::TryDownloadFile(PASI_FDL_INFO pafi)
 			for(begin; begin != end; begin++)
 			{
 				nHttpRtn = t_HttpFileGetUtil.GetFile_Host((char *)begin->strAddress.c_str(), szDLSvrPath, szSaveFilePath, begin->nPort);
-
 				if( nHttpRtn == 0 )
 				{
-					WriteLogN("dl file success from site svr : gid[%d],type[%d],item_id[%d],ref[%d]",
-						pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt);
+					WriteLogN("dl file success from site svr : gid[%d],type[%d],item_id[%d],ref[%d]", pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt);
 					nResult	= ASIFDL_DL_RST_TYPE_SUCCESS;						
 					break;
 				}
 				else
 				{
-					WriteLogE("dl file fails from site svr : id[%d],type[%d],item_id[%d],ref[%d],rtn[%d]:[%s]",
-						pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt, nHttpRtn, pafi->szDLPath);
+					WriteLogE("dl file fails from site svr : id[%d],type[%d],item_id[%d],ref[%d],rtn[%d]:[%s]", pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt, nHttpRtn, pafi->szDLPath);
 				}
 			}
 			m_tDLSvrInfoMutex.UnLock();

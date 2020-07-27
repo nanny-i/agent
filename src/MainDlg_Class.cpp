@@ -924,7 +924,8 @@ INT32		CMainDlg::InitLoadLibrary()
 	do
 	{
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_resinfo.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_ResInfoDLLUtil->LoadLibraryExt(szDLLName);
+		if(t_ResInfoDLLUtil)
+			nRetVal = t_ResInfoDLLUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -932,21 +933,24 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 	
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_comp.so", t_EnvInfo->m_strDLLPath.c_str());
-		if(t_ASICOMPDLLUtil->LoadLibraryExt(szDLLName))
+		if(t_ASICOMPDLLUtil)
+			if(t_ASICOMPDLLUtil->LoadLibraryExt(szDLLName))
 		{
 			WriteLogE("load library fail : [%s][%d]", szDLLName, GetLastError());
 			return -12;
 		}
 		
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_rmlog.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_RemoveLogDLLUtil->LoadLibraryExt(szDLLName);
+		if(t_RemoveLogDLLUtil)
+			nRetVal = t_RemoveLogDLLUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
 			return -13;
 		}
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_ff.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_ASIFFDLLUtil->LoadLibraryExt(szDLLName);
+		if(t_ASIFFDLLUtil)
+			nRetVal = t_ASIFFDLLUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -970,7 +974,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_seed.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_SeedDLLUtil->LoadLibraryExt(szDLLName);
+		if(t_SeedDLLUtil)
+			nRetVal = t_SeedDLLUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0) 
 		{
 			WriteLogE("fail to load library : [%s][%d] : %s", szDLLName, nRetVal, strerror(errno));
@@ -978,7 +983,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_procinfo.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_ProcInfoDLLUtil->LoadLibraryExt(szDLLName);
+		if(t_ProcInfoDLLUtil)
+			nRetVal = t_ProcInfoDLLUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0) 
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -986,7 +992,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_devinfo.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_DevInfoDLLUtil->LoadLibraryExt(szDLLName);
+		if(t_DevInfoDLLUtil)
+			nRetVal = t_DevInfoDLLUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0) 
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -994,7 +1001,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_cltsock.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_LgnCltUtil->LoadLibraryExt(szDLLName);
+		if(t_LgnCltUtil)
+			nRetVal = t_LgnCltUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)	
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -1002,7 +1010,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_cltsock.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_MgrCltUtil->LoadLibraryExt(szDLLName);
+		if(t_MgrCltUtil)
+			nRetVal = t_MgrCltUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)	
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -1010,7 +1019,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_cltsock.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_UdtCltUtil->LoadLibraryExt(szDLLName);
+		if(t_UdtCltUtil)
+			nRetVal = t_UdtCltUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)	
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -1018,7 +1028,8 @@ INT32		CMainDlg::InitLoadLibrary()
 		}
 
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_svrsock.so", t_EnvInfo->m_strDLLPath.c_str());
-		nRetVal = t_LinkSvrUtil->LoadLibraryExt(szDLLName);
+		if(t_LinkSvrUtil)
+			nRetVal = t_LinkSvrUtil->LoadLibraryExt(szDLLName);
 		if(nRetVal != 0)
 		{
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
@@ -1052,9 +1063,10 @@ INT32		CMainDlg::InitSubClass()
 	}
 
 	{
-		
-		t_ProcInfoDLLUtil->Init();
-		t_DevInfoDLLUtil->Init();
+		if(t_ProcInfoDLLUtil)
+			t_ProcInfoDLLUtil->Init();
+		if(t_DevInfoDLLUtil)
+			t_DevInfoDLLUtil->Init();
 	}
 
 	return 0;

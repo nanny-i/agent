@@ -68,7 +68,10 @@ BOOL CProcUtil::ProcessStart(LPCSTR lpExeFileName, LPCSTR lpCommand, BOOL bWait,
 	char szCmd[CHAR_MAX_SIZE] = {0,};
 
 	if(lpExeFileName == NULL || lpExeFileName[0] == 0)
+	{
+		WriteLogE("[ProcessStart] invalid input data");
 		return FALSE;
+	}
 
 	if(lpCommand == NULL || lpCommand[0] == 0)
 		snprintf(szCmd, CHAR_MAX_SIZE-1, "%s\n", lpExeFileName);
@@ -77,7 +80,10 @@ BOOL CProcUtil::ProcessStart(LPCSTR lpExeFileName, LPCSTR lpCommand, BOOL bWait,
 	szCmd[CHAR_MAX_SIZE-1] = 0;
 
 	if(system(szCmd) == -1)
+	{
+		WriteLogE("[ProcessStart] fail to start %s (%d)", szCmd, errno);
 		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -105,6 +111,7 @@ INT32 CProcUtil::GetProcessID(LPCSTR lpProcName)
 	pDp = opendir("/proc");
 	if (pDp == NULL)
 	{
+		WriteLogE("[GetProcessID] fail to open proc dir (%d)", errno);
 		return 0;
 	}
 

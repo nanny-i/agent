@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "com_struct.h"
+#include "as_registry.h"
 #include "as_parse.h"
 #include "as_sha256.h"
 #include "as_zip.h"
@@ -35,7 +36,7 @@ void print_usage()
 {
 	printf("Examples : \n");
 	printf("\tupdate -z -v vesion -d zip_dir [-f zip_file_name]\n");
-	printf("\t# create a zip file from zip_dir. (default zip file name : ssa_lnx_x64_XXXXXXXX.upt)\n");
+	printf("\t# create a zip file from zip_dir. (default zip file name : ssa_lnx_x64_XXXXXXXX.zip)\n");
 	printf("\tupdate -u -f zip_file_name [-d ext_dir]\n");
 	printf("\t# update by a zip file to ext_dir. (default ext dir : /usr/local/ashin/nanny)\n");
 	printf("\tupdate -e -f zip_file_name [-d ext_dir]\n");
@@ -123,36 +124,11 @@ int set_opt(int argc, char *argv[], char *pcFileName, int nFileMax, char *pcPath
 	return nRetVal;
 }
 
-int get_nanny_agent_root(char *pRootPath, int nRootMax)
-{
-	HKEY hSubKey = NULL;
-	char szPath[MAX_PATH] = {0,};
-	DWORD dwDisp = 0;
-	DWORD dwType = 0;
-	DWORD cbData = MAX_PATH - 1;
-
-	if(pRootPath == NULL || nRootMax < 1)
-		return -1;
-
-	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_LOCAL_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp) != 0)
-	{
-		return -2;
-	}
-	if(RegQueryValueEx(hSubKey, "root_path", 0, &dwType, (PBYTE)szPath, MAX_PATH-1, &cbData) != 0)
-	{
-		RegCloseKey(hSubKey);
-		return -3;
-	}
-	RegCloseKey(hSubKey);
-	strncpy(pRootPath, szPath, nRootMax-1);
-	return 0;
-}
-
 int get_zip_path(char *pZipPath, int nMaxLen, char *pDirPath, char *pZipFileName)
 {
 	char acUpdatePath[MAX_PATH] = {0,};
 	char acTempPath[MAX_PATH] = {0,};
-	char acCurrentTime[CHAR_MAX_SIZE] = {0,};
+	char acCurrentTime[MAX_TIME_STR] = {0,};
 	int i = 0;
 	int nRet = 0;
 	if(pZipPath == NULL || nMaxLen < 1 || pDirPath == NULL)
@@ -173,7 +149,7 @@ int get_zip_path(char *pZipPath, int nMaxLen, char *pDirPath, char *pZipFileName
 		nRet = -3;
 		for(i=1; i<33;)
 		{
-			snprintf(acTempPath, MAX_PATH-1, "%s/ssa_lnx_x64_%s_%02d.udt", acUpdatePath, acCurrentTime, i);
+			snprintf(acTempPath, MAX_PATH-1, "%s/ssa_lnx_x64_%s_%02d.zip", acUpdatePath, acCurrentTime, i);
 			if(is_file(acTempPath) != 0)
 			{
 				strncpy(pZipPath, acTempPath, nMaxLen-1);
@@ -450,7 +426,7 @@ int main(int argc, char* argv[])
 			return 16;
 		}
 
-		unlink(acZipFileName);
+//		unlink(acZipFileName);
 
 		if(system(acShPath) == -1)
 		{

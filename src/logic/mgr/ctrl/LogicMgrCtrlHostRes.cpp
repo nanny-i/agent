@@ -88,7 +88,8 @@ INT32		CLogicMgrCtrlHostRes::AnalyzePkt_FromMgr_Ext_HostResInfo()
 	TListResInfoProcInfo tProcList;
 	if(nResType & HOST_RESINFO_PROCESS)
 	{
-		t_ProcInfoDLLUtil->GetProcessInfo(tProcList);
+		if(t_ProcInfoDLLUtil)
+			t_ProcInfoDLLUtil->GetProcessInfo(tProcList);
 		SendToken.TokenAdd_32(tProcList.size());
 		if(tProcList.size() > 0)
 		{
@@ -120,7 +121,8 @@ INT32		CLogicMgrCtrlHostRes::AnalyzePkt_FromMgr_Ext_HostResInfo()
 	TListResInfoNetStat tNetList;
 	if(nResType & HOST_RESINFO_NETSTAT)
 	{
-		t_ProcInfoDLLUtil->GetNetWorkInfo(tNetList);
+		if(t_ProcInfoDLLUtil)
+			t_ProcInfoDLLUtil->GetNetWorkInfo(tNetList);
 		SendToken.TokenAdd_32(tNetList.size());
 		if(tNetList.size() > 0)
 		{

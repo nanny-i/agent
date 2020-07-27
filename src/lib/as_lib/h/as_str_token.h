@@ -34,7 +34,7 @@ char *copy_token(char *pDst, int nDstMax, char *pSrc, int ch);
 
 int HexStringToInt(char *pHexString);
 int StringToInt(char *pString);
-
+UINT64 StringToUInt64(const char *pString);
 
 #endif /* _AS_STR_TOKEN_H_ */
 

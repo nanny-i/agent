@@ -97,7 +97,7 @@ INT32		CExecuteFileUtil::ExecuteFile_Udt()
 	char acZipFile[MAX_PATH] = {0,};
 	char acUdtExePath[MAX_PATH] = {0,};
 	char acUpdatePath[MAX_PATH] = {0,};
-	char acCommand[CHAR_MAX_SIZE] = {0,};
+	char acCommand[MAX_PATH] = {0,};
 	t_ManageFileDown->GetIDListByType(ASIFDL_DL_FILE_TYPE_UPDATE, tIDList);
 
 	if(tIDList.size() == 0)
@@ -114,10 +114,20 @@ INT32		CExecuteFileUtil::ExecuteFile_Udt()
 		snprintf(acZipFile, MAX_PATH-1, "%s/%s/%s", (char *)t_EnvInfo->m_strRootPath.c_str(), STR_DEPLOY_FILE_LOCAL_DOWN, pafi->szFileName);
 		snprintf(acUpdatePath, MAX_PATH-1, "%s/%s", (char *)t_EnvInfo->m_strRootPath.c_str(), STR_UNZIP_PATH_FOR_UPDATE);
 		snprintf(acCommand, MAX_PATH-1, "-u -f %s -d %s", acZipFile, acUpdatePath);
+		if(is_file(acZipFile) != 0)
+		{
+			char acTempFile[MAX_PATH] = {0,};
+			snprintf(acTempFile, MAX_PATH-1, "%s/%s/%s", (char *)t_EnvInfo->m_strRootPath.c_str(), STR_DEPLOY_FILE_LOCAL_TEMP, pafi->szFileName);
+			MoveFileEx(acTempFile, acZipFile);
+			if(is_file(acZipFile) != 0)
+			{
+				WriteLogE("[%s] fail to find zip file : [%s]", (char *)m_strUtilName.c_str(), acZipFile);
+				continue;
+			}
+		}
 
 		if(ChkFileHash(acZipFile, pafi->szFileHash))
 		{
-			WriteLogE("[%s] execute file udt invalid hash : [%s][%s]", (char *)m_strUtilName.c_str(), acZipFile, pafi->szFileHash);
 			continue;
 		}
 	
@@ -132,7 +142,7 @@ INT32		CExecuteFileUtil::ExecuteFile_Udt()
 
 		if(m_tProcUtil.ProcessStart(acUdtExePath, acCommand))
 		{
-			WriteLogN("[%s] start agent update file .. ", (char *)m_strUtilName.c_str());
+			WriteLogN("[%s] start agent update file : (%s %s)", (char *)m_strUtilName.c_str(), acUdtExePath, acCommand);
 			nRtn = 1;
 			break;
 		}
@@ -837,15 +847,25 @@ INT32		CExecuteFileUtil::ExecuteFile_WPtnGWO(INT32& nChgWPtn)
 
 INT32		CExecuteFileUtil::ChkFileHash(String strFileName, String strFileHash)
 {
+	INT nHashLen = 0;
 	char pszHashValue[CHAR_MAX_SIZE] = {0, };
 	
-	switch(strFileHash.length())
+	nHashLen = strFileHash.length();
+	switch(nHashLen)
 	{
-		case ASIHASH_SHA_TYPE_128_LEN:		SHAFile(ASIHASH_SHA_LEN_TYPE_128, strFileName.c_str(), pszHashValue, CHAR_MAX_SIZE-1);			break;
-		case ASIHASH_SHA_TYPE_256_LEN:		SHAFile(ASIHASH_SHA_LEN_TYPE_256, strFileName.c_str(), pszHashValue, CHAR_MAX_SIZE-1);			break;
+		case ASIHASH_SHA_TYPE_128_LEN:
+			SHAFile(ASIHASH_SHA_LEN_TYPE_128, strFileName.c_str(), pszHashValue, CHAR_MAX_SIZE-1);
+			break;
+		case ASIHASH_SHA_TYPE_256_LEN:
+			SHAFile(ASIHASH_SHA_LEN_TYPE_256, strFileName.c_str(), pszHashValue, CHAR_MAX_SIZE-1);
+			break;
 	}
 
-	if(_stricmp(strFileHash.c_str(), pszHashValue))	return -1;
+	if(_stricmp(strFileHash.c_str(), pszHashValue))
+	{
+		WriteLogE("[%s] invalid hash (%s) (%d) [%s : %s]", (char *)m_strUtilName.c_str(), strFileName.c_str(), nHashLen, strFileHash.c_str(), pszHashValue);
+		return -1;
+	}
 
 	return 0;
 }

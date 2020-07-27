@@ -52,6 +52,7 @@ INT32		CManageHostSys::LoadDBMS()
 		if(tDBHostSysList.size() == 0)
 		{
 			memset(&dhs, 0, sizeof(DB_HOST_SYS));
+			dhs.nUsedFlag = 1;
 			AddHostSys(dhs);
 		}
     	return g_nErrRtn;
@@ -66,6 +67,7 @@ INT32		CManageHostSys::LoadDBMS()
 	if(tDBHostSysList.size() == 0)
 	{
 		memset(&dhs, 0, sizeof(DB_HOST_SYS));
+		dhs.nUsedFlag = 1;
 		AddHostSys(dhs);
 	}
     return 0;
