@@ -29,8 +29,7 @@ using namespace std;
 typedef map<UINT32, string> ID2STRMAP;
 
 const char* root_key_nm[] = {"Setting db connection configurations", 
-							"Setting nanny agent configurations", 
-							"Clear nanny agent configurations",
+							"Setting nanny agent configurations",
 							NULL};
 
 const HKEY root_key[] = {(HKEY)(-1), (HKEY)(-1), HKEY_LOCAL_MACHINE, (HKEY)(-1), NULL};
@@ -45,7 +44,7 @@ void PrintMenuTitle(const char* root = "", const char* keyname = "")
 {
     system("clear");
 	printf("=======================================\n");
-    printf("Edit Nanny Agent for Linux configuration.\n");
+    printf("Edit Nanny Agent for Linux Configuration.\n");
 	printf("Build Date - %s\n", __DATE__);
     printf("=======================================\n\n");
 	if(root && strlen(root)) 
@@ -83,89 +82,84 @@ BOOL GetNannyAgentRoot(String& strPath)
 	return TRUE;
 }
 
-BOOL SetNannyAgentRoot(String strPath)
+int SetNannyAgentRoot(String strPath)
 {
 	HKEY hSubKey = NULL;
 	DWORD dwDisp = 0;
 	char acLogMsg[MAX_LOGMSG+1] = {0,};
+	if(strPath.length() == 0)
+	{
+		printf("invalid root path\n");
+		return 3;
+	}
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_LOCAL_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{
 		printf("fail to create key : %s\n", acLogMsg);
-		return FALSE;
+		return 4;
 	}
 	if(RegSetValueEx(hSubKey,  "root_path", 0, REG_SZ, (PBYTE)strPath.c_str(), strPath.length()+1) != 0)
 	{
 		printf("fail to set value key : %s\n", acLogMsg);
 		RegCloseKey(hSubKey);
-		return FALSE;
+		return 5;
 	}
 	RegCloseKey(hSubKey);
-	return TRUE;
+	return 0;
 }
 
-BOOL SetDBAccount(char* pszDBName = NULL, char* pszID = NULL)
+int SetDBAccount(char* pszDBName, char* pszID)
 {
 	HKEY hSubKey = NULL;
    	DWORD dwDisp = 0;
-	BOOL bRetVal = TRUE;
-	String strDBName;
-	String strID;
+	int nRetVal = 0;
+	int nLengh = 0;
 	char acLogMsg[MAX_LOGMSG+1] = {0,};
+
+	if(pszDBName == NULL || pszID == NULL)
+	{
+		printf("invalid input data\n");
+		return 3;
+	}
 
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_DB_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{
 		printf("fail to create key : %s\n", acLogMsg);
-		return FALSE;
+		return 4;
 	}
 
 	do{
-		if(pszDBName)
-			strDBName = pszDBName;
-
-		if(strDBName.length() == 0)
+		nLengh = (int)strlen(pszDBName);
+		if(nLengh < 1)
 		{
-			printf("DB Name : ");
-			getline(cin, strDBName);
-			if(strDBName.length() < 2)
-			{
-				printf("db name is too short\n");
-				bRetVal = FALSE;
-				break;
-			}
-		}	
-
-		if(RegSetValueEx(hSubKey,  "main_db_name", 0, REG_SZ, (PBYTE)strDBName.c_str(), strDBName.length()+1, acLogMsg) != 0)
+			printf("invalid db name (%d)\n", nLengh);
+			nRetVal = 5;
+			break;
+		}
+		if(RegSetValueEx(hSubKey, "main_db_name", 0, REG_SZ, (PBYTE)pszDBName, nLengh+1, acLogMsg) != 0)
 		{
 			printf("fail to set value main_db_name : %s\n", acLogMsg);
-			bRetVal = FALSE;
+			nRetVal = 6;
 			break;
 		}
 
-		if(pszID)
-			strID = pszID;
-
-		if(strID.length() == 0)
+		nLengh = (int)strlen(pszID);
+		if(nLengh < 1)
 		{
-			printf("DB Login ID : ");
-			getline(cin, strID);
-			if(strID.length() < 2)
-			{
-				printf("id is too short\n");
-				bRetVal = FALSE;
-				break;
-			}
+			printf("invalid db id (%d)\n", nLengh);
+			nRetVal = 7;
+			break;
 		}
-		
-		if(RegSetValueEx(hSubKey,  "main_db_account_id", 0, REG_SZ, (PBYTE)strID.c_str(), strID.length()+1, acLogMsg) != 0)
+
+		if(RegSetValueEx(hSubKey,  "main_db_account_id", 0, REG_SZ, (PBYTE)pszID, nLengh+1, acLogMsg) != 0)
 		{
 			printf("fail to set value main_db_account_id : %s\n", acLogMsg);
-			bRetVal = FALSE;
+			nRetVal = 8;
 			break;
 		}
-		bRetVal = TRUE;
+		nRetVal = 0;
 	}while(FALSE);
 	RegCloseKey(hSubKey);
-	return bRetVal;
+	return nRetVal;
 }
 
 BOOL GetDBInfo(DBMS_ACCOUNT_INFO& dai)
@@ -210,26 +204,27 @@ BOOL GetDBInfo(DBMS_ACCOUNT_INFO& dai)
 	return bRetVal;
 }
 
-BOOL SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
+int SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 {
 	HKEY hSubKey = NULL;
    	DWORD dwDisp = 0;
-	BOOL bRetVal = TRUE;
+	int nRetVal = 0;
 	int nPort = 0;
 	UINT32 dwIpAddr = INADDR_NONE;
 	String strLgnSvrInfo;
 	char acLogMsg[MAX_LOGMSG+1] = {0,};
 
+	
 	if(pcLgnSvrIp == NULL || pcLgnSvrPort == NULL)
 	{
 		printf("fail to set logon server info : invalid input data\n", acLogMsg);
-		return FALSE;
+		return 3;
 	}
 		
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_CON_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{
 		printf("fail to create key : %s\n", acLogMsg);
-		return FALSE;
+		return 4;
 	}
 
 	do{
@@ -237,21 +232,21 @@ BOOL SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 		if(dwIpAddr == (UINT32)INADDR_NONE)
 		{
 			printf("invalid ip address : %s\n", pcLgnSvrIp);
-			bRetVal = FALSE;
+			nRetVal = 5;
 			break;
 		}
 
 		if(is_valid_num(pcLgnSvrPort) != 0)
 		{
 			printf("invalid port : %s\n", pcLgnSvrPort);
-			bRetVal = FALSE;
+			nRetVal = 6;
 			break;
 		}
 		nPort = atoi(pcLgnSvrPort);
 		if(nPort < 1 || nPort > 65535)
 		{
 			printf("invalid port range : %d\n", nPort);
-			bRetVal = FALSE;
+			nRetVal = 7;
 			break;
 		}
 			
@@ -260,19 +255,20 @@ BOOL SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 		if(RegSetValueEx(hSubKey,  "lgn_svr_list", 0, REG_SZ, (PBYTE)strLgnSvrInfo.c_str(), strLgnSvrInfo.length()+1, acLogMsg) != 0)
 		{
 			printf("fail to set value lgn_svr_list : %s\n", acLogMsg);
-			bRetVal = FALSE;
+			nRetVal = 8;
 			break;
 		}
-		bRetVal = TRUE;
+		nRetVal = 0;
 	}while(FALSE);
 	RegCloseKey(hSubKey);
-	return bRetVal;
+	return nRetVal;
 }
 
 
 //-----------------------------------------------------------------------------------------------------------
 int ProcessArgs(int argc, char* argv[])
 {
+	int nRetVal = 1;
 	BOOL bValidArgs = FALSE;
 
 	if(strcmp(argv[1], "-rp") == 0) // root path setting
@@ -280,7 +276,7 @@ int ProcessArgs(int argc, char* argv[])
 		if(argc >= 3)
 		{   
 			bValidArgs = TRUE;
-			SetNannyAgentRoot(argv[2]);
+			nRetVal = SetNannyAgentRoot(argv[2]);
 		}
 	}
 	else if(strcmp(argv[1], "-db") == 0) // database setting
@@ -288,7 +284,7 @@ int ProcessArgs(int argc, char* argv[])
 		if(argc >= 4)
 		{
 			bValidArgs = TRUE;
-			SetDBAccount(argv[2], argv[3]); // dbname, id
+			nRetVal = SetDBAccount(argv[2], argv[3]); // dbname, id
 		}
 	}
 	else if(strcmp(argv[1], "-li") == 0) // logon server setting
@@ -296,7 +292,7 @@ int ProcessArgs(int argc, char* argv[])
 		if(argc >= 3)
 		{   
 			bValidArgs = TRUE;
-			SetLogonServer(argv[2], argv[3]); // ip, port
+			nRetVal = SetLogonServer(argv[2], argv[3]); // ip, port
 		}
 	}
 	if(bValidArgs == FALSE)
@@ -304,9 +300,10 @@ int ProcessArgs(int argc, char* argv[])
 		printf("usage1: -rp [agent root path]\n");
 		printf("usage2: -db [database name] [admin id]\n");
 		printf("usage3: -li [logon server ip] [logon server port]\n");
+		return 2;
 	}
 
-	return (int)bValidArgs;
+	return nRetVal;
 }
 
 int main(int argc, char* argv[])
@@ -318,6 +315,7 @@ int main(int argc, char* argv[])
 
 	HKEY hSubKey = NULL;
 	INT32 nIndex = 0;
+	INT32 nRetVal = 0;
 
 	char c = 'c';
 	string strCmd;
@@ -326,7 +324,7 @@ int main(int argc, char* argv[])
 		PrintMenuTitle();
 		INT32 i = 0;
 		printf("---------------------------------------\n");
-		while(root_key_nm[i] && i < 3)
+		while(root_key_nm[i] && i < 2)
 		{
 			printf("%d. %s\n", i+1, root_key_nm[i]);
 			i++;
@@ -343,7 +341,20 @@ int main(int argc, char* argv[])
 			{
 				case '1': // db settings
 					{
-						SetDBAccount();
+						String strDBName;
+						String strID;
+						printf("\n DB Name   : ");
+						getline(cin, strDBName);
+
+						printf(" DB Lgn ID : ");
+						getline(cin, strID);
+
+
+						nRetVal = SetDBAccount((char *)strDBName.c_str(), (char *)strID.c_str());
+						if(nRetVal == 0)
+							printf("\n Success to set db connection configurations\n\n");
+						else
+							printf("\n Fail to set db connection configurations (%d)\n\n", nRetVal);
 						printf("Press 'Enter' to continue ...\n");
                         getline(cin, strCmd);
 						c = 'p';
@@ -486,14 +497,6 @@ int main(int argc, char* argv[])
 							}
 						}
 					}
-				}
-				break;
-			case '3':
-				{
-					system("rm -rf /etc/naconf");
-					printf("Press 'Enter' to continue ...\n");
-					getline(cin, strCmd);
-					c = 'p';
 				}
 				break;
 			default:
