@@ -536,7 +536,7 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 
 			t_ManagePoFePtnOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po fe ptn op success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
-			SendToken.Clear();
+			SendToken.Clear(); 
 
 		}while(FALSE);
 

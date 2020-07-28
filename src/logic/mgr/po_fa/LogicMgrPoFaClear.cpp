@@ -194,6 +194,12 @@ INT32		CLogicMgrPoFaClear::IsExistSysOffSch()
 				continue;
 			}
 
+			// 20200728 add jhjung
+			if(!(t_EnvInfo->m_nHostSysType & pdpfcu->tDPH.nNotifyInfoID)) 
+			{
+				continue;				
+			}
+
 			if(pdpfcu->nSchType != SCHEDULE_PERIOD_TYPE_SHUTDOWN && pdpfcu->nSchType != SCHEDULE_PERIOD_TYPE_SHUTDOWN_EXT)		continue;
 
 			nRet = 1;
@@ -234,6 +240,12 @@ INT32		CLogicMgrPoFaClear::IsExistSysOffSchByPoPwr()
 			}
 
 			if(pdpfcu->nSchType != SCHEDULE_PERIOD_TYPE_SHUTDOWN_EXT)		continue;
+
+			// 20200728 add jhjung
+			if(!(t_EnvInfo->m_nHostSysType & pdpfcu->tDPH.nNotifyInfoID)) 
+			{
+				continue;				
+			}
 
 			nRet = 1;
 			break;
@@ -294,6 +306,12 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(UINT32 nUnitID, MEM_FIND_ORDER_INFO&
 	if(!pdpfcu || pdpfcu->tDPH.nUsedMode == STATUS_USED_MODE_OFF)
 	{ 
 		return -1;
+	}
+
+	// 20200728 add jhjung	
+	if(!(t_EnvInfo->m_nHostSysType & pdpfcu->tDPH.nNotifyInfoID))
+	{
+		return -1;				
 	}
 
 	return ApplyPolicy_Unit(pdpfcu, tMFOI);
@@ -428,6 +446,12 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 						PDB_PO_FA_ENV_UNIT pdb_unit_env = t_ManagePoFaEnvUnit->FindItem(*begin_e);
 						if(!pdb_unit_env || pdb_unit_env->tDPH.nUsedMode == STATUS_USED_MODE_OFF)
 							continue;
+
+						// 20200715 add jhjung
+						if(!(t_EnvInfo->m_nHostSysType & pdb_unit_env->tDPH.nNotifyInfoID))
+						{
+							continue;										
+						}
 
 						if(strScanPtn.empty() == FALSE)
 						{

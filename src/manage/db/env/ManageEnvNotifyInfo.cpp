@@ -304,6 +304,12 @@ INT32					CManageEnvNotifyInfo::IsExcludeNotifySchdule(UINT32 nPoType, UINT32 nP
 			if(!pdpfcu)
 				break;
 
+			// 20200728 add jhjung
+			if(!(t_EnvInfo->m_nHostSysType & pdpfcu->tDPH.nNotifyInfoID))
+			{
+				break;				
+			}
+
 			if(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_NOTIFY_EXCEPT_SCH_INFO)
 				nRtn = 1;
 

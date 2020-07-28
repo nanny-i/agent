@@ -310,7 +310,9 @@ INT32		CLogicMgrLogDoc::DeleteLogDoc(DB_LOG_DOC& dld)
 	if(dld.nOpType == SS_LOG_DOC_OP_TYPE_SCHEDULE || dld.nOpType == SS_LOG_DOC_OP_TYPE_SCHEDULE_DEMAND)
 	{
 		PDB_PO_FA_CLEAR_UNIT pdb_unit = t_ManagePoFaClearUnit->FindItem(dld.nPolicyType - ASI_EPS_APP_POLICY_GROUP_ID_FA_CLEAR);
-		if(pdb_unit)
+		// 20200728 edit jhjung
+	//	if(pdb_unit)
+		if(pdb_unit && (t_EnvInfo->m_nHostSysType & pdb_unit->tDPH.nNotifyInfoID))
 		{
 			nDelCnt			= pdb_unit->nDelCount;
 			nLimitSize		= pdb_unit->nLimitSize;
