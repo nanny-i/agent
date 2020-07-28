@@ -50,7 +50,7 @@ INT32			CDBMgrHostSys::LoadDB(TListDBHostSys& tDBHostSysList)
 {
     UINT32 nReadCnt = 0;
     DB_HOST_SYS dhs;
-
+	String strOsID;
     INT32 nIndex = 0;
 
 	m_strQuery = SPrintf("SELECT id, used_flag, "
@@ -66,8 +66,10 @@ INT32			CDBMgrHostSys::LoadDB(TListDBHostSys& tDBHostSysList)
     	
 		dhs.nID						= GetDBField_Int(nIndex++) ;
 		dhs.nUsedFlag				= GetDBField_Int(nIndex++) ;
-		
-		dhs.nOsID					= GetDBField_UInt64(nIndex++);
+		if(dhs.nUsedFlag == 0)
+			break;
+		strOsID						= GetDBField_String(nIndex++); 
+		dhs.nOsID					= StringToUInt64(strOsID.c_str());
 		dhs.nOsSP					= GetDBField_Int(nIndex++);
 		dhs.nOsPd					= GetDBField_Int(nIndex++);
 		dhs.strOsPdLux				= GetDBField_String(nIndex++);
@@ -86,13 +88,14 @@ INT32			CDBMgrHostSys::LoadDB(TListDBHostSys& tDBHostSysList)
 
 INT32			CDBMgrHostSys::InsertHostSys(DB_HOST_SYS& dhs)
 {
+	String strOsID = SPrintf("%llu", dhs.nOsID);
 	m_strQuery = SPrintf("INSERT INTO host_sys (used_flag,  "
 									"os_id, os_sp, os_pd, os_pd_lux, os_pa )"
 									"VALUES ( "
 									"%u, "
-									"'%I64u', %u, %u, '%s', %u);",
+									"'%s', %u, %u, '%s', %u);",
                                     dhs.nUsedFlag,
-									dhs.nOsID, dhs.nOsSP, dhs.nOsPd, dhs.strOsPdLux.c_str(), dhs.nOsPa);
+									strOsID.c_str(), dhs.nOsSP, dhs.nOsPd, dhs.strOsPdLux.c_str(), dhs.nOsPa);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -105,10 +108,11 @@ INT32			CDBMgrHostSys::InsertHostSys(DB_HOST_SYS& dhs)
 
 INT32			CDBMgrHostSys::UpdateHostSys(DB_HOST_SYS& dhs)
 {
+	String strOsID = SPrintf("%llu", dhs.nOsID);
 	m_strQuery = SPrintf("UPDATE host_sys SET "
-						"os_id='%I64u', os_sp=%u, os_pd=%u, os_pd_lux='%s', os_pa=%u "
+						"os_id='%s', os_sp=%u, os_pd=%u, os_pd_lux='%s', os_pa=%u "
 						"WHERE id=%u;",
-							dhs.nOsID, dhs.nOsSP, dhs.nOsPd, dhs.strOsPdLux.c_str(), dhs.nOsPa, 
+							strOsID.c_str(), dhs.nOsSP, dhs.nOsPd, dhs.strOsPdLux.c_str(), dhs.nOsPa, 
 							dhs.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

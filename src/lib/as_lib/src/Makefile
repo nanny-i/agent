@@ -20,7 +20,7 @@ $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -c $*.cpp
 
 clean:
-	/bin/rm -f $(TARGET) $(OBJ)
+	rm -f $(TARGET) $(OBJ)
 
 install:
-	/bin/cp -f $(TARGET) ../../../libs
+	cp -f $(TARGET) ../../../libs

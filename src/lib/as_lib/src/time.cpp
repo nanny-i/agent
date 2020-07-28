@@ -214,9 +214,9 @@ void			GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf)
 		return;
 
 	if(nDateTime == 0)
-		snprintf(lpBuf, CHAR_MAX_SIZE-1, "%.4d_%.2d_%.2d", dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday);
+		snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d", dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday);
 	else
-		snprintf(lpBuf, CHAR_MAX_SIZE-1, "%.4d_%.2d_%.2d %.2d:%.2d:%.2d",	dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday, dt->tm_hour, dt->tm_min, dt->tm_sec);
+		snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d %.2d:%.2d:%.2d",	dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday, dt->tm_hour, dt->tm_min, dt->tm_sec);
 }
 //-------------------------------------------------------------------------
 

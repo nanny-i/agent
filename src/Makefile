@@ -15,7 +15,7 @@ define inst_sub_dir
 set -e;										\
 	for instdir in $(INSTDIR); do						\
 		if [ -d "$${instdir}" ]; then					\
-			$(MAKE) $(@) --directory="$${instdir}" $(MAKEFLAGS);	\
+			$(MAKE) $(@) --directory="$${instdir}" $(MAKEFLAGS) $(INST_PKG);	\
 		fi								\
 	done
 endef
@@ -36,14 +36,14 @@ install:
 	
 clean:
 	@$(make_sub_dir)
-#	/bin/rm -f nannysvc
-#	/bin/rm -rf *.o
+#	rm -f nannysvc
+#	rm -rf *.o
 	make sys_clean
 
 sys_clean:
-	/bin/rm -f nannysvc
-	/bin/rm -f nannysvc.debug
-	/bin/rm -f *.o
+	rm -f nannysvc
+	rm -f nannysvc.debug
+	rm -f *.o
 
 sys_all:
 	$(CC) $(CFLAGS) -c Environment.cpp EnvironmentOp.cpp MainDlg.cpp MainDlg_Class.cpp MainDlg_DBSync.cpp MainDlg_SockEvt.cpp MainDlg_Util.cpp MainDlg_WMEvt.cpp NannyAgent.cpp
@@ -52,5 +52,5 @@ sys_all:
 #	objcopy --strip-debug nannysvc
 
 sys_install:
-	/usr/bin/cp -f nannysvc /usr/local/ashin/nanny/sbin
-	/usr/bin/cp -f nannysvc /home/share/install/media/nanny/sbin
+	cp -f nannysvc /usr/local/ashin/nanny/sbin
+	cp -f nannysvc $(AS_PKG_HOME)/nanny

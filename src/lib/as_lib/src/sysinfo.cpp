@@ -30,7 +30,7 @@
 #define CMD_ARG_NETIFACE_COUNT_HWADDR		"/sbin/ifconfig -a | grep inet | wc -l"
 #define CMD_ARG_NETIFACE_COUNT_ETHER		"/sbin/ifconfig -a | grep ether | wc -l"
 
-/* cpu ì½”??ê°œ?˜ë¥?ë°˜?˜ */
+/* cpu ì½??ê°?˜ë?ë°??*/
 int get_cpu_core_num(void)
 {
 	int  num = 0;
@@ -45,7 +45,7 @@ int get_cpu_core_num(void)
 }
 
 
-/* cpu ?€?…?„ ë°˜?˜ */
+/* cpu ?€???ë°??*/
 int get_cpu_type(char *cpu_type, int len)
 {
 	FILE  *fp = NULL;
@@ -89,7 +89,7 @@ int get_cpu_type(char *cpu_type, int len)
 	return 0;
 }
 
-/* cpu ??„ë¥?MHz ?¨ìœ„ë¡œ ë°˜?˜ */
+/* cpu ??„ë?MHz ?¨ìœ„ë¡?ë°??*/
 int get_cpu_speed(void)
 {
 	FILE  *fp = NULL;
@@ -166,7 +166,7 @@ int get_bios_date(char *pcBiosDate, int nMaxLen)
 }
 
 
-/* ?œ?¤í…œ ë©”ëª¨ë¦¬ ?©ëŸ‰?„ MB ?¨ìœ„ë¡œ ë°˜?˜ */
+/* ??¤í…œ ë©”ëª¨ë¦??©ëŸ‰??MB ?¨ìœ„ë¡?ë°??*/
 int get_total_mem(void)
 {
 	int nTotalMem = 0;
@@ -183,7 +183,7 @@ int get_total_mem(void)
 }
 
 
-/* ì´ ?”?¤í??©ëŸ‰?„ MB ?¨ìœ„ë¡œ ë°˜?˜ */
+/* ì´???¤í??©ëŸ‰??MB ?¨ìœ„ë¡?ë°??*/
 int get_total_disk_size(void)
 {
 	FILE    *fp_cmd = NULL;
@@ -239,7 +239,7 @@ int get_total_disk_size(void)
 }
 
 
-/* ?¤íŠ¸ì›Œ???¸í„°íŽ˜?´ìŠ?ê°œ?˜ë¥?ë°˜?˜ */
+/* ?¤íŠ¸????¸í„°??´ì?ê°?˜ë?ë°??*/
 int get_netiface_count(void)
 {
 	FILE  *fp_cmd = NULL;
@@ -253,9 +253,9 @@ int get_netiface_count(void)
 	fgets(buf, sizeof(buf), fp_cmd);
 	pclose(fp_cmd);
 
-	/* Linux ë°°í¬íŒ? ?°ë?ì²«ë?ì§?ì»¤ë§¨?œë¡œ ?¤íŠ¸ì›Œ???¸í„°íŽ˜?´ìŠ¤ì˜
-	 * ê°œ?˜ë¥??•?¸í•˜ì§€ ëª»í•  ?˜?„ ?ˆ?¼ë¯€ë¡œ ?ë²ˆì§?ì»¤ë§¨?œë¡œ ?œë²ˆ ?”
-	 * ?•?¸í•œ??	 */
+	/* Linux ë°°í¬????°ë?ì²«ë?ì§?ì»¤ë§¨?œë¡œ ?¤íŠ¸????¸í„°??´ìŠ¤??
+	 * ê°?˜ë???¸í•˜ì§€ ëª»í•  ?????¼ë?ë¡??ë²ˆì§?ì»¤ë§¨?œë¡œ ?œë²ˆ ??
+	 * ??¸í•œ??	 */
 	if (atoi(buf) == 0)
 	{
 		if ( (fp_cmd = popen(CMD_ARG_NETIFACE_COUNT_ETHER, "r")) == NULL)
@@ -547,7 +547,7 @@ int read_lsb_release(char *acOsName, int nMaxLen, UINT64 *pddwOsID, UINT32 *pdwO
 		return -1;
 
 	/* pipe() or fork() failed, failure! */
-	pPipe = popen("/usr/bin/lsb_release -d -s 2 > /dev/null", "r");
+	pPipe = popen("/usr/bin/lsb_release -d -s > /dev/null", "r");
 	if(pPipe == NULL)
 	{
 		return -2;

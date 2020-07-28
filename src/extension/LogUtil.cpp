@@ -24,58 +24,47 @@
 
 
 CMutexExt	glbm_MutexLog;
-char		glbm_LogFilePath[CHAR_MAX_SIZE] = {0, };
-char		glbm_LogFileName[CHAR_MAX_SIZE] = {0, };
+char		glbm_LogFilePath[MAX_PATH] = {0, };
+char		glbm_LogFileName[MAX_FILE_NAME] = {0, };
 UINT32		glbm_nRemainLog = 1;
 UINT32		glbm_nLogSKey = 0;
 
 void	WriteLogN(char* fmt,...)
 {
-	FILE *fp;
+	FILE *fp = NULL;
 	va_list args;
-	char	lpSaveFile[CHAR_MAX_SIZE] = {0, };
-	char	lpTimeBuf[CHAR_MAX_SIZE] = {0, };
-
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+/*
 	if(!glbm_nRemainLog)
 		return;
+*/
+	GetCurrentDateTime(0, acTimeBuf);
 
-	GetCurrentDateTime(0, lpTimeBuf);
-
-    if(glbm_LogFilePath[0])
-		strncpy(lpSaveFile, glbm_LogFilePath, CHAR_MAX_SIZE-1);
-	else
-		strncpy(lpSaveFile, "./log", CHAR_MAX_SIZE-1);
-	
-	make_dir(lpSaveFile);
-
-	if(glbm_LogFileName[0])
-		strcat_ext(lpSaveFile, glbm_LogFileName, CHAR_MAX_SIZE-1);
-	else
-		strcat_ext(lpSaveFile, "/system_log_", CHAR_MAX_SIZE-1);
-
-    strcat_ext(lpSaveFile, lpTimeBuf, CHAR_MAX_SIZE-1);
-    strcat_ext(lpSaveFile, ".txt", CHAR_MAX_SIZE-1);
+	if(glbm_LogFilePath[0] == 0)
+	{
+		char acRootPath[MAX_PATH] = {0, };
+		if(get_nanny_agent_root(acRootPath, MAX_PATH) != 0)
+			return;
+		snprintf(glbm_LogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
+	}
+	if(glbm_LogFileName[0] == 0)
+		strncpy(glbm_LogFileName, "/nanny_agt_sys_log_", MAX_FILE_NAME-1);
+	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", glbm_LogFilePath, glbm_LogFileName, acTimeBuf);
 	
     glbm_MutexLog.Lock();
 
-	fp = fopen(lpSaveFile, "a");
+	fp = fopen(acSaveFile, "at");
 	if(fp != NULL)
 	{
-		char lpLogBuf[CHAR_MAX_SIZE] = {0, };
-		char lpBuf[CHAR_MAX_SIZE] = {0, };
-		ZeroMemoryExt(lpTimeBuf);
-		GetCurrentDateTime(1, lpTimeBuf);
+		char acLogBuf[CHAR_MAX_SIZE] = {0, };
+		GetCurrentDateTime(1, acTimeBuf);
 		
 		va_start(args,fmt);
-		vsnprintf(lpBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
 		va_end(args);
 
-		if(!lpTimeBuf[0])
-			sprintf_ext(CHAR_MAX_SIZE, lpTimeBuf, "time value is null(%d).", errno);
-
-		sprintf_ext(CHAR_MAX_SIZE, lpLogBuf, "%s \t[Info]\t%s\r\n", lpTimeBuf, lpBuf);
-
-		fwrite(lpLogBuf, sizeof(CHAR), strlen(lpLogBuf), fp);
+		fprintf(fp, "%s\t[Info]\t%s\n", acTimeBuf, acLogBuf);
 
 		fclose(fp);
 	}
@@ -85,88 +74,47 @@ void	WriteLogN(char* fmt,...)
 
 void	WriteLogE(char* fmt,...)
 {
+/*
 	if(!glbm_nRemainLog)
 		return;
-
-    glbm_MutexLog.Lock();
-	FILE *fp;
+*/
+	FILE *fp = NULL;
 	va_list args;
-	char	lpSaveFile[CHAR_MAX_SIZE] = {0, };
-	char	lpTimeBuf[CHAR_MAX_SIZE] = {0, };
+	char	acSaveFile[MAX_PATH] = {0, };
+	char	acTimeBuf[MAX_TIME_STR] = {0, };
 	
-	GetCurrentDateTime(0, lpTimeBuf);
+	GetCurrentDateTime(0, acTimeBuf);
 
-    if(glbm_LogFilePath[0])
-		strncpy(lpSaveFile, glbm_LogFilePath, CHAR_MAX_SIZE-1);
-	else
-		strncpy(lpSaveFile, "./log", CHAR_MAX_SIZE-1);
-
-	make_dir(lpSaveFile);
-	
-	if(glbm_LogFileName[0])
-		strcat_ext(lpSaveFile, glbm_LogFileName, CHAR_MAX_SIZE-1);
-	else
-		strcat_ext(lpSaveFile, "/system_log_", CHAR_MAX_SIZE-1);
-
-    strcat_ext(lpSaveFile, lpTimeBuf, CHAR_MAX_SIZE-1);
-    strcat_ext(lpSaveFile, ".txt", CHAR_MAX_SIZE-1);
-	
-	if((fp =fopen(lpSaveFile, (glbm_nLogSKey ? "ab":"a"))) !=NULL)
+	if(glbm_LogFilePath[0] == 0)
 	{
-		char lpLogBuf[CHAR_MAX_SIZE] = {0, };
-		char lpBuf[CHAR_MAX_SIZE] = {0, };
-		ZeroMemoryExt(lpTimeBuf);
-		GetCurrentDateTime(1, lpTimeBuf);
+		char acRootPath[MAX_PATH] = {0, };
+		if(get_nanny_agent_root(acRootPath, MAX_PATH) != 0)
+			return;
+		snprintf(glbm_LogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
+	}
+	if(glbm_LogFileName[0] == 0)
+		strncpy(glbm_LogFileName, "/nanny_agt_sys_log_", MAX_FILE_NAME-1);
+
+	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", glbm_LogFilePath, glbm_LogFileName, acTimeBuf);
+
+	glbm_MutexLog.Lock();
+
+	fp =fopen(acSaveFile, "at");
+	if(fp != NULL)
+	{
+		char acLogBuf[CHAR_MAX_SIZE] = {0, };
+		GetCurrentDateTime(1, acTimeBuf);
 		
 		va_start(args,fmt);
-		vsnprintf(lpBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
 		va_end(args);
 
-		if(!lpTimeBuf[0])
-			sprintf_ext(CHAR_MAX_SIZE, lpTimeBuf, "time value is null(%d).", errno);
-
-		sprintf_ext(CHAR_MAX_SIZE, lpLogBuf, "%s \t[Error]\t%s\r\n", lpTimeBuf, lpBuf);
-
-		if(glbm_nLogSKey)	WriteLog_Enc(lpLogBuf, fp);
-		else				fwrite(lpLogBuf, sizeof(CHAR), strlen(lpLogBuf), fp);
+		fprintf(fp, "%s\t[Error]\t%s\n", acTimeBuf, acLogBuf);
 
 		fclose(fp);
 	}
 	glbm_MutexLog.UnLock();
 }
-//-------------------------------------------------------------------------
-
-/*
-void	WriteLogN(UINT32 nID,...)
-{
-	char lpfmt[CHAR_MAX_SIZE] = {0, };
-	char lpBuf[CHAR_MAX_SIZE] = {0, };
-
-	LoadStringExt(lpfmt, nID);
-	va_list args;
-	va_start(args, nID);
-	vsnprintf(lpBuf, CHAR_MAX_SIZE - 1, lpfmt, args);		
-	va_end(args);
-
-	WriteLogN(lpBuf);	
-}
-//-------------------------------------------------------------------------
-
-void	WriteLogE(UINT32 nID,...)
-{
-	char lpfmt[CHAR_MAX_SIZE] = {0, };
-	char lpBuf[CHAR_MAX_SIZE] = {0, };
-
-	LoadStringExt(lpfmt, nID);
-	va_list args;
-	va_start(args, nID);
-	vsnprintf(lpBuf, CHAR_MAX_SIZE - 1, lpfmt, args);		
-	va_end(args);
-
-	WriteLogE(lpBuf);
-}
-*/
-//-------------------------------------------------------------------------
 
 void	Encrypt_Log(UINT32	key, PBYTE SrcData,	INT32 SrcLen)
 {	
@@ -290,46 +238,45 @@ void	SetLogSKey(UINT32 nSKey)
 
 void    WriteLogN_Size(UINT32 nSize, LPCTSTR lpFileName, char* fmt,...)
 {
+/*
 	if(!glbm_nRemainLog)	return;
-
-	glbm_MutexLog.Lock();
-	FILE *fp;
+*/
+	
+	FILE *fp = NULL;
 	va_list args;
-	char	lpSaveFile[CHAR_MAX_SIZE] = {0, };
-	char	lpTimeBuf[CHAR_MAX_SIZE] = {0, };
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
 
-	GetCurrentDateTime(0, lpTimeBuf);
+	GetCurrentDateTime(0, acTimeBuf);
 
-	if(glbm_LogFilePath[0])
-		strncpy(lpSaveFile, glbm_LogFilePath, CHAR_MAX_SIZE-1);
-	else
-		strncpy(lpSaveFile, "./log", CHAR_MAX_SIZE-1);
 
-	make_dir(lpSaveFile);
-
-	strcat_ext(lpSaveFile, lpFileName, CHAR_MAX_SIZE-1);
-	strcat_ext(lpSaveFile, lpTimeBuf, CHAR_MAX_SIZE-1);
-	strcat_ext(lpSaveFile, ".txt", CHAR_MAX_SIZE-1);
-
-	if(GetFileSizeExt(lpSaveFile) > (1024 * 1024 * nSize))
+	if(glbm_LogFilePath[0] == 0)
 	{
-		unlink(lpSaveFile);
+		char acRootPath[MAX_PATH] = {0, };
+		if(get_nanny_agent_root(acRootPath, MAX_PATH) != 0)
+			return;
+		snprintf(glbm_LogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
 	}
 
-	if((fp =fopen(lpSaveFile, "a")) !=NULL)
+	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", glbm_LogFilePath, lpFileName, acTimeBuf);
+
+	if(GetFileSizeExt(acSaveFile) > (ASI_MEGABYTE * nSize))
 	{
-		char lpLogBuf[CHAR_MAX_SIZE] = {0, };
-		char lpBuf[CHAR_MAX_SIZE] = {0, };
-		ZeroMemoryExt(lpTimeBuf);
-		GetCurrentDateTime(1, lpTimeBuf);
+		unlink(acSaveFile);
+	}
+
+	glbm_MutexLog.Lock();
+	if((fp =fopen(acSaveFile, "a")) !=NULL)
+	{
+		char acLogBuf[CHAR_MAX_SIZE] = {0, };
+		GetCurrentDateTime(1, acTimeBuf);
 
 		va_start(args,fmt);
-		vsnprintf(lpBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
 		va_end(args);
 
-		sprintf_ext(CHAR_MAX_SIZE, lpLogBuf, "%s \t[Info]\t%s\r\n", lpTimeBuf, lpBuf);
+		fprintf(fp, "%s\t[Info]\t%s\n", acTimeBuf, acLogBuf);
 
-		fwrite(lpLogBuf, sizeof(CHAR), strlen(lpLogBuf), fp);
 		fclose(fp);
 	}
 	glbm_MutexLog.UnLock();
@@ -340,11 +287,11 @@ void	SetLogFileInfo(LPSTR lpLogPath, LPSTR lpLogName, INT32 nRmLog)
 {
 	glbm_nRemainLog = nRmLog;
 
-	memset(glbm_LogFilePath, 0, CHAR_MAX_SIZE);
-	memset(glbm_LogFileName, 0, CHAR_MAX_SIZE);
+	memset(glbm_LogFilePath, 0, MAX_PATH);
+	memset(glbm_LogFileName, 0, MAX_FILE_NAME);
 	if(lpLogPath != NULL && lpLogPath[0] != 0)
-		strncpy(glbm_LogFilePath, lpLogPath, CHAR_MAX_SIZE-1);
+		strncpy(glbm_LogFilePath, lpLogPath, MAX_PATH-1);
 	if(lpLogName != NULL && lpLogName[0] != 0)
-		strncpy(glbm_LogFileName, lpLogName, CHAR_MAX_SIZE-1);
+		strncpy(glbm_LogFileName, lpLogName, MAX_FILE_NAME-1);
 }
 //-------------------------------------------------------------------------

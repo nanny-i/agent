@@ -22,6 +22,7 @@
 #include "as_file.h"
 #include "as_string.h"
 #include "as_registry.h"
+#include "com_define_string.h"
 
 static vector<String> listRegKey;
 
@@ -417,5 +418,30 @@ long RegEnumValue(HKEY hKey, DWORD dwIndex, LPTSTR lpValueName, DWORD* lpcchValu
 	fclose(fp);
 	safe_free(pBuf);
 
+	return 0;
+}
+
+int get_nanny_agent_root(char *pRootPath, int nRootMax)
+{
+	HKEY hSubKey = NULL;
+	char szPath[MAX_PATH] = {0,};
+	DWORD dwDisp = 0;
+	DWORD dwType = 0;
+	DWORD cbData = MAX_PATH - 1;
+
+	if(pRootPath == NULL || nRootMax < 1)
+		return -1;
+
+	if(RegCreateKeyEx((HKEY)HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_LOCAL_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp) != 0)
+	{
+		return -2;
+	}
+	if(RegQueryValueEx(hSubKey, "root_path", 0, &dwType, (PBYTE)szPath, MAX_PATH-1, &cbData) != 0)
+	{
+		RegCloseKey(hSubKey);
+		return -3;
+	}
+	RegCloseKey(hSubKey);
+	strncpy(pRootPath, szPath, nRootMax-1);
 	return 0;
 }

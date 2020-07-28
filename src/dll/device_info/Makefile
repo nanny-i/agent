@@ -13,9 +13,9 @@ all: $(OBJ)
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 install:
-	/usr/bin/cp -f asi_devinfo.so /usr/local/ashin/nanny/dll
-	/usr/bin/cp -f asi_devinfo.so /home/share/install/media/nanny/dll
+	cp -f asi_devinfo.so /usr/local/ashin/nanny/dll
+	cp -f asi_devinfo.so $(AS_PKG_HOME)/nanny/dll
 
 clean:
-	/bin/rm -f $(OBJ)
-	/bin/rm -f asi_devinfo.so
+	rm -f $(OBJ)
+	rm -f asi_devinfo.so

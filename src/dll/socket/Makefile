@@ -22,12 +22,12 @@ all:
 	$(CC) -shared -o asi_cltsock.so ../common_util/*.o source_client/*.o ../../lib/as_lib/src/libascomm.a -L$(OPENSSL_PATH)/lib -lssl -lcrypto
 
 install:
-	/usr/bin/cp -f asi_svrsock.so /usr/local/ashin/nanny/dll
-	/usr/bin/cp -f asi_svrsock.so /home/share/install/media/nanny/dll
-	/usr/bin/cp -f asi_cltsock.so /usr/local/ashin/nanny/dll
-	/usr/bin/cp -f asi_cltsock.so /home/share/install/media/nanny/dll	
+	cp -f asi_svrsock.so /usr/local/ashin/nanny/dll
+	cp -f asi_svrsock.so $(AS_PKG_HOME)/nanny/dll
+	cp -f asi_cltsock.so /usr/local/ashin/nanny/dll
+	cp -f asi_cltsock.so $(AS_PKG_HOME)/nanny/dll	
 
 clean:
 	@$(make_sub_dir)
-	/bin/rm -f asi_svrsock.so
-	/bin/rm -f asi_cltsock.so
+	rm -f asi_svrsock.so
+	rm -f asi_cltsock.so

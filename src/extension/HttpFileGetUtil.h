@@ -40,8 +40,8 @@ using namespace std;
 class CHttpFileGetUtil  
 {
 public:
+	INT32 SendData(INT32 nSock, char *pMessage);
 	INT32 GetFile_Address(LPSTR lpAddress, LPSTR lpFile, LPSTR lpSaveedFileName, INT32 nPort = 80);
-	void SetRootPath(LPSTR lpRootPath);
 	INT32 GetFile_Host(LPSTR lpHostName, LPSTR lpFile, LPSTR lpSaveedFileName, INT32 nPort = 80);
 	void  EnableHttpUtil(INT32 nEnable = 1);
 public:	
@@ -49,8 +49,8 @@ public:
 	virtual ~CHttpFileGetUtil();
 
 private:
-	CHAR	m_lpRootPath[CHAR_MAX_SIZE];
 	INT32   m_nContinue;
+
 private:
 	INT32 GetHeaderResult(string strHeader);
 	INT32 GetRecvFileSize(string strHeader);

@@ -122,6 +122,13 @@ int StringToInt(char *pString)
     return (int)strtol(pString, NULL, 10);
 }
 
+UINT64 StringToUInt64(const char *pString)
+{
+	if(pString == NULL)
+		return 0;
+
+	return (UINT64)stoull(pString, NULL, 0);
+}
 
 static void token_append(str_token_t **token, char *str, int len)
 {

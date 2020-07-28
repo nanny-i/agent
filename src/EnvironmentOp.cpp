@@ -294,7 +294,7 @@ String			CEnvironmentOp::GetUdtDataSvrInfo()
 	for(begin; begin != end; begin++)
 	{
 		String strSvrInfo;
-		strSvrInfo = SPrintf("%s:%u;", begin->second.strSvrInfo, begin->second.nSvrPort);			
+		strSvrInfo = SPrintf("%s:%u;", begin->second.strSvrInfo.c_str(), begin->second.nSvrPort);			
 		strRtn += strSvrInfo;
 	}
 	return strRtn;

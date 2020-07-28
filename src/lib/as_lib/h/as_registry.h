@@ -46,7 +46,7 @@ extern long RegOpenKey(HKEY hKey, LPCTSTR lpSubKey, HKEY* phkResult, char *acLog
 extern long RegOpenKeyEx(HKEY hKey, LPCTSTR lpSubKey, DWORD ulOptions, DWORD samDesired, HKEY* phkResult, char *acLogMsg=NULL);
 extern long RegDeleteKey(HKEY hKey, LPCTSTR lpSubKey, char *acLogMsg=NULL);
 extern long RegDeleteValue(HKEY hKey, LPCTSTR lpValueName, char *acLogMsg=NULL);
-
+extern int get_nanny_agent_root(char *pRootPath, int nRootMax);
 #endif /* _AS_REGISTRY_H_ */
 
 
