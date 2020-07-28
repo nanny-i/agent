@@ -177,6 +177,25 @@ String					CManagePoPower::GetName(UINT32 nID)
     return pdpp->tDPH.strName;
 }
 //---------------------------------------------------------------------------
+
+INT32					CManagePoPower::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList)
+{
+	TMapIDItor begin, end;
+	begin = tSubIDMap.begin();	end = tSubIDMap.end();
+	for(begin; begin != end; begin++)
+	{
+		PDB_PO_POWER_PKG pdppp = t_ManagePoPowerPkg->FindItem(begin->first);
+		if(!pdppp)	continue;
+
+		PDB_PO_POWER_UNIT pdppu = t_ManagePoPowerUnit->FindItem(pdppp->tDPH.nUnitID);
+		if(!pdppu)	continue;
+
+		if(t_EnvInfo->m_nHostSysType & pdppu->tDPH.nNotifyInfoID)
+			tPkgIDList.push_back(pdppp->tDPH.nID);
+	}
+
+	return 0;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
@@ -230,6 +249,31 @@ INT32					CManagePoPower::SetPktHost(UINT32 nID, MemToken& SendToken)
 		for(begin; begin != end; begin++)
 		{
 			t_ManagePoPowerPkg->SetPktHost(begin->first, SendToken);
+		}
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32					CManagePoPower::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
+{
+	PDB_PO_POWER pdpp = FindItem(nID);
+	if(!pdpp)	return -1;
+
+	SetPkt(pdpp, SendToken);
+
+	{
+		TListID tPkgIDList;
+		GetHostSysTypePkgListID(pdpp->tDPH.tSubIDMap, tPkgIDList);	// OSType check
+
+		SendToken.TokenAdd_32(tPkgIDList.size());		
+
+		TListIDItor begin, end;
+		begin = tPkgIDList.begin();	end = tPkgIDList.end();
+		for(begin; begin != end; begin++)
+		{
+			t_ManagePoPowerPkg->SetPktHost(*begin, SendToken);
 		}
 	}
 

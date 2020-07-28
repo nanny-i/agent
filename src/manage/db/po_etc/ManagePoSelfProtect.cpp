@@ -178,6 +178,25 @@ String					CManagePoSelfProtect::GetName(UINT32 nID)
     return pdpsp->tDPH.strName;
 }
 //---------------------------------------------------------------------------
+
+INT32					CManagePoSelfProtect::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList)
+{
+	TMapIDItor begin, end;
+	begin = tSubIDMap.begin();	end = tSubIDMap.end();
+	for(begin; begin != end; begin++)
+	{
+		PDB_PO_SELF_PROTECT_PKG pdpspp = t_ManagePoSelfProtectPkg->FindItem(begin->first);
+		if(!pdpspp)	continue;
+
+		PDB_PO_SELF_PROTECT_UNIT pdpspu = t_ManagePoSelfProtectUnit->FindItem(pdpspp->tDPH.nUnitID);
+		if(!pdpspu)	continue;
+
+		if(t_EnvInfo->m_nHostSysType & pdpspu->tDPH.nNotifyInfoID)
+			tPkgIDList.push_back(pdpspp->tDPH.nID);
+	}
+
+	return 0;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
@@ -231,6 +250,31 @@ INT32					CManagePoSelfProtect::SetPktHost(UINT32 nID, MemToken& SendToken)
 		for(begin; begin != end; begin++)
 		{
 			t_ManagePoSelfProtectPkg->SetPktHost(begin->first, SendToken);
+		}
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32					CManagePoSelfProtect::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
+{
+	PDB_PO_SELF_PROTECT pdpsp = FindItem(nID);
+	if(!pdpsp)	return -1;
+
+	SetPkt(pdpsp, SendToken);
+
+	{
+		TListID tPkgIDList;
+		GetHostSysTypePkgListID(pdpsp->tDPH.tSubIDMap, tPkgIDList);	// OSType check
+
+		SendToken.TokenAdd_32(tPkgIDList.size());		
+
+		TListIDItor begin, end;
+		begin = tPkgIDList.begin();	end = tPkgIDList.end();
+		for(begin; begin != end; begin++)
+		{
+			t_ManagePoSelfProtectPkg->SetPktHost(*begin, SendToken);
 		}
 	}
 

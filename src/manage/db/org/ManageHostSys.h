@@ -38,6 +38,10 @@ public:
 	INT32			SetPkt(MemToken& SendToken);
     INT32			SetPkt(PDB_HOST_SYS pdhs, MemToken& SendToken);
 
+	// 20200724 add jhjung
+public:
+	INT32			SetHostSysType(UINT64 nOsID);
+
 public:
 	CManageHostSys();
     ~CManageHostSys();

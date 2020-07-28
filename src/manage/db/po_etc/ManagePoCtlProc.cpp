@@ -178,6 +178,25 @@ String					CManagePoCtlProc::GetName(UINT32 nID)
     return pdpcp->tDPH.strName;
 }
 //---------------------------------------------------------------------------
+
+INT32					CManagePoCtlProc::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList)
+{
+	TMapIDItor begin, end;
+	begin = tSubIDMap.begin();	end = tSubIDMap.end();
+	for(begin; begin != end; begin++)
+	{
+		PDB_PO_CTL_PROC_PKG pdpcpp = t_ManagePoCtlProcPkg->FindItem(begin->first);
+		if(!pdpcpp)	continue;
+
+		PDB_PO_CTL_PROC_UNIT pdpppu = t_ManagePoCtlProcUnit->FindItem(pdpcpp->tDPH.nUnitID);
+		if(!pdpppu)	continue;
+
+		if(t_EnvInfo->m_nHostSysType & pdpppu->tDPH.nNotifyInfoID)
+			tPkgIDList.push_back(pdpcpp->tDPH.nID);
+	}
+
+	return 0;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
@@ -231,6 +250,31 @@ INT32					CManagePoCtlProc::SetPktHost(UINT32 nID, MemToken& SendToken)
 		for(begin; begin != end; begin++)
 		{
 			t_ManagePoCtlProcPkg->SetPktHost(begin->first, SendToken);
+		}
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32					CManagePoCtlProc::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
+{
+	PDB_PO_CTL_PROC pdpcp = FindItem(nID);
+	if(!pdpcp)	return -1;
+
+	SetPkt(pdpcp, SendToken);
+
+	{
+		TListID tPkgIDList;
+		GetHostSysTypePkgListID(pdpcp->tDPH.tSubIDMap, tPkgIDList);	// OSType check
+
+		SendToken.TokenAdd_32(tPkgIDList.size());		
+
+		TListIDItor begin, end;
+		begin = tPkgIDList.begin();	end = tPkgIDList.end();
+		for(begin; begin != end; begin++)
+		{
+			t_ManagePoCtlProcPkg->SetPktHost(*begin, SendToken);
 		}
 	}
 

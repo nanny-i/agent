@@ -57,6 +57,8 @@ public:
 	UINT32		m_nLastOffTime;
 	INT32		m_nTsDebugMode;
 
+	UINT32		m_nHostSysType;
+
 public://Con
 	String		m_strLgnSvrInfoList;
 	UINT32		m_nLgnSvrInfoListMode;

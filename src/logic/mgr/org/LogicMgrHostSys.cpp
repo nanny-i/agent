@@ -91,10 +91,15 @@ INT32		CLogicMgrHostSys::AnalyzePkt_FromMgr_Edit_Ext()
 		pdhs->nOsPd == dhs.nOsPd && pdhs->nOsPa == dhs.nOsPa &&
 		pdhs->strOsPdLux == dhs.strOsPdLux)							return AZPKT_CB_RTN_SUCCESS_END;
 
-	pdhs->nOsID = dhs.nOsID;
-	pdhs->nOsSP = dhs.nOsSP;
-	pdhs->nOsPd = dhs.nOsPd;
-	pdhs->nOsPa = dhs.nOsPa;
+	// 20200724 add jhjung
+	if(pdhs->nOsID != dhs.nOsID)
+		t_ManageHostSys->SetHostSysType(dhs.nOsID);
+
+	pdhs->nOsID			= dhs.nOsID;
+	pdhs->nOsSP			= dhs.nOsSP;
+	pdhs->nOsPd			= dhs.nOsPd;
+	pdhs->nOsPa			= dhs.nOsPa;
+	pdhs->strOsPdLux	= dhs.strOsPdLux;	
 
 	if(SetER(t_ManageHostSys->EditHostSys(*pdhs)))
 	{
@@ -130,6 +135,9 @@ void		CLogicMgrHostSys::SendPkt_Edit()
 		dhs.nOsSP	= tSystemInfo.GetSPID();
 		dhs.nOsPa	= tSystemInfo.GetSystemPaType();
 		dhs.nOsPd	= tSystemInfo.GetSystemPdType();
+
+		// 20200724 add jhjung
+		//dhs.strOsPdLux	= "???????????????????????";
 	}
 	
 	PDB_HOST_SYS pdhs = t_ManageHostSys->FirstItem();
@@ -141,10 +149,12 @@ void		CLogicMgrHostSys::SendPkt_Edit()
 
 	do 
 	{
+		// 20200724 edit jhjung
 		if( pdhs->nOsID != dhs.nOsID ||
 			pdhs->nOsSP != dhs.nOsSP ||
 			pdhs->nOsPa != dhs.nOsPa ||
-			pdhs->nOsPd != dhs.nOsPd)
+			pdhs->nOsPd != dhs.nOsPd ||
+			pdhs->strOsPdLux != dhs.strOsPdLux)
 		{
 			break;
 		}

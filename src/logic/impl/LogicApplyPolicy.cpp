@@ -425,7 +425,9 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 				break;
 			}
 
-			t_ManagePoCtlPanel->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			// 20200724 edit jhjung
+		//	t_ManagePoCtlPanel->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoCtlPanel->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po ctl panel success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
@@ -440,7 +442,9 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 				break;
 			}
 
-			t_ManagePoCtlProc->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			// 20200724 edit jhjung
+		//	t_ManagePoCtlProc->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoCtlProc->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
 /*			
 			if(SetER(t_ASIEPSAPPDLLUtil->SetPoCtlProc(SendToken.GetData(), SendToken.GetLength())))
 			{
@@ -462,7 +466,9 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 				break;
 			}
 
-			t_ManagePoSelfProtect->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			// 20200724 edit jhjung		
+		//	t_ManagePoSelfProtect->SetPktHost(pCurPolicy->tDPH.nID, SendToken);	
+			t_ManagePoSelfProtect->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po self protect success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
@@ -477,7 +483,9 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 				break;
 			}
 
-			t_ManagePoFaEnv->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			// 20200724 edit jhjung		
+		//	t_ManagePoFaEnv->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoFaEnv->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po fa env success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
@@ -492,7 +500,9 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 				break;
 			}
 
-			t_ManagePoFaOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			// 20200724 edit jhjung		
+		//	t_ManagePoFaOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoFaOp->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po fa op success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
@@ -507,7 +517,9 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 				break;
 			}
 
-			t_ManagePoFaProc->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			// 20200724 edit jhjung		
+		//	t_ManagePoFaProc->SetPktHost(pCurPolicy->tDPH.nID, SendToken);	
+			t_ManagePoFaProc->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po fa proc success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 

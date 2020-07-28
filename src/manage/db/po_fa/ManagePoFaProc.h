@@ -40,11 +40,13 @@ public:
 
 public:
 	String					GetName(UINT32 nID);    
+	INT32					GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList);
 
 public:
 	INT32					SetPkt(MemToken& SendToken);
 	INT32					SetPkt(UINT32 nID, MemToken& SendToken);
 	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
+	INT32					SetPktHost_EPS(UINT32 nID, MemToken& SendToken);
 	INT32					SetPkt(PDB_PO_FA_PROC pdpfp, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_PO_FA_PROC& dpfp);
 

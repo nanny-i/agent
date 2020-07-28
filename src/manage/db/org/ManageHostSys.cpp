@@ -42,18 +42,12 @@ CManageHostSys::~CManageHostSys()
 //---------------------------------------------------------------------------
 
 INT32		CManageHostSys::LoadDBMS()
-{
-	DB_HOST_SYS dhs;
+{	
 	TListDBHostSys tDBHostSysList;
     TListDBHostSysItor begin, end;
 	
 	if(SetER(t_DBMgrHostSys->LoadExecute(&tDBHostSysList)))
-    {
-		if(tDBHostSysList.size() == 0)
-		{
-			memset(&dhs, 0, sizeof(DB_HOST_SYS));
-			AddHostSys(dhs);
-		}
+    {		
     	return g_nErrRtn;
     }
 
@@ -63,10 +57,17 @@ INT32		CManageHostSys::LoadDBMS()
     	AddItem(begin->nID, *begin);
     }
 
+	// 20200724  edit jhjung
 	if(tDBHostSysList.size() == 0)
 	{
+		DB_HOST_SYS dhs;
 		memset(&dhs, 0, sizeof(DB_HOST_SYS));
 		AddHostSys(dhs);
+	}
+	else
+	{
+		PDB_HOST_SYS pdhs = FirstItem();
+		if(pdhs)	SetHostSysType(pdhs->nOsID);
 	}
     return 0;
 }
@@ -162,5 +163,14 @@ INT32		CManageHostSys::SetPkt(PDB_HOST_SYS pdhs, MemToken& SendToken)
 //---------------------------------------------------------------------------
 //--------------------------------------------------------------------------- 
 
+INT32			CManageHostSys::SetHostSysType(UINT64 nOsID)
+{
+	if(nOsID < ASI_SYSTEM_ID_LAST)
+		t_EnvInfo->m_nHostSysType = ASI_SYSTEM_OS_TYPE_WIN;
+	else 
+		t_EnvInfo->m_nHostSysType = ASI_SYSTEM_OS_TYPE_LINUX;
 
+	return 0;
+}
+//--------------------------------------------------------------------------- 
 

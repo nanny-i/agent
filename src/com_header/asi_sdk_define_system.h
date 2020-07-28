@@ -97,7 +97,14 @@
 #define ASI_SYSTEM_TYPE_SERVER			0x00000002
 #define ASI_SYSTEM_TYPE_ALL				ASI_SYSTEM_TYPE_WORKSTATION | ASI_SYSTEM_TYPE_SERVER
 
+//--------------------------------------------------------------------
 
+#define ASI_SYSTEM_OS_TYPE_WIN			0x00000001
+#define ASI_SYSTEM_OS_TYPE_LINUX		0x00000002
+#define ASI_SYSTEM_OS_TYPE_UNIX			0x00000004
+
+#define ASI_SYSTEM_OS_TYPE_ALL			0x0000FFFF	/*ASI_SYSTEM_OS_TYPE_WIN | ASI_SYSTEM_OS_TYPE_LINUX | ASI_SYSTEM_OS_TYPE_UNIX*/
+//-----------------------------------------------------------------------
 
 #define PROCESSOR_ARCHITECTURE_INTEL            0
 #define PROCESSOR_ARCHITECTURE_ARM              5

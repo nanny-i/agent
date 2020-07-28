@@ -44,6 +44,8 @@ CEnvironment::CEnvironment()
 	m_nTsDebugMode				= 0;
 
 	t_RegUtil.SetRootPath(STR_REG_DEFAULT_SVC_PATH);
+
+	m_nHostSysType				= ASI_SYSTEM_OS_TYPE_ALL;
 }
 //---------------------------------------------------------------------------
 
