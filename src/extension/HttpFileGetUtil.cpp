@@ -20,15 +20,31 @@
 
 #include "stdafx.h"
 #include "com_struct.h"
+#include "as_time.h"
+#include "as_file.h"
 #include "HttpFileGetUtil.h"
 
 CHttpFileGetUtil::CHttpFileGetUtil()
 {
 	m_nContinue = 1;
+	m_nRemainDebugLog = 1;
+	m_nFileLogRetention = 5;
+	memset(m_acLogPath, 0, MAX_PATH);
+	memset(m_acLogFile, 0, MAX_PATH);
 }
 
 CHttpFileGetUtil::~CHttpFileGetUtil()
 {
+}
+
+void CHttpFileGetUtil::SetLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention)
+{
+	m_nRemainDebugLog = nRemainLog;
+	m_nFileLogRetention = nFileLogRetention;
+	if(pLogPath)
+		strncpy(m_acLogPath, pLogPath, MAX_PATH-1);
+	if(pLogFile)
+		strncpy(m_acLogFile, pLogFile, MAX_PATH-1);
 }
 
 void  CHttpFileGetUtil::EnableHttpUtil(INT32 nEnable)
@@ -104,7 +120,7 @@ INT32 CHttpFileGetUtil::GetFile_Address(LPSTR lpAddress, LPSTR lpFile, LPSTR lpS
 	char acSendMsg[CHAR_MAX_SIZE] = {0,};
 
 	WriteLog("\n\n---------------- Get File Recv Operation Start !! ---------------------------------------");
-	WriteLog("start date : %s, server [%s:%d], file [%s]", GetCurrentDateTime(1).c_str(), lpAddress, nPort, lpFile);
+	WriteLog("start server [%s:%d], file [%s]", lpAddress, nPort, lpFile);
 
 	nSock = socket (AF_INET, SOCK_STREAM, 0);
     if (nSock == -1)
@@ -349,7 +365,6 @@ INT32 CHttpFileGetUtil::GetFile_Address(LPSTR lpAddress, LPSTR lpFile, LPSTR lpS
 		return -109;
 	}
 	
-	WriteLog("end date : %s", GetCurrentDateTime(1).c_str());
 	WriteLog("**************** Get File Operation Success !! ***************************************\n\n");
 	
 	return 0;
@@ -385,49 +400,47 @@ void CHttpFileGetUtil::WriteLog(char *fmt,...)
 {
 	FILE *fp = NULL;
 	va_list args;
-	char acLogFile[MAX_PATH] = {0, };
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+	m_MutexHttpLog.Lock();
+	do{
+		if(m_nRemainDebugLog == 0)
+			break;
+		GetCurrentDateTime(0, acTimeBuf);
+		
+		if(m_acLogPath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(m_acLogPath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		if(m_acLogFile[0] == 0)
+			strncpy(m_acLogFile, "/nanny_agt_http_log_", MAX_PATH-1);
+		snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", m_acLogPath, m_acLogFile, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
 
-	if(t_EnvInfo == NULL)
-	{
-		return;
-	}
-	snprintf(acLogFile, MAX_PATH-1,  "%s/dm_http_download_%s.log", t_EnvInfo->m_strLogPath.c_str(), GetCurrentDateTime().c_str());
-	
-	if((fp =fopen(acLogFile, "a")) !=NULL)
-	{		
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(m_acLogPath, m_acLogFile, m_nFileLogRetention);
+		}
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
 		va_start(args,fmt);
-		
-		vfprintf(fp, fmt, args);
-		fprintf(fp, "\n");
-		fclose(fp);
-		
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
 		va_end(args);
-	}
+		fprintf(fp, "%s\t[Info]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	m_MutexHttpLog.UnLock();
 }
 
-String CHttpFileGetUtil::GetCurrentDateTime(INT32 nDateTime)
-{
-	String strResult;
-    time_t tTime = 0;
-    struct tm *pTime = NULL;
-	char acDate[16] = {0,} ;
-    char acTime[16] = {0,} ;
-
-	tTime = time(NULL);
-	pTime = localtime(&tTime);
-	if(pTime)
-	{
-		snprintf(acDate, 15, "%.4d_%.2d_%.2d", pTime->tm_year + 1900, pTime->tm_mon + 1, pTime->tm_mday);
-		snprintf(acTime, 15, "%.2d:%.2d:%.2d", pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
-	}
-    
-    if(nDateTime)
-        strResult = SPrintf("%s %s", acDate, acTime);
-    else
-        strResult = SPrintf("%s", acDate);
-
-    return strResult;
-}
 
 INT32 CHttpFileGetUtil::GetRecvFileSize(string strHeader)
 {	

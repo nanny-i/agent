@@ -31,11 +31,11 @@ INT32		CThreadSocket::Logic_CltLgn(INT32& nTotalPktCnt, INT32 nOncePktNum)
 {
 	PKT_DATA pkt_data;
 	CMainDlg* pMainDlg = (CMainDlg*)t_EnvInfoOp->GetMainHandle();
-	CCltSocketUtil*	tCltSocketUtil		= t_LgnCltUtil;
+	CCltSocketUtil*	tCltSocketUtil = t_LgnCltUtil;
 
 	if(pMainDlg == NULL || tCltSocketUtil == NULL)
 	{
-		WriteLogE("invalid logic clt lgn class");
+		WriteLogE("[Logic_CltLgn] invalid logic clt lgn class");
 		return 1;
 	}
 

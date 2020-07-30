@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "com_struct.h"
 #include "TokenString.h"
+#include "DownLoadFile.h"
 #include "Environment.h"
 
 
@@ -42,6 +43,9 @@ CEnvironment::CEnvironment()
 	m_nLastOffType				= 0;
 	m_nLastOffTime				= 0;
 	m_nTsDebugMode				= 0;
+
+	m_nDbLogRetention			= 30;
+	m_nFileLogRetention			= 5;
 
 	t_RegUtil.SetRootPath(STR_REG_DEFAULT_SVC_PATH);
 
@@ -114,18 +118,6 @@ INT32       CEnvironment::LoadEnv_Local()
 
 	m_strUtilPath = SPrintf("%s/%s", m_pszBuf, NANNY_UTIL_DIR);
 
-	{
-		m_strLogPath = SPrintf("%s/log", m_strRootPath.c_str());
-		CreateDirectory(m_strLogPath.c_str(), NULL);
-		SetLogFileInfo((char *)m_strLogPath.c_str(), "/nanny_agt_sys_log_");
-	}
-	
-	{
-		m_strDLLPath = SPrintf("%s/dll", m_strRootPath.c_str());
-		m_strPemCertFileName = SPrintf("%s/pem/nanny_agent_cert.pem", m_strRootPath.c_str());
-		m_strPemKeyFileName = SPrintf("%s/pem/nanny_agent_key.pem", m_strRootPath.c_str());
-	}
-
 	if(t_RegUtil.RegReadString(HKEY_LOCAL_MACHINE, "", "host_key", m_pszBuf, CHAR_MAX_SIZE))
 	{
 		strncpy(m_pszBuf, GetGUID().c_str(), CHAR_MAX_SIZE-1);
@@ -160,6 +152,33 @@ INT32       CEnvironment::LoadEnv_Local()
 		t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "boot_chk_time", m_nValue);
 	}
 	m_nBootChkTime = m_nValue;
+
+	if(t_RegUtil.RegReadInt(HKEY_LOCAL_MACHINE, "", "db_log_retention", m_nValue))
+	{
+		m_nValue = 30;
+		t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "db_log_retention", m_nValue);
+	}
+	m_nDbLogRetention = m_nValue;
+	
+	if(t_RegUtil.RegReadInt(HKEY_LOCAL_MACHINE, "", "file_log_retention", m_nValue))
+	{
+		m_nValue = 5;
+		t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "file_log_retention", m_nValue);
+	}
+	m_nFileLogRetention = m_nValue;
+
+	{
+		m_strLogPath = SPrintf("%s/log", m_strRootPath.c_str());
+		CreateDirectory(m_strLogPath.c_str(), NULL);
+		SetLogFileInfo((char *)m_strLogPath.c_str(), "/nanny_agt_sys_log_", 1, m_nFileLogRetention);
+		SetDLLogPath((char *)m_strLogPath.c_str(), "nanny_agt_http_log_", 1, m_nFileLogRetention);
+	}
+
+	{
+		m_strDLLPath = SPrintf("%s/dll", m_strRootPath.c_str());
+		m_strPemCertFileName = SPrintf("%s/pem/nanny_agent_cert.pem", m_strRootPath.c_str());
+		m_strPemKeyFileName = SPrintf("%s/pem/nanny_agent_key.pem", m_strRootPath.c_str());
+	}
 
 	t_RegUtil.SetRootPath(STR_REG_DEFAULT_SVC_PATH);
 	return 0;

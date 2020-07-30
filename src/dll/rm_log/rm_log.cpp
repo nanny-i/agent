@@ -30,204 +30,205 @@ void find_entry(DEL_FILE_LIST& FindList, int maxChkDay);
 
 int RemoveFileByDT(const char* lpFindPath, unsigned int nChkType, unsigned int nDay)
 {
-	DIR     *pDir = NULL;
-	time_t  CurrentTime, ChkTime;
-	char    DelFilePath[CHAR_MAX_SIZE] = {0,};
+	time_t  tCurrentTime, tChkTime;
+	char    acDelFilePath[CHAR_MAX_SIZE] = {0,};
 	int     nChkDay, nChkHour, nChkMin, nChkSec;
-	double  DiffTime;
-	struct stat FindStat, FileStat;
-	struct dirent entry, *result = NULL;
-	
+	double  dDiffTime;
+	struct stat stFileStat;
+	DIR     *pDir = NULL;
+	struct dirent *pDirEnt = NULL;
 
-	if (lstat(lpFindPath, &FindStat) != 0)
+	if(nChkType != FILE_DT_CHK_TYPE_WRITE && nChkType != FILE_DT_CHK_TYPE_ACCESS)
 	{
-		printf("[RemoveFileByDT] fail to stat %s %d\n", lpFindPath, errno);
+		return 0;
+	}
+
+	if(lpFindPath == NULL)
 		return -1;
-	}
-
-	if (S_ISDIR(FindStat.st_mode))
+	
+	if (lstat(lpFindPath, &stFileStat) != 0)
 	{
-		if ( (pDir = opendir(lpFindPath)) == NULL)
-		{
-			printf("[FindFileByLastDay] fail to open %s %d\n", lpFindPath, errno);
-			return -1;
-		}
-		while (readdir_r(pDir, &entry, &result) == 0 && result != NULL )
-		{
-			if (entry.d_ino == 0 ) {
-				continue;
-			}
-
-			if (strcmp(entry.d_name, ".") == 0 || strcmp(entry.d_name,"..") == 0) {
-				continue;
-			}
-			snprintf(DelFilePath, CHAR_MAX_SIZE-1, "%s/%s", lpFindPath, entry.d_name);
-			DelFilePath[CHAR_MAX_SIZE-1] = 0;
-
-			if (lstat(DelFilePath, &FileStat) != 0)
-			{
-				printf("[RemoveFileByDT] fail to stat %s %d\n", DelFilePath, errno);
-				return -1;
-			}
-			switch(nChkType)
-			{
-				case FILE_DT_CHK_TYPE_WRITE:
-					ChkTime = FileStat.st_mtime;
-					break;
-				case FILE_DT_CHK_TYPE_ACCESS:
-					ChkTime = FileStat.st_atime;
-					break;
-				default :
-					return 0;
-			}
-
-			time(&CurrentTime);
-
-			DiffTime = difftime(CurrentTime, ChkTime);
-
-			nChkDay = DiffTime / (60 * 60 * 24);
-			if (nChkDay < nDay)
-			{
-				continue;
-			}
-
-			unlink(DelFilePath);
-
-		}
-		closedir(pDir);
+		return -2;
 	}
+
+	if (!S_ISDIR(stFileStat.st_mode))
+	{
+		return 0;
+	}
+
+	if ( (pDir = opendir(lpFindPath)) == NULL)
+	{
+		return -3;
+	}
+
+	while((pDirEnt = readdir(pDir)) != NULL)
+	{
+		if (!_stricmp(pDirEnt->d_name, ".") || !_stricmp(pDirEnt->d_name,".."))
+		{
+			continue;
+		}
+
+		if(DT_REG != pDirEnt->d_type)
+		{
+			continue;
+		}
+
+		snprintf(acDelFilePath, CHAR_MAX_SIZE-1, "%s/%s", lpFindPath, pDirEnt->d_name);
+		acDelFilePath[CHAR_MAX_SIZE-1] = 0;
+
+		if (lstat(acDelFilePath, &stFileStat) != 0)
+		{
+			closedir(pDir);
+			return -4;
+		}
+
+		if(nChkType == FILE_DT_CHK_TYPE_WRITE)
+		{
+			tChkTime = stFileStat.st_mtime;
+		}
+		else if(nChkType == FILE_DT_CHK_TYPE_ACCESS)
+		{
+			tChkTime = stFileStat.st_atime;
+		}
+		time(&tCurrentTime);
+		dDiffTime = difftime(tCurrentTime, tChkTime);
+		nChkDay = dDiffTime / (60 * 60 * 24);
+		if (nChkDay < nDay)
+		{
+			continue;
+		}
+		unlink(acDelFilePath);
+	}
+	closedir(pDir);
 	
 	return 0;
 }
 
-int FindFileByLastDay(const char* lpFindPath, unsigned int nChkType, unsigned int nDay, 
-		DEL_FILE_LIST& DelFileList, time_t& tOldestDay)
+int FindFileByLastDay(const char* lpFindPath, unsigned int nChkType, unsigned int nDay, DEL_FILE_LIST& DelFileList, time_t& tOldestDay)
 {
-	DIR     *pDir = NULL;
-	struct dirent entry, *result = NULL;
-	char    DelFilePath[CHAR_MAX_SIZE] = {0,};
-	struct stat FileStat;
-	time_t  ChkTime;
-	UINT32 nChkDay;
+	DIR  *pDir = NULL;
+	struct dirent *pDirEnt = NULL;
+	char acDelFilePath[CHAR_MAX_SIZE] = {0,};
+	struct stat stFileStat;
+	time_t  tChkTime = 0;
+	UINT32 nChkDay = 0;
 
+	if(nChkType != FILE_DT_CHK_TYPE_WRITE && nChkType != FILE_DT_CHK_TYPE_ACCESS)
 	{
-		if ( (pDir = opendir(lpFindPath)) == NULL)
-		{
-			printf("[FindFileByLastDay] fail to open %s %d\n", lpFindPath, errno);
-			return -1;
-		}
-		while (readdir_r(pDir, &entry, &result) == 0 && result != NULL )
-		{
-			if (entry.d_ino == 0 )
-			{
-				continue;
-			}
-
-			if (strcmp(entry.d_name, ".") == 0 || strcmp(entry.d_name,"..") == 0)
-			{
-				continue;
-			}
-			snprintf(DelFilePath, CHAR_MAX_SIZE-1, "%s/%s", lpFindPath, entry.d_name);
-			DelFilePath[CHAR_MAX_SIZE-1] = 0;
-
-			if (lstat(DelFilePath, &FileStat) != 0)
-			{
-				printf("[FindFileByLastDay] fail to stat %s %d\n", DelFilePath, errno);
-				return -1;
-			}
-			if (S_ISDIR(FileStat.st_mode))
-			{
-				FindFileByLastDay(DelFilePath, nChkType, nDay, DelFileList, tOldestDay);
-
-			}
-			else if (S_ISREG(FileStat.st_mode))
-			{
-				switch(nChkType) {
-					case FILE_DT_CHK_TYPE_WRITE:
-						ChkTime = FileStat.st_mtime;
-						break;
-					case FILE_DT_CHK_TYPE_ACCESS:
-						ChkTime = FileStat.st_atime;
-						break;
-					default :
-						return 0;
-				}
-
-				nChkDay = ChkTime/(60*60*24);
-				if(tOldestDay == 0)
-					tOldestDay = nChkDay;
-				else if(tOldestDay > nChkDay)
-					tOldestDay = nChkDay;
-
-				DeleteFileList_t* FileInfoList = (DeleteFileList_t*)malloc(sizeof(DeleteFileList_t));
-				FileInfoList->nChkDay = nChkDay;
-				snprintf(FileInfoList->FilePath, sizeof(FileInfoList->FilePath)-1, "%s", lpFindPath);
-				snprintf(FileInfoList->FileName, sizeof(FileInfoList->FilePath)-1, "%s", entry.d_name);
-				DelFileList.push_back(FileInfoList);
-
-			}
-		}
-		closedir(pDir);
+		return 0;
 	}
+
+	if(lpFindPath == NULL)
+		return -1;
+
+	if ( (pDir = opendir(lpFindPath)) == NULL)
+	{
+		return -2;
+	}
+
+	while((pDirEnt = readdir(pDir)) != NULL)
+	{
+		if (strcmp(pDirEnt->d_name, ".") == 0 || strcmp(pDirEnt->d_name,"..") == 0)
+		{
+			continue;
+		}
+		snprintf(acDelFilePath, CHAR_MAX_SIZE-1, "%s/%s", lpFindPath, pDirEnt->d_name);
+		acDelFilePath[CHAR_MAX_SIZE-1] = 0;
+
+		if(DT_DIR == pDirEnt->d_type)
+		{
+			FindFileByLastDay(acDelFilePath, nChkType, nDay, DelFileList, tOldestDay);
+		}
+		else if(DT_REG == pDirEnt->d_type)
+		{
+			if (lstat(acDelFilePath, &stFileStat) != 0)
+			{
+				closedir(pDir);
+				return -3;
+			}
+			if(nChkType == FILE_DT_CHK_TYPE_WRITE)
+			{
+				tChkTime = stFileStat.st_mtime;
+			}
+			else if(nChkType == FILE_DT_CHK_TYPE_ACCESS)
+			{
+				tChkTime = stFileStat.st_atime;
+			}
+
+			nChkDay = tChkTime/(60*60*24);
+			if(tOldestDay == 0)
+				tOldestDay = nChkDay;
+			else if(tOldestDay > nChkDay)
+				tOldestDay = nChkDay;
+
+			DeleteFileList_t* pFileInfoList = (DeleteFileList_t*)malloc(sizeof(DeleteFileList_t));
+			if(pFileInfoList != NULL)
+			{
+				pFileInfoList->nChkDay = nChkDay;
+				snprintf(pFileInfoList->acFilePath, CHAR_MAX_SIZE-1, "%s", lpFindPath);
+				snprintf(pFileInfoList->acFileName, CHAR_MAX_SIZE-1, "%s", pDirEnt->d_name);
+				DelFileList.push_back(pFileInfoList);
+			}
+		}
+	}
+	closedir(pDir);
+	return 0;
 }
 
 int RemoveFileByLastDay(const char* lpFindPath, unsigned int nChkType, unsigned int nDay)
 {
-	struct stat FindStat;
+	struct stat stFindStat;
+	DeleteFileList_t* pInfo = NULL;
 
 	if(lpFindPath == NULL)
 	{
-		printf("[RemoveFileByLastDay] invalid input data\n");
 		return -1;
 	}
-	if (lstat(lpFindPath, &FindStat) != 0)
+	if (lstat(lpFindPath, &stFindStat) != 0)
 	{
-		printf("[RemoveFileByLastDay] fail to get stat %s %d\n", lpFindPath, errno);
-		return -1;
+		return -2;
 	}
 
 	time_t tOldestDay = 0;
-	DEL_FILE_LIST DelFileList;
+	DEL_FILE_LIST stDelFileList;
 
-	if (S_ISDIR(FindStat.st_mode)) 
+	if (S_ISDIR(stFindStat.st_mode)) 
 	{
-		FindFileByLastDay(lpFindPath, nChkType, nDay, DelFileList, tOldestDay);
-		find_entry(DelFileList, (UINT32)tOldestDay + nDay);
+		FindFileByLastDay(lpFindPath, nChkType, nDay, stDelFileList, tOldestDay);
+		find_entry(stDelFileList, (UINT32)tOldestDay + nDay);
 	}
 
 	delItor begin, end;	
-	begin = DelFileList.begin(); end = DelFileList.end();
+	begin = stDelFileList.begin(); end = stDelFileList.end();
 	for(;begin != end; begin++)	
 	{	
-		DeleteFileList_t* pInfo = *begin;		
-		delete pInfo;	    
+		pInfo = *begin;
+		safe_free(pInfo);
 	}
-	DelFileList.clear();	
+	stDelFileList.clear();	
 	
 	return 0;
 }
 
 void find_entry(DEL_FILE_LIST& FindList, int maxChkDay)
 {
-	DeleteFileList_t *list = NULL;
-	CHAR szFullPath[PATH_MAX] = {0,};
+	DeleteFileList_t *pList = NULL;
+	char szFullPath[CHAR_MAX_SIZE] = {0,};
 	
 	delItor begin, end;
 	begin = FindList.begin(); end = FindList.end();
 	for(;begin != end; begin++)
 	{
-		list = *begin;
-		if(list != NULL)
+		pList = *begin;
+		if(pList == NULL)
 		{
-			if (list->nChkDay < maxChkDay)
-			{
-				snprintf(szFullPath, PATH_MAX-1, "%s/%s", list->FilePath,list->FileName);
-				szFullPath[PATH_MAX-1] = 0;
-				if(unlink(szFullPath) == -1)
-				{
-					printf("[find_entry] fail to unlink %s %d\n", szFullPath, errno);
-				}
-			}
+			continue;
+		}
+		if (pList->nChkDay < maxChkDay)
+		{
+			snprintf(szFullPath, CHAR_MAX_SIZE-1, "%s/%s", pList->acFilePath,pList->acFileName);
+			szFullPath[CHAR_MAX_SIZE-1] = 0;
+			unlink(szFullPath);
 		}
 	}
 }

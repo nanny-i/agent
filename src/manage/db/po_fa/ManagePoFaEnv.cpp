@@ -178,20 +178,21 @@ String					CManagePoFaEnv::GetName(UINT32 nID)
 }
 //---------------------------------------------------------------------------
 
-INT32					CManagePoFaProc::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList)
+INT32					CManagePoFaEnv::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList)
 {
 	TMapIDItor begin, end;
 	begin = tSubIDMap.begin();	end = tSubIDMap.end();
 	for(begin; begin != end; begin++)
 	{
-		PDB_PO_FA_PROC_PKG pdpfpp = t_ManagePoFaProcPkg->FindItem(begin->first);
-		if(!pdpfpp)	continue;
+		PDB_PO_FA_ENV_PKG pdpfep = t_ManagePoFaEnvPkg->FindItem(begin->first);
+		if(!pdpfep)
+			continue;
 
-		PDB_PO_FA_PROC_UNIT pdpfpu = t_ManagePoFaProcUnit->FindItem(pdpfpp->tDPH.nUnitID);
-		if(!pdpfpu)	continue;
+		PDB_PO_FA_ENV_UNIT pdpfeu = t_ManagePoFaEnvUnit->FindItem(pdpfep->tDPH.nUnitID);
+		if(!pdpfeu)	continue;
 
-		if(t_EnvInfo->m_nHostSysType & pdpfpu->tDPH.nNotifyInfoID)
-			tPkgIDList.push_back(pdpfpp->tDPH.nID);
+		if(t_EnvInfo->m_nHostSysType & pdpfeu->tDPH.nNotifyInfoID)
+			tPkgIDList.push_back(pdpfeu->tDPH.nID);
 	}
 
 	return 0;
@@ -256,9 +257,9 @@ INT32					CManagePoFaEnv::SetPktHost(UINT32 nID, MemToken& SendToken)
 }
 //---------------------------------------------------------------------------
 
-INT32					CManagePoFaProc::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
+INT32					CManagePoFaEnv::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
 {
-	PDB_PO_FA_PROC pdpfp = FindItem(nID);
+	PDB_PO_FA_ENV pdpfp = FindItem(nID);
 	if(!pdpfp)	return -1;
 
 	SetPkt(pdpfp, SendToken);
@@ -273,7 +274,7 @@ INT32					CManagePoFaProc::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
 		begin = tPkgIDList.begin();	end = tPkgIDList.end();
 		for(begin; begin != end; begin++)
 		{
-			t_ManagePoFaProcPkg->SetPktHost(*begin, SendToken);
+			t_ManagePoFaEnvPkg->SetPktHost(*begin, SendToken);
 		}
 	}
 

@@ -172,79 +172,82 @@ int check_proc_exist_by_pid_file(const char *acPidPath, const char *acProcName)
 int check_proc_exist_by_name(const char *acProcName, int nExceptPid)
 {
 	FILE *fp = NULL;
-	DIR *dir = NULL;
-	char *tok, *last;
-	char buf[256] = { 0,};
-	char acFileName[MAX_PROC_PATH] = {0,};
+	char *pTok, *pLast;
+	char acBuf[MAX_PATH] = { 0,};
+	char acFileName[MAX_PATH] = {0,};
 	char *pcPath = NULL;
-	char delim[3] = { 0x09, 0x20, 0x00 }; /* tab, space */
-	struct dirent entry, *result = NULL;
+	char acDelim[3] = { 0x09, 0x20, 0x00 }; /* tab, space */
+	DIR *pDir = NULL;
+	struct dirent *pDirEnt = NULL;
 
-	pcPath = (char *)malloc(MAX_PROC_PATH);
+	if(acProcName == NULL)
+		return -1;
+
+	pcPath = (char *)malloc(MAX_PATH);
 	if(pcPath == NULL)
 	{
-		return -1;
-	}
-	memset(pcPath, 0, MAX_PROC_PATH);
-
-	if ( (dir = opendir("/proc")) == NULL)
-	{
-		safe_free(pcPath);
 		return -2;
 	}
+	memset(pcPath, 0, MAX_PATH);
 
-	while (readdir_r(dir, &entry, &result) == 0 && result != NULL)
+	if ( (pDir = opendir("/proc")) == NULL)
 	{
-		if (entry.d_name[0] < '0' || entry.d_name[0] > '9')
+		safe_free(pcPath);
+		return -3;
+	}
+
+	while((pDirEnt = readdir(pDir)) != NULL)
+	{
+		if (pDirEnt->d_name[0] < '0' || pDirEnt->d_name[0] > '9')
 		{
 			continue;
 		}
-		strncpy(acFileName, entry.d_name, MAX_PROC_PATH-1);
-		acFileName[MAX_PROC_PATH-1] = 0;
-		snprintf(pcPath, MAX_PROC_PATH-1, "/proc/%s/status", acFileName);
-		pcPath[MAX_PROC_PATH-1] = 0;
+		strncpy(acFileName, pDirEnt->d_name, MAX_PATH-1);
+		acFileName[MAX_PATH-1] = 0;
+		snprintf(pcPath, MAX_PATH-1, "/proc/%s/status", acFileName);
+		pcPath[MAX_PATH-1] = 0;
 
 		if ( (fp = fopen(pcPath, "r")) == NULL)
 		{
 			continue;
 		}
 
-		while (fgets(buf, sizeof(buf), fp))
+		while (fgets(acBuf, MAX_PATH-1, fp))
 		{
-			trim_line_feed(buf);
-			tok = strtok_r(buf, delim, &last);
-			if (tok == NULL)
+			trim_line_feed(acBuf);
+			pTok = strtok_r(acBuf, acDelim, &pLast);
+			if (pTok == NULL)
 			{
-				memset(buf, 0x00, sizeof(buf));
+				memset(acBuf, 0, MAX_PATH);
 				continue;
 			}
 
-			if (strcmp(tok, "Name:") != 0)
+			if (strcmp(pTok, "Name:") != 0)
 			{
-				memset(buf, 0x00, sizeof(buf));
+				memset(acBuf, 0, MAX_PATH);
 				continue;
 			}
 
-			tok = strtok_r(NULL, "", &last);
-			if (tok == NULL)
+			pTok = strtok_r(NULL, "", &pLast);
+			if (pTok == NULL)
 			{
-				memset(buf, 0x00, sizeof(buf));
+				memset(acBuf, 0, MAX_PATH);
 				continue;
 			}
 
-			if (strcmp(tok, acProcName) != 0)
+			if (strcmp(pTok, acProcName) != 0)
 			{
-				memset(buf, 0x00, sizeof(buf));
+				memset(acBuf, 0, MAX_PATH);
 				break;
 			}
 			else
 			{
-				if ( nExceptPid != 0 && nExceptPid == atoi(entry.d_name))
+				if ( nExceptPid != 0 && nExceptPid == atoi(pDirEnt->d_name))
 				{
 					break;
 				}
 				fclose(fp);
-				closedir(dir);
+				closedir(pDir);
 				safe_free(pcPath);
 				return ASI_PROC_EXIST;
 			}
@@ -253,7 +256,7 @@ int check_proc_exist_by_name(const char *acProcName, int nExceptPid)
 		fclose(fp);
 	}
 
-	closedir(dir);
+	closedir(pDir);
 	safe_free(pcPath);
 
 	return ASI_PROC_NOT_EXIST;

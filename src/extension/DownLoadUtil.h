@@ -72,6 +72,7 @@ private:
 
 public:
 	INT32			SetHomePath(LPCTSTR lpHomePathList, UINT32 nLen);
+	INT32			SetDLLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention);
 
 public:
 	INT32			AddDownLoadInfo(PASI_FDL_INFO pafi);

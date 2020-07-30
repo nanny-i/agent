@@ -23,11 +23,12 @@
 #include "LogUtil.h"
 
 
-CMutexExt	glbm_MutexLog;
-char		glbm_LogFilePath[MAX_PATH] = {0, };
-char		glbm_LogFileName[MAX_FILE_NAME] = {0, };
-UINT32		glbm_nRemainLog = 1;
-UINT32		glbm_nLogSKey = 0;
+CMutexExt	g_MutexLog;
+char		g_acLogFilePath[MAX_PATH] = {0, };
+char		g_acLogFileName[MAX_PATH] = {0, };
+UINT32		g_nRemainLog = 1;
+UINT32		g_nFileLogRetention = 5;
+UINT32		g_nLogSKey = 0;
 
 void	WriteLogN(char* fmt,...)
 {
@@ -35,74 +36,85 @@ void	WriteLogN(char* fmt,...)
 	va_list args;
 	char acSaveFile[MAX_PATH] = {0, };
 	char acTimeBuf[MAX_TIME_STR] = {0, };
-/*
-	if(!glbm_nRemainLog)
-		return;
-*/
-	GetCurrentDateTime(0, acTimeBuf);
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
 
-	if(glbm_LogFilePath[0] == 0)
-	{
-		char acRootPath[MAX_PATH] = {0, };
-		if(get_nanny_agent_root(acRootPath, MAX_PATH) != 0)
-			return;
-		snprintf(glbm_LogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
-	}
-	if(glbm_LogFileName[0] == 0)
-		strncpy(glbm_LogFileName, "/nanny_agt_sys_log_", MAX_FILE_NAME-1);
-	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", glbm_LogFilePath, glbm_LogFileName, acTimeBuf);
+	g_MutexLog.Lock();
+	do{
+		if(!g_nRemainLog)
+			break;
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(g_acLogFilePath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(g_acLogFilePath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		if(g_acLogFileName[0] == 0)
+			strncpy(g_acLogFileName, "/nanny_agt_sys_log_", MAX_PATH-1);
+		snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", g_acLogFilePath, g_acLogFileName, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(g_acLogFilePath, g_acLogFileName, g_nFileLogRetention);
+		}
 	
-    glbm_MutexLog.Lock();
-
-	fp = fopen(acSaveFile, "at");
-	if(fp != NULL)
-	{
-		char acLogBuf[CHAR_MAX_SIZE] = {0, };
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+			
 		GetCurrentDateTime(1, acTimeBuf);
-		
 		va_start(args,fmt);
 		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
 		va_end(args);
-
 		fprintf(fp, "%s\t[Info]\t%s\n", acTimeBuf, acLogBuf);
-
 		fclose(fp);
-	}
-	glbm_MutexLog.UnLock();
+	}while(FALSE);
+	g_MutexLog.UnLock();
 }
 //-------------------------------------------------------------------------
 
 void	WriteLogE(char* fmt,...)
 {
-/*
-	if(!glbm_nRemainLog)
-		return;
-*/
 	FILE *fp = NULL;
 	va_list args;
 	char	acSaveFile[MAX_PATH] = {0, };
 	char	acTimeBuf[MAX_TIME_STR] = {0, };
+	char	acLogBuf[CHAR_MAX_SIZE] = {0, };
+
+	g_MutexLog.Lock();
 	
-	GetCurrentDateTime(0, acTimeBuf);
+	do{
+		if(!g_nRemainLog)
+			break;
 
-	if(glbm_LogFilePath[0] == 0)
-	{
-		char acRootPath[MAX_PATH] = {0, };
-		if(get_nanny_agent_root(acRootPath, MAX_PATH) != 0)
-			return;
-		snprintf(glbm_LogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
-	}
-	if(glbm_LogFileName[0] == 0)
-		strncpy(glbm_LogFileName, "/nanny_agt_sys_log_", MAX_FILE_NAME-1);
+		if(g_acLogFilePath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(g_acLogFilePath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		if(g_acLogFileName[0] == 0)
+			strncpy(g_acLogFileName, "/nanny_agt_sys_log_", MAX_PATH-1);
 
-	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", glbm_LogFilePath, glbm_LogFileName, acTimeBuf);
+		GetCurrentDateTime(0, acTimeBuf);
 
-	glbm_MutexLog.Lock();
+		snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", g_acLogFilePath, g_acLogFileName, acTimeBuf);
 
-	fp =fopen(acSaveFile, "at");
-	if(fp != NULL)
-	{
-		char acLogBuf[CHAR_MAX_SIZE] = {0, };
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(g_acLogFilePath, g_acLogFileName, g_nFileLogRetention);
+		}
+
+		fp =fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
 		GetCurrentDateTime(1, acTimeBuf);
 		
 		va_start(args,fmt);
@@ -112,8 +124,8 @@ void	WriteLogE(char* fmt,...)
 		fprintf(fp, "%s\t[Error]\t%s\n", acTimeBuf, acLogBuf);
 
 		fclose(fp);
-	}
-	glbm_MutexLog.UnLock();
+	}while(FALSE);
+	g_MutexLog.UnLock();
 }
 
 void	Encrypt_Log(UINT32	key, PBYTE SrcData,	INT32 SrcLen)
@@ -208,7 +220,7 @@ void		WriteLog_Enc(LPTSTR lpLog, FILE* fp)
 	if(nEncLen <= 0)
 		return;
 
-	Encrypt_Log(glbm_nLogSKey, (PBYTE)lpLog, nEncLen);	
+	Encrypt_Log(g_nLogSKey, (PBYTE)lpLog, nEncLen);	
 
 	memcpy(lpEncBuff, &nEncLen, sizeof(INT16));
 	memcpy(lpEncBuff + 2, lpLog, nEncLen);
@@ -231,7 +243,7 @@ void		WriteLog_Enc(LPTSTR lpLog, FILE* fp)
 
 void	SetLogSKey(UINT32 nSKey)
 {
-	glbm_nLogSKey = nSKey;
+	g_nLogSKey = nSKey;
 	return;
 }
 //-------------------------------------------------------------------------------------------
@@ -239,7 +251,7 @@ void	SetLogSKey(UINT32 nSKey)
 void    WriteLogN_Size(UINT32 nSize, LPCTSTR lpFileName, char* fmt,...)
 {
 /*
-	if(!glbm_nRemainLog)	return;
+	if(!g_nRemainLog)	return;
 */
 	
 	FILE *fp = NULL;
@@ -250,22 +262,22 @@ void    WriteLogN_Size(UINT32 nSize, LPCTSTR lpFileName, char* fmt,...)
 	GetCurrentDateTime(0, acTimeBuf);
 
 
-	if(glbm_LogFilePath[0] == 0)
+	if(g_acLogFilePath[0] == 0)
 	{
 		char acRootPath[MAX_PATH] = {0, };
 		if(get_nanny_agent_root(acRootPath, MAX_PATH) != 0)
 			return;
-		snprintf(glbm_LogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
+		snprintf(g_acLogFilePath, MAX_PATH-1, "%s/nanny/log", acRootPath);
 	}
 
-	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", glbm_LogFilePath, lpFileName, acTimeBuf);
+	snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", g_acLogFilePath, lpFileName, acTimeBuf);
 
 	if(GetFileSizeExt(acSaveFile) > (ASI_MEGABYTE * nSize))
 	{
 		unlink(acSaveFile);
 	}
 
-	glbm_MutexLog.Lock();
+	g_MutexLog.Lock();
 	if((fp =fopen(acSaveFile, "a")) !=NULL)
 	{
 		char acLogBuf[CHAR_MAX_SIZE] = {0, };
@@ -279,19 +291,20 @@ void    WriteLogN_Size(UINT32 nSize, LPCTSTR lpFileName, char* fmt,...)
 
 		fclose(fp);
 	}
-	glbm_MutexLog.UnLock();
+	g_MutexLog.UnLock();
 }
 //-------------------------------------------------------------------------
 
-void	SetLogFileInfo(LPSTR lpLogPath, LPSTR lpLogName, INT32 nRmLog)
+void	SetLogFileInfo(LPSTR lpLogPath, LPSTR lpLogName, INT32 nRmLog, UINT32 nFileLogRetention)
 {
-	glbm_nRemainLog = nRmLog;
+	g_nRemainLog = nRmLog;
+	g_nFileLogRetention = nFileLogRetention;
 
-	memset(glbm_LogFilePath, 0, MAX_PATH);
-	memset(glbm_LogFileName, 0, MAX_FILE_NAME);
+	memset(g_acLogFilePath, 0, MAX_PATH);
+	memset(g_acLogFileName, 0, MAX_PATH);
 	if(lpLogPath != NULL && lpLogPath[0] != 0)
-		strncpy(glbm_LogFilePath, lpLogPath, MAX_PATH-1);
+		strncpy(g_acLogFilePath, lpLogPath, MAX_PATH-1);
 	if(lpLogName != NULL && lpLogName[0] != 0)
-		strncpy(glbm_LogFileName, lpLogName, MAX_FILE_NAME-1);
+		strncpy(g_acLogFileName, lpLogName, MAX_PATH-1);
 }
 //-------------------------------------------------------------------------

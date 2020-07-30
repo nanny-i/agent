@@ -61,6 +61,15 @@ INT32	CDownLoadUtil::SetHomePath(LPCSTR lpHomePathList, UINT32 nLen)
 	}
 	return 0;
 }
+
+INT32	CDownLoadUtil::SetDLLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention)
+{
+	if(pLogPath == NULL || pLogFile == NULL)
+		return -1;
+	t_HttpFileGetUtil.SetLogPath(pLogPath, pLogFile, nRemainLog, nFileLogRetention);
+	return 0;
+}
+
 //--------------------------------------------------------------------
 
 INT32	CDownLoadUtil::AddDownLoadInfo(PASI_FDL_INFO pafi)
@@ -143,8 +152,6 @@ INT32	CDownLoadUtil::SetDownloadInit(PASI_FDL_INIT pafdli)
 		return -1;
 
 	m_tAFDLI = *pafdli;	
-
-	SetLogFileInfo(m_tAFDLI.szLogPath, m_tAFDLI.szLogFile);
 
 	strncpy(acPtoPHomePath, pafdli->szHomePath, CHAR_MAX_SIZE-1);
 	strncpy(acPtoPTempPath, pafdli->szTempPath, CHAR_MAX_SIZE-1);

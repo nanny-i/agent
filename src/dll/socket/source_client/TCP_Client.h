@@ -87,7 +87,6 @@ private:
 	static void *SendThread(LPVOID lParam);
 	void	FreeResource();
 	INT32	MakeSendBuf(UINT16 type, UINT16 code, UINT32 length, PVOID lpBuf, PVOID *lpOutput);
-	void	GetCurrentDateTime(INT32 nDateTime, LPSTR lpBuf, DWORD dwLen);
 	INT32	Connect();
 	INT32	Connect_Normal();
 	INT32	Connect_SSL();

@@ -28,7 +28,7 @@ void	WriteLogE(char* fmt,...);
 //void	WriteLogN(UINT32 nID,...);
 //void	WriteLogE(UINT32 nID,...);
 void    WriteLogN_Size(UINT32 nSize, LPCTSTR lpFileName, char* fmt,...);
-void	SetLogFileInfo(LPSTR lpLogPath, LPSTR lpLogName, INT32 nRmLog = 1);
+void	SetLogFileInfo(LPSTR lpLogPath, LPSTR lpLogName, INT32 nRmLog = 1, UINT32 nFileLogRetention = 5);
 
 void	Encrypt_Log(UINT32	key, PBYTE SrcData,	INT32 SrcLen);
 void	Decript_Log(UINT32	key, PBYTE SrcData,	INT32 SrcLen);

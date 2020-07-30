@@ -46,6 +46,9 @@ CTCP_Client::CTCP_Client()
 
 	memset(&m_InitData, 0, sizeof(m_InitData));
 	memset(&m_NotifyMsg, 0, sizeof(m_NotifyMsg));
+
+	m_InitData.nRemainDebugLog = 1;
+	m_InitData.m_nFileLogRetention = 5;
 	
 	memset(&m_SA, 0, sizeof(SOCKADDR_IN));
 
@@ -77,8 +80,16 @@ INT32 CTCP_Client::StartClient(LPCTSTR lpAddress, UINT32 dwPort, SOCK_NOTIFY_MSG
 	INT32 nRetVal = 0;
 	UINT32 dwEncType = ASI_PKT_ENC_TYPE_SEED_SHA2;
 
+	if(pClassName)
+		strncpy(m_acClassName, pClassName, MAX_TYPE_LEN-1);
+	else
+		strncpy(m_acClassName, "unknown", MAX_TYPE_LEN-1);
+
 	if(lpAddress == NULL || dwPort == 0 || dwPort > 65536)
+	{
+		WriteLog("[Error] [%s] [StartClient] invalid input data (-1)", m_acClassName);
 		return -1;
+	}
 
 	
 	memcpy(&m_InitData, &init_data, sizeof(m_InitData));
@@ -101,6 +112,7 @@ INT32 CTCP_Client::StartClient(LPCTSTR lpAddress, UINT32 dwPort, SOCK_NOTIFY_MSG
 
 	if (m_InitData.nPktEncType == ASI_PKT_ENC_TYPE_SSL && m_tSSLSockUtil.Init_SSL(0))			
 	{
+		WriteLog("[Error] [%s] [StartClient] fail to init ssl (-2) (%d)", m_acClassName, errno);
 		return -2;
 	}
 
@@ -116,10 +128,10 @@ INT32 CTCP_Client::StartClient(LPCTSTR lpAddress, UINT32 dwPort, SOCK_NOTIFY_MSG
 			break;
 		}
 		m_IsRunThreadRecv = 1;
+		m_bContinue = TRUE;
 		if (pthread_create(&m_tRecvThread, NULL, RecvThread, (void *)this) != 0)
 		{
-			if(pClassName)
-				WriteLog("[%s] fail to create recv thread errno [%d]", pClassName, errno);
+			WriteLog("[Error] [%s] [StartClient] fail to create recv thread (-3) (%d)", m_acClassName, errno);
 			nRetVal = -3;
 			break;
 		}
@@ -129,20 +141,21 @@ INT32 CTCP_Client::StartClient(LPCTSTR lpAddress, UINT32 dwPort, SOCK_NOTIFY_MSG
 			m_IsRunThreadSend = 1;
 			if (pthread_create(&m_tSendThread, NULL, SendThread, (void *) this) != 0)
 			{
-				if(pClassName)
-					WriteLog("[%s] fail to create send thread errno [%d]", pClassName, errno);
+				WriteLog("[Error] [%s] [StartClient] fail to create send thread (-4) (%d)", m_acClassName, errno);
 				nRetVal = -4;
 				break;
 			}
 		}
 		nRetVal = 0;
-		if(pClassName)
-			strncpy(m_acClassName, pClassName, MAX_TYPE_LEN-1);
+
+		WriteLog("[Info] [%s] [StartClient] success to connect %s:%d", m_acClassName, lpAddress, dwPort);
+
 	}while(FALSE);
 	if(nRetVal != 0)
 	{
 		FreeResource();
 		StopClient();
+		m_bContinue = FALSE;
 	}
 
 	return nRetVal;	
@@ -186,6 +199,8 @@ INT32 CTCP_Client::CloseSocket(INT32 nFlag)
 		{
 			sock_evt_prop.nEventID	= ASI_SOCKET_EVENT_DISCONNECT;
 			AddEvtWithPktLock(sock_evt_prop);
+			WriteLog("[Info] [%s] [RecvThread] add socket event disconnect", m_acClassName);
+			Sleep(500);
 		}
 
 		RemovePktWithPktLock();
@@ -288,7 +303,9 @@ void *CTCP_Client::SendThread(LPVOID lParam)
 	pthread_detach(pthread_self());
 
 	pTcpClient->m_IsRunThreadSend = 2;
-		
+	
+	pTcpClient->WriteLog("[Info] [%s] [SendThread] send thread start (%d)", pTcpClient->m_acClassName, pTcpClient->m_bContinue);
+
 	while (pTcpClient->m_bContinue)
 	{
 		if (pTcpClient->m_bConnected == FALSE)	
@@ -308,6 +325,8 @@ void *CTCP_Client::SendThread(LPVOID lParam)
 		Sleep(10);
 	}	
 
+	pTcpClient->WriteLog("[Info] [%s] [SendThread] send thread end", pTcpClient->m_acClassName);
+
 	pTcpClient->m_IsRunThreadSend = 0;
 	return (void *)NULL;
 }
@@ -323,19 +342,20 @@ INT32	CTCP_Client::Send(UINT16 wType, UINT16 wCode, UINT32 dwLength, PVOID pData
 	
 	if (m_bConnected == FALSE)
 	{
+		WriteLog("[Info] [%s] [Send] close to thread (-1)", m_acClassName);
 		return -1;
 	}
 
 	if (dwLength > MAKE_BUFFER_MAX_SIZE || dwLength == 0)
 	{
-		WriteLog("[Send] invalid send length : [type:%d][code:%d][length:%d]", wType, wCode, dwLength);
+		WriteLog("[Error] [%s] [Send] invalid send length : [type:%d][code:%d][length:%d] (-2)", m_acClassName, wType, wCode, dwLength);
 		return -2;
 	}	
 
 	nMakeBufSize = MakeSendBuf(wType, wCode, dwLength, pData, &lpOutput);
 	if (nMakeBufSize < 1)
 	{
-		WriteLog("[Send] fail to make buf size is [%d]", nMakeBufSize);
+		WriteLog("[Error] [%s] [Send] fail to make buf size is [%d] (-3) (%d)", m_acClassName, nMakeBufSize, errno);
 		return -3;
 	}
 
@@ -376,11 +396,17 @@ INT32	CTCP_Client::SendCoreWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 	INT32 nStatePos = 0;
 	
 	if(pPktData == NULL)
+	{
+		WriteLog("[Error] [%s] [SendCoreWithSndPktLock] invalid input data (-1)", m_acClassName);
 		return -1;
+	}
 	nMakeBufSize = pPktData->hdr.length;
 	pcOutput = (char *)pPktData->body.data;
 	if(nMakeBufSize < 1 || pcOutput == NULL)
+	{
+		WriteLog("[Error] [%s] [SendCoreWithSndPktLock] invalid input data (-2)", m_acClassName);
 		return -2;
+	}
 
 	pthread_mutex_lock(&m_pkt_send_mutex);
 	while(nSendedSize < nMakeBufSize && nRtn == 0)
@@ -403,15 +429,15 @@ INT32	CTCP_Client::SendCoreWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 				}
 				else
 				{
+					WriteLog("[Info] [%s] [SendCoreWithSndPktLock] send time out. socket close (-3) (%d)", m_acClassName, nTimeOut);
 					nRtn = -3;
-					WriteLog("[SendCore] send data wouldblock error. errno [%d]", errno);
 					CloseSocket();
 					break;
 				}
 			}
 			else
 			{
-				WriteLog("[SendCore] send data error. errno [%d], close socket", errno);
+				WriteLog("[Error] [%s] [SendCoreWithSndPktLock] fail to send. socket close (-4) (%d)", m_acClassName, errno);
 				CloseSocket();
 				nRtn = -4;
 				break;
@@ -419,7 +445,7 @@ INT32	CTCP_Client::SendCoreWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 		}
 		else if(nSendSize == 0)
 		{
-			WriteLog("[SendCore] session closed. close socket");
+			WriteLog("[Info] [%s] [SendCoreWithSndPktLock] detect session close. socket close (-5)", m_acClassName);
 			CloseSocket();
 			nRtn = -5;
 			break;
@@ -448,12 +474,18 @@ INT32	CTCP_Client::SendCoreSSLWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 	time_t	nEndTime = 0;
 
 	if(pPktData == NULL)
+	{
+		WriteLog("[Error] [%s] [SendCoreSSLWithSndPktLock] invalid input data (-1)", m_acClassName);
 		return -1;
+	}
 
 	nMakeBufSize = pPktData->hdr.length;
 	pcHeader = (char *)pPktData->body.data;
 	if(nMakeBufSize < 1 || pcHeader == NULL)
+	{
+		WriteLog("[Error] [%s] [SendCoreSSLWithSndPktLock] invalid input data (-2)", m_acClassName);
 		return -2;
+	}
 
 	pthread_mutex_lock(&m_pkt_send_mutex);
 	nBufferSize = nMakeBufSize;
@@ -468,6 +500,7 @@ INT32	CTCP_Client::SendCoreSSLWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 				nEndTime = time(NULL);
 				if(difftime(nEndTime, nStartTime) > nTimeOut)
 				{
+					WriteLog("[Info] [%s] [SendCoreSSLWithSndPktLock] send time out. socket close (-3) (%d)", m_acClassName, nTimeOut);
 					CloseSocket();
 					nRtn = -3;
 					break;
@@ -477,6 +510,7 @@ INT32	CTCP_Client::SendCoreSSLWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 			}
 			else
 			{
+				WriteLog("[Error] [%s] [SendCoreSSLWithSndPktLock] fail to send. socket close (-4) (%d)", m_acClassName, errno);
 				CloseSocket();
 				nRtn = -4;
 				break;
@@ -484,6 +518,7 @@ INT32	CTCP_Client::SendCoreSSLWithSndPktLock(PPKT_DATA pPktData, INT32 nTimeOut)
 		}
 		else if(nSendLen == 0)
 		{
+			WriteLog("[Info] [%s] [SendCoreSSLWithSndPktLock] detect session close. socket close (-5)", m_acClassName);
 			CloseSocket();
 			nRtn = -5;
 			break;
@@ -527,11 +562,17 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 	nStartTime = time(NULL);
 
 	if(m_InitData.nPktHdrSize > 1023)
+	{
+		WriteLog("[Error] [%s] [Recv] invalid hdr size (-1) (%d)", m_acClassName, m_InitData.nPktHdrSize);
 		return -1;
+	}
 	
 	pRecvHdr = (char *)malloc(1024);
 	if(pRecvHdr == NULL)
+	{
+		WriteLog("[Error] [%s] [Recv] fail to allocate memory (-2) (%d)", m_acClassName, errno);
 		return -2;
+	}
 	memset(pRecvHdr, 0, 1024);
 
 	while (nRecvedSize != m_InitData.nPktHdrSize && m_bContinue)
@@ -554,7 +595,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 				nEndTime = time(NULL);
 				if(difftime(nEndTime, nStartTime) > nTimeOut)
 				{
-					WriteLog("[Recv] recv header time out.");
+					WriteLog("[Info] [%s] [Recv] recv header time out. socket close (-3) (%d)", m_acClassName, nTimeOut);
 					CloseSocket();
 					safe_free(pRecvHdr);
 					return -3;
@@ -564,7 +605,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 			}
 			else
 			{
-				WriteLog("[Recv] fail to recv header [%d]", errno);
+				WriteLog("[Error] [%s] [Recv] fail to recv header. socket close (-4) (%d)", m_acClassName, errno);
 				CloseSocket();
 				safe_free(pRecvHdr);
 				return -4;
@@ -572,7 +613,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 		}
 		else if (nRecvSize == 0)	//	socket close
 		{
-			WriteLog("[Recv] session close");
+			WriteLog("[Info] [%s] [Recv] detect session close. socket close (-5)", m_acClassName);
 			safe_free(pRecvHdr);
 			CloseSocket();
 			return -5;
@@ -586,7 +627,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 
 	if(m_bContinue == FALSE)
 	{
-		WriteLog("[Recv] continue flag false");
+		WriteLog("[Info] [%s] [Recv] close to thread (-6)", m_acClassName);
 		safe_free(pRecvHdr);
 		return -6;
 	}
@@ -606,6 +647,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 	pRecvData = (char*)malloc(nBodySize + 1);
 	if(pRecvData == NULL)
 	{
+		WriteLog("[Error] [%s] [Recv] fail to allocate memory (-6) (%d) (%d)", m_acClassName, nBodySize, errno);
 		safe_free(pRecvHdr);
 		return -7;
 	}
@@ -637,7 +679,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 				nEndTime = time(NULL);
 				if(difftime(nEndTime, nStartTime) > nTimeOut)
 				{
-					WriteLog("[Recv] recv body time cout");
+					WriteLog("[Info] [%s] [Recv] recv body time out. socket close (-8) (%d)", m_acClassName, nTimeOut);
 					safe_free(pRecvData);
 					CloseSocket();
 					return -8;
@@ -647,7 +689,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 			}
 			else
 			{
-				WriteLog("[Recv] fail to recv body error. [%d]", errno);
+				WriteLog("[Error] [%s] [Recv] fail to recv body. socket close (-9) (%d)", m_acClassName, errno);
 				safe_free(pRecvData);
 				CloseSocket();
 				return -9;
@@ -655,7 +697,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 		}
 		else if(nRecvSize == 0)
 		{
-			WriteLog("[Recv] session close");
+			WriteLog("[Info] [%s] [Recv] detect session close. socket close (-10)", m_acClassName);
 			safe_free(pRecvData);
 			CloseSocket();
 			return -10;
@@ -669,7 +711,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 	
 	if(m_bContinue == FALSE)
 	{
-		WriteLog("[Recv] thread close");
+		WriteLog("[Info] [%s] [Recv] close to thread (-10)", m_acClassName);
 		safe_free(pRecvData);
 		return -10;
 	}
@@ -683,8 +725,7 @@ INT32 CTCP_Client::Recv(INT32 nTimeOut)
 			
 			m_tSecuUtilRecv.ConvertSha256(pkt_hdr_sha256.hash, pszChkHash, sizeof(pszChkHash));
 			m_tSecuUtilRecv.ConvertSha256Last(pszCurHash, sizeof(pszCurHash));
-			
-			WriteLog("[Recv] invalid hash value : [chk:%s]--[cur:%s]", pszChkHash, pszCurHash);
+			WriteLog("[Error] [%s] [Recv] invalid hash value : [chk:%s]--[cur:%s] (-11)", m_acClassName, pszChkHash, pszCurHash);
 			safe_free(pRecvData);
 			return -11;
 		}
@@ -713,6 +754,7 @@ INT32 CTCP_Client::Connect()
 	m_nSock = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_nSock == -1)
 	{
+		WriteLog("[Error] [%s] [Connect] fail to create socket (-1) (%d)", m_acClassName, errno);
 		return -1;
 	}
 
@@ -733,7 +775,7 @@ INT32 CTCP_Client::Connect()
 			return nRtn;
 		}
 	}
-	SetSockKeepAlive(m_nSock, 10, 10, 10);
+	SetSockKeepAlive(m_nSock, 5, 5, 5);
 	m_bConnected = TRUE;
 	return 0;	
 }
@@ -748,21 +790,24 @@ INT32 CTCP_Client::Connect_Normal()
 	struct timeval  tTimeVal;
 
 	if(m_nSock == -1)
+	{
+		WriteLog("[Error] [%s] [Connect_Normal] invalid socket (-1)", m_acClassName);
 		return -1;
+	}
 
 	do{
 
 		nFlags = fcntl(m_nSock, F_GETFL, 0);
 		if (nFlags < 0)
 		{
-			WriteLog("[Connect_Normal] fail to get fcntl. [%d]", errno);
+			WriteLog("[Error] [%s] [Connect_Normal] fail to get fcntl (-2) (%d)", m_acClassName, errno);
 			nRetVal = -2;
 			break;
 		}
 		
 		if (fcntl(m_nSock, F_SETFL, nFlags | O_NONBLOCK) < 0)
 		{	
-			WriteLog("[Connect_Normal] fail to set fcntl. [%d]", errno);
+			WriteLog("[Error] [%s] [Connect_Normal] fail to set fcntl (-3) (%d)", m_acClassName, errno);
 			nRetVal = -3;
 			break;
 		}
@@ -781,7 +826,7 @@ INT32 CTCP_Client::Connect_Normal()
 				
 				if (nRetVal == 0)
 				{
-					WriteLog("[Connect_Normal] fail to set select option [%d]", errno); 	
+					WriteLog("[Error] [%s] [Connect_Normal] fail to set select option (-4) (%d)", m_acClassName, errno); 	
 					nRetVal = -4;
 					break;
 				}	
@@ -792,7 +837,7 @@ INT32 CTCP_Client::Connect_Normal()
 				
 				if (nError) 
 				{
-					WriteLog("[Connect_Normal] fail to get sock option [%d]", errno); 	
+//					WriteLog("[Error] [Connect_Normal] fail to get sock option (-5) (%d)", errno); 	
 					nRetVal = -5;
 					break;
 				
@@ -800,7 +845,7 @@ INT32 CTCP_Client::Connect_Normal()
 			}
 			else
 			{
-				WriteLog("[Connect_Normal] fail to connect. [%d]", errno);
+				WriteLog("[Error] [%s] [Connect_Normal] fail to connect (-7) (%d)", m_acClassName, errno); 	
 				nRetVal = -7;
 				break;
 			}
@@ -813,6 +858,7 @@ INT32 CTCP_Client::Connect_Normal()
 		nRetVal = fcntl(m_nSock, F_SETFL, nFlags);
 		if (nRetVal < 0)
 		{
+			WriteLog("[Error] [%s] [Connect_Normal] fail to set fcntl (-8) (%d)", m_acClassName, errno);
  			nRetVal = -8;
 		}
  	}
@@ -844,7 +890,7 @@ INT32 CTCP_Client::Connect_SSL()
 	
 	if(m_pSSL == NULL)
 	{
-		WriteLog("[Connect_SSL] fail to connect ssl : errno [%d] nErrRtn [%d]", errno, nReVal);
+		WriteLog("[Error] [%s] [Connect_SSL] fail to connect ssl (-2) (%d) (%d)", m_acClassName, nReVal, errno);
 		close(m_nSock);
 		m_nSock = -1;
 		return -2;
@@ -873,12 +919,14 @@ void *CTCP_Client::RecvThread(LPVOID lParam)
 	SOCK_EVT_PROP sock_evt_prop;
 	CTCP_Client *pTcpClient = (CTCP_Client *)lParam;
 
-	pthread_detach(pthread_self());
-
 	if(pTcpClient == NULL)
 	{
 		return (void *)NULL;
 	}
+
+	pthread_detach(pthread_self());
+
+	pTcpClient->WriteLog("[Info] [%s] [RecvThread] recv thread start (%d)", pTcpClient->m_acClassName, pTcpClient->m_bContinue);
 
 	pTcpClient->m_IsRunThreadRecv = 2;	
 
@@ -887,7 +935,10 @@ void *CTCP_Client::RecvThread(LPVOID lParam)
 		if (pTcpClient->m_bConnected == FALSE)	
 		{
 			if (pTcpClient->m_InitData.nOpTypeClt == ASI_CLT_TCP_EVENT_OP_TYPE_DEFAULT)
+			{
+				pTcpClient->WriteLog("[Info] [%s] [RecvThread] op type default and break", pTcpClient->m_acClassName);
 				break;
+			}
 
 			nCurrentTime = time(NULL);
 			if (pTcpClient->m_nLastConnectTryTime == 0 || difftime(nCurrentTime, pTcpClient->m_nLastConnectTryTime) > 2 && 
@@ -898,6 +949,7 @@ void *CTCP_Client::RecvThread(LPVOID lParam)
 				{
 					if(pTcpClient->m_InitData.nRemainSockEvt)
 					{
+						pTcpClient->WriteLog("[Info] [%s] [RecvThread] add socket event connect", pTcpClient->m_acClassName);
 						sock_evt_prop.nEventID = ASI_SOCKET_EVENT_CONNECT;
 						pTcpClient->AddEvtWithPktLock(sock_evt_prop);
 					}
@@ -924,6 +976,8 @@ void *CTCP_Client::RecvThread(LPVOID lParam)
 			pTcpClient->Recv();
 		}
 	}	
+
+	pTcpClient->WriteLog("[Info] [%s] [RecvThread] recv thread end", pTcpClient->m_acClassName);
 
 	pTcpClient->m_IsRunThreadRecv = 0;
 	return (void *)NULL;
@@ -964,7 +1018,7 @@ INT32		CTCP_Client::GetPktWithPktLock(PKT_DATA& pkt_data)
 	pthread_mutex_unlock(&m_pkt_mutex);
 	return nResult;
 }
-//---------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------
 
 UINT32		CTCP_Client::IsExistPktWithPktLock()
 {
@@ -1057,56 +1111,50 @@ void CTCP_Client::WriteLog(char* fmt,...)
 {
 	FILE *fp = NULL;
 	va_list  args;
-	char lpLogBuf[CHAR_MAX_SIZE] = {0, };
-	char lpBuf[CHAR_MAX_SIZE] = {0, };
-	char lpTimeBuf[MAX_TIME_STR] = {0, };
+	char acSaveFile[MAX_PATH] = {0, };
+	char acBuf[CHAR_MAX_SIZE] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
 
-    if (m_InitData.nRemainDebugLog == 0)
-		return;
-	
-	GetCurrentDateTime(0, lpTimeBuf, MAX_TIME_STR-1);
+	pthread_mutex_lock(&m_pkt_mutex);
+	do{
+		if (m_InitData.nRemainDebugLog == 0)
+			break;
 
-    if(m_InitData.szLogFilePath[0] && m_InitData.szLogFileName[0])
-		snprintf(lpBuf, CHAR_MAX_SIZE-1, "%s%s%s.txt", m_InitData.szLogFilePath, m_InitData.szLogFileName, lpTimeBuf);
-	else
-		snprintf(lpBuf, CHAR_MAX_SIZE-1, "./log/nanny_agt_clt_sock_%s.txt", lpTimeBuf);
-	
-	fp = fopen(lpBuf, "a");
-	if (fp != NULL)
-	{
-		memset(lpBuf, 0x00, CHAR_MAX_SIZE);
-	
+		if(m_InitData.szLogFilePath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH-1) != 0)
+				break;
+			snprintf(m_InitData.szLogFilePath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+
+		if(m_InitData.szLogFileName[0] == 0)
+		{
+			snprintf(m_InitData.szLogFileName, MAX_PATH-1, "/nanny_agt_clt_sock_");
+		}
+
+		GetCurrentDateTime(0, acTimeBuf);
+
+		snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", m_InitData.szLogFilePath, m_InitData.szLogFileName, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(m_InitData.szLogFilePath, m_InitData.szLogFileName, m_InitData.m_nFileLogRetention);
+		}
+
+		fp = fopen(acSaveFile, "a");
+		if (fp == NULL)
+		{
+			break;
+		}
+		GetCurrentDateTime(1, acTimeBuf);
 		va_start(args,fmt);
-		vsnprintf(lpBuf, CHAR_MAX_SIZE-1, fmt, args);		
+		vsnprintf(acBuf, CHAR_MAX_SIZE-1, fmt, args);		
 		va_end(args);
-		snprintf(lpLogBuf, CHAR_MAX_SIZE-1, "%s \t%s\n", lpTimeBuf, lpBuf);
-		fprintf(fp, lpLogBuf);
+		fprintf(fp, "%s\t%s\n", acTimeBuf, acBuf);
 		fclose(fp);
-	}
-}
-//---------------------------------------------------------------------------------------------------------------------
-
-
-void CTCP_Client::GetCurrentDateTime(INT32 nDateTime, LPSTR lpBuf, DWORD dwLen)
-{
-    time_t     t;
-    char       date[12] = {0,};
-    char       time_str[10] = {0,};
-    struct tm  dt;
-
-    t = time(NULL);
-	localtime_r(&t, &dt);
-
-
-    snprintf(date, sizeof(date)-1, "%.4d_%.2d_%.2d",dt.tm_year + 1900, dt.tm_mon + 1, dt.tm_mday);
-    snprintf(time_str, sizeof(time_str)-1, "%.2d:%.2d:%.2d", dt.tm_hour, dt.tm_min, dt.tm_sec);
-	    
-    if(nDateTime)
-        snprintf(lpBuf, dwLen-1, "%s %s", date, time_str);
-    else
-        snprintf(lpBuf, dwLen-1, "%s", date);
-	
-    return;
+	}while(FALSE);
+	pthread_mutex_unlock(&m_pkt_mutex);
 }
 //---------------------------------------------------------------------------------------------------------------------------
 

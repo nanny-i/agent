@@ -46,7 +46,7 @@ extern void MoveFileEx(LPCSTR szSourceFile, LPCSTR szTargetFile);
 extern HMODULE LoadLibrary(LPCTSTR lpFileName);
 extern void* GetProcAddress(HMODULE hModule, LPCTSTR lpProcName);
 extern void FreeLibrary(HMODULE hModule);
-
+extern void ClearOldLogFile(char *acLogPath, char *acLogFile, UINT32 m_nFileLogRetention=5);
 
 
 #endif /* _AS_FILE_H_ */

@@ -29,6 +29,11 @@ CFindFileUtil::CFindFileUtil(void)
 {
 	m_tASIDFFDLLUtil = NULL;
 	m_tASIFIDLLUtil = NULL;
+	m_nRemainDebugLog = 1;
+	m_nFileLogRetention = 5;
+	memset(m_acLogPath, 0, MAX_PATH);
+	memset(m_acLogFile, 0, MAX_PATH);
+	pthread_mutex_init(&m_log_mutex, NULL);
 }
 //--------------------------------------------------------------
 
@@ -36,7 +41,64 @@ CFindFileUtil::~CFindFileUtil(void)
 {
 	SAFE_DELETE(m_tASIDFFDLLUtil);
 	SAFE_DELETE(m_tASIFIDLLUtil);
+	pthread_mutex_destroy(&m_log_mutex);
 }
+
+void CFindFileUtil::SetLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention)
+{
+	m_nRemainDebugLog = nRemainLog;
+	m_nFileLogRetention = nFileLogRetention;
+	if(pLogPath)
+		strncpy(m_acLogPath, pLogPath, MAX_PATH-1);
+	if(pLogFile)
+		strncpy(m_acLogFile, pLogFile, MAX_PATH-1);
+}
+
+void CFindFileUtil::WriteLog(char *fmt,...)
+{
+	FILE *fp = NULL;
+	va_list args;
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+	pthread_mutex_lock(&m_log_mutex);
+	do{
+		if(m_nRemainDebugLog == 0)
+			break;
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(m_acLogPath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(m_acLogPath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		if(m_acLogFile[0] == 0)
+			strncpy(m_acLogFile, "/nanny_agt_ff_log_", MAX_PATH-1);
+		snprintf(acSaveFile, MAX_PATH-1, "%s%s%s.txt", m_acLogPath, m_acLogFile, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(m_acLogPath, m_acLogFile, m_nFileLogRetention);
+		}
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
+		va_start(args,fmt);
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		va_end(args);
+		fprintf(fp, "%s\t[Info]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	pthread_mutex_unlock(&m_log_mutex);
+}
+
 //--------------------------------------------------------------
 
 INT32		CFindFileUtil::Init(PASI_FF_INIT_INFO pAfii)
@@ -51,7 +113,8 @@ INT32		CFindFileUtil::Init(PASI_FF_INIT_INFO pAfii)
 	memcpy(&m_tAFII, pAfii, sizeof(m_tAFII));
 	if(m_tAFII.szDocFileFmtDLLPath[0] == 0 || m_tAFII.szFileInfoDLLPath[0] == 0)	
 		return -2;
-	SetLogFileInfo(m_tAFII.szLogPath, m_tAFII.szLogFile, m_tAFII.nRemainLog);
+
+	SetLogPath(m_tAFII.szLogPath, m_tAFII.szLogFile, m_tAFII.nRemainLog, m_tAFII.nFileLogRetention);
 
 	m_tASIDFFDLLUtil = new CASIDFFDLLUtil();
 	if(m_tASIDFFDLLUtil == NULL)
@@ -80,6 +143,7 @@ INT32		CFindFileUtil::Init(PASI_FF_INIT_INFO pAfii)
 	strncpy(tADFI.szLogPath , m_tAFII.szLogPath, CHAR_MAX_SIZE-1);
 	strncpy(tADFI.szLogFile, m_tAFII.szLogFile, CHAR_MAX_SIZE-1);
 	tADFI.nRemainLog = m_tAFII.nRemainLog;
+	tADFI.nFileLogRetention = m_tAFII.nFileLogRetention;
 	m_tASIDFFDLLUtil->ASIDFF_SetDFFmtInit(&tADFI);
 	
 	nTFMaxNum = m_tAFII.nFinderThreadMaxNum;
@@ -89,7 +153,7 @@ INT32		CFindFileUtil::Init(PASI_FF_INIT_INFO pAfii)
 		nTFMaxNum = 1;
 		if(nCpuCount > 2)
 			nTFMaxNum = nCpuCount - 2;
-		WriteLogN("auto detect number of process in system : [%d]", nTFMaxNum);
+		WriteLog("[Info] auto detect number of process in system : [%d]", nTFMaxNum);
 	}
 
 	m_nPreSearchLevel = 0;
@@ -136,9 +200,9 @@ INT32		CFindFileUtil::Release()
 	}
 
 	{
-		ClearFindSubDirItem();		WriteLogN("clear find sub dir items..");
-		ClearFindFileDirItem();		WriteLogN("clear find find dir items..");
-		ClearFindFileWork();		WriteLogN("clear find file work..");
+		ClearFindSubDirItem();		WriteLog("[Info] clear find sub dir items..");
+		ClearFindFileDirItem();		WriteLog("[Info] clear find find dir items..");
+		ClearFindFileWork();		WriteLog("[Info] clear find file work..");
 	}
 	return 0;
 }
@@ -168,7 +232,7 @@ INT32		CFindFileUtil::StopThread_Common(CThreadBase* tThreadObject, UINT32 nWait
 	m_SemExt.CloseHandle(); 
 	if(!nLWaitTime)
 	{
-		WriteLogN("thread terminate fail : over wait time [%d]", nWaitTime);
+		WriteLog("[Info] thread terminate fail : over wait time [%d]", nWaitTime);
 		return -10;
 	}
 	return 0;
@@ -204,7 +268,7 @@ UINT32		CFindFileUtil::GetPreSearchLevel(String strSearchPath)
 	else
 		nRtn = m_tAFII.nAutoSearchDirLevel - nRtn;
 
-	WriteLogN("auto pre-search level is : [%d/%d][%s]", nRtn, m_tAFII.nAutoSearchDirLevel, strSearchPath.c_str());
+	WriteLog("[Info] auto pre-search level is : [%d/%d][%s]", nRtn, m_tAFII.nAutoSearchDirLevel, strSearchPath.c_str());
 	return nRtn;
 }
 //--------------------------------------------------------------------
@@ -239,7 +303,7 @@ INT32		CFindFileUtil::ClearSearchDirPath(UINT32 nOrderID)
 INT32		CFindFileUtil::AddFileFindOption(UINT32 nOrderID, UINT32 nFindOption)
 {
 	m_tFindOptionMap[nOrderID] = nFindOption;
-	WriteLogN("file find option : [%d][%d]", nOrderID, nFindOption);
+	WriteLog("[Info] file find option : [%d][%d]", nOrderID, nFindOption);
 	return 0;
 }
 //--------------------------------------------------------------------
@@ -372,7 +436,10 @@ INT32		CFindFileUtil::PreSearchDirThread(UINT32 nOrderID, String strRootPath)
 
 	nLen = strRootPath.length();
 	if(strRootPath.length() < 2)
+	{
+		WriteLog("[Error] [PreSearchDirThread] invalid root path");
 		return -1;
+	}
 
 	strncpy(szFindDir, strRootPath.c_str(), MAX_PATH-1);
 	if(szFindDir[nLen - 1] == '*')
@@ -384,14 +451,14 @@ INT32		CFindFileUtil::PreSearchDirThread(UINT32 nOrderID, String strRootPath)
 
 	if(DirectoryExists(szFindDir) == FALSE)
 	{
-		WriteLogE("invalid directory path : [%s]", szFindDir);
+		WriteLog("[Error] [PreSearchDirThread] fail to find %s (%d)", szFindDir, errno);
 		return -3;
 	}
 
 	strFindDirPath = SPrintf(szFindDir);
 
 	Recursive_SearchDir(nOrderID, strFindDirPath, "", nPreSubDirSearchLevel, tNameList, &tLastNameList, &tFindFileItemList);
-	WriteLogN("pre search dir thread : [%s] name (%d) last name (%d) file (%d)", szFindDir, tNameList.size(), tLastNameList.size(), tFindFileItemList.size());
+	WriteLog("[Info] pre search dir thread : [%s] name (%d) last name (%d) file (%d)", szFindDir, tNameList.size(), tLastNameList.size(), tFindFileItemList.size());
 	SetFindFileWork_TotalDir(nOrderID, tNameList.size());
 	AddFindSubDirItem(nOrderID, nSubDirSearch, tLastNameList);
 	AddFindFileItemList(nOrderID, tNameList.size(), tFindFileItemList);
@@ -437,7 +504,7 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 	{
 		if(IsExistExceptDir(nOrderID, strChkDirA.c_str()))
 		{
-			WriteLogN("exist dir mask : [%s]", strChkDirA.c_str());
+			WriteLog("[Info] exist except dir mask : [%s]", strChkDirA.c_str());
 			return 0;
 		}
 		if(!nSubDirSearch)
@@ -456,6 +523,7 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 	pDir = opendir(strFindDirA.c_str());
 	if (pDir == NULL)
 	{
+		WriteLog( "[Error] [Recursive_SearchDir] fail to open %s (%d)", strChkDirA.c_str(), errno);
 		return 0 ;
 	}
 
@@ -524,6 +592,7 @@ INT32		CFindFileUtil::Recursive_SearchFile(UINT32 nOrderID, String strSearchPath
 	pDir = opendir(strChkDirA.c_str());
 	if (pDir == NULL)
 	{
+		WriteLog( "[Error] [Recursive_SearchFile] fail to open %s (%d)", strChkDirA.c_str(), errno);
 		return 0 ;
 	}
 
@@ -602,7 +671,7 @@ INT32		CFindFileUtil::Recursive_SearchDirFile(UINT32 nOrderID, String strSearchP
 	
 	if(IsExistExceptDir(nOrderID, strChkDirA.c_str()))
 	{
-		WriteLogN("except dir : [%d][%s]", nOrderID, strChkDirA.c_str());
+		WriteLog("[Info] except dir : [%d][%s]", nOrderID, strChkDirA.c_str());
 		return 0;
 	}
 	nDirNum++;
@@ -610,7 +679,7 @@ INT32		CFindFileUtil::Recursive_SearchDirFile(UINT32 nOrderID, String strSearchP
 	pDir = opendir(strChkDirA.c_str());
 	if (pDir == NULL)
 	{
-		WriteLogE("[Recursive_SearchDirFile] fail to open %s (%u)", strChkDirA.c_str(), errno);
+		WriteLog("[Error] [Recursive_SearchDirFile] fail to open %s (%d)", strChkDirA.c_str(), errno);
 		return 0 ;
 	}	
 
@@ -696,7 +765,7 @@ INT32		CFindFileUtil::AddFileMask(UINT32 nOrderID, LPCTSTR lpFileMask)
 	String strDFFmt = Token.NextToken();
 
 	find->second[szFileExt] = strDFFmt;
-	WriteLogN("file mask filter : [%d][%s]:[%s]", nOrderID, szFileExt, strDFFmt.c_str());
+	WriteLog("[Info] file mask filter : [%d][%s]:[%s]", nOrderID, szFileExt, strDFFmt.c_str());
 	return 0;
 }
 //--------------------------------------------------------------------
@@ -823,7 +892,7 @@ INT32		CFindFileUtil::IsExistFileMaskByDFF(UINT32 nOrderID, String strFileFullNa
 	if(m_tASIDFFDLLUtil->ASIDFF_GetDFFmtInfo(&tADFI, acLogMsg) != 0)
 	{
 		if(acLogMsg[0] != 0)
-			WriteLogE("fail to get file fmt info : %s", acLogMsg);
+			WriteLog("fail to get file fmt info : %s", acLogMsg);
 	}
 	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW)
 		return 0;
@@ -894,7 +963,7 @@ INT32		CFindFileUtil::AddExceptDir(UINT32 nOrderID, LPCTSTR lpDirPath)
 	}
 
 	find->second[szDirPath] = nIncludeSubPath;
-	WriteLogN("file exclude dir filter : [%d][%s]", nOrderID, lpDirPath);
+	WriteLog("file exclude dir filter : [%d][%s]", nOrderID, lpDirPath);
 
 	return 0;
 }
@@ -1022,7 +1091,7 @@ INT32		CFindFileUtil::AddExceptDirFileMask(UINT32 nOrderID, LPCTSTR lpDirPathFil
 	}
 
 	find->second[szDirPath] = strFileMask;
-	WriteLogN("file exclude dir file mask filter : [%d][%s]", nOrderID, lpDirPathFileMask);
+	WriteLog("file exclude dir file mask filter : [%d][%s]", nOrderID, lpDirPathFileMask);
 
 	return 0;
 }
@@ -1123,7 +1192,7 @@ INT32		CFindFileUtil::AddFileDateTime(UINT32 nOrderID, UINT32 nType, UINT32 nChk
 	}
 
 	find->second[nType] = nChkDT;
-	WriteLogN("file date time filter : [%d][%d][%d]", nOrderID, nType, nChkDT);
+	WriteLog("file date time filter : [%d][%d][%d]", nOrderID, nType, nChkDT);
 	return 0;
 }
 //--------------------------------------------------------------------
@@ -1178,7 +1247,7 @@ INT32		CFindFileUtil::IsExistFileDateTime(UINT32 nOrderID, String strFilePath, S
 
 	if(strFilePath.length() == 0)
 	{
-		WriteLogE("[IsExistFileDateTime] invalid input data");
+		WriteLog("[IsExistFileDateTime] invalid input data");
 		return 0;	
 	}
 		
@@ -1193,7 +1262,7 @@ INT32		CFindFileUtil::IsExistFileDateTime(UINT32 nOrderID, String strFilePath, S
 	nRetVal = GetFileTimeInfo(strChkFileNameA.c_str(), &nCurCDT, &nCurMDT, &nCurADT);
 	if(nRetVal != 0)
 	{
-		WriteLogE("[IsExistFileDateTime] fail to get file time %s (%d)", strChkFileNameA.c_str(), nRetVal);
+		WriteLog("[IsExistFileDateTime] fail to get file time %s (%d)", strChkFileNameA.c_str(), nRetVal);
 		return 0;	
 	}
 
@@ -1421,7 +1490,7 @@ INT32		CFindFileUtil::ClearFindFileDirItem()
 {
 	m_tFindFileDirItemMutex.Lock();
 
-	WriteLogN("clear find file dir item num : [%d]", m_tFindFileDirItemList.size());
+	WriteLog("clear find file dir item num : [%d]", m_tFindFileDirItemList.size());
 	m_tFindFileDirItemList.clear();
 
 	m_tFindFileDirItemMutex.UnLock();
@@ -1436,7 +1505,7 @@ INT32		CFindFileUtil::InitFindFileWork(UINT32 nOrderID)
 	FIND_FILE_WORK tSFFW;
 	if(m_tFindFileWorkMap.find(nOrderID) != m_tFindFileWorkMap.end())
 	{
-		WriteLogN("already exist order id : [%d]", nOrderID);
+		WriteLog("already exist order id : [%d]", nOrderID);
 		return -1;
 	}
 
@@ -1596,14 +1665,14 @@ INT32		CFindFileUtil::GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFI, 
 	PFIND_FILE_WORK pSFFW = GetFindFileWork(nOrderID);
 	if(!pSFFW)
 	{
-		WriteLogE("[GetFindFileItem] fail to find file work (%d)", nOrderID);
+		WriteLog("[GetFindFileItem] fail to find file work (%d)", nOrderID);
 		return -1;
 	}
 
 	tMutexExt = (CMutexExt*)(pSFFW->tMutexExt);
 	if(tMutexExt == NULL)
 	{
-		WriteLogE("[GetFindFileItem] invalid mutex lock");
+		WriteLog("[GetFindFileItem] invalid mutex lock");
 		return -2;
 	}
 	

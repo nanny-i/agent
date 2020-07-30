@@ -57,7 +57,6 @@ int CThreadFinder::Run()
 	// TODO: Add your specialized code here and/or call the base class
 	m_nRunFlag = 1;
 	INT32 nMaxFindDirNum = 0;
-	WriteLogN("start %s thread : [%d]", m_strThreadName.c_str(), m_nRunFlag);
 	while(GetContinue())
 	{
 		if(!m_nPause)
@@ -83,12 +82,6 @@ int CThreadFinder::Run()
 			Sleep(10);
 		}		
 	}
-
-	if(!GetContinue())
-		WriteLogN("stop thread by sub continue flag : [%s]", m_strThreadName.c_str());
-	else
-		WriteLogN("stop thread by work end : [%s]", m_strThreadName.c_str());
-
 	m_nRunFlag = 0;	
 	return 0;
 }
@@ -140,11 +133,6 @@ INT32		CThreadFinder::ChkWorkFindFile()
 		for(begin; begin != end && m_nContinue; begin++)
 		{
 			tFFU->Recursive_SearchFile(begin->nOrderID, begin->strSearchDir, tAFFIList, &m_nContinue);
-			if(nOldNum == tAFFIList.size())
-			{
-				//WriteLogN("%s : [%d] [%s] ", m_strThreadName, tAFFIList.size() - nOldNum, begin->strSearchDir);
-			}
-			
 			nOldNum = (UINT32)tAFFIList.size();
 		}				
 				

@@ -58,10 +58,12 @@ typedef struct _asi_dfile_fmt_init
 		ZeroMemoryExt(szLogPath);
 		ZeroMemoryExt(szLogFile);
 		nRemainLog				= 1;
+		nFileLogRetention		= 5;
 	}
 	CHAR				szLogPath[CHAR_MAX_SIZE];
 	CHAR				szLogFile[CHAR_MAX_SIZE];
 	UINT32				nRemainLog;
+	UINT32				nFileLogRetention;
 }ASI_DFILE_FMT_INIT, *PASI_DFILE_FMT_INIT;
 
 //-------------------------------------------------------------------------------------

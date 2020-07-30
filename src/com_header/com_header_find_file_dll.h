@@ -55,6 +55,7 @@ typedef struct _asi_ff_init_info
 	CHAR		szLogPath[MAX_PATH];
 	CHAR		szLogFile[MAX_PATH];
 	UINT32		nRemainLog;
+	UINT32		nFileLogRetention;
 	UINT32		nFinderThreadMaxNum;
 	UINT32		nAutoSearchDirLevel;
 	UINT32		nOnceFindFileNum;

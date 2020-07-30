@@ -427,6 +427,8 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltLgnSID(INT32 nSSLMode)
 	tSID.nRemainDebugLog	= t_EnvInfo->m_nRemainSockLog;
 
 	strncpy(tSID.szLogFilePath, t_EnvInfo->m_strRootPath.c_str(), MAX_PATH);
+	tSID.m_nFileLogRetention = t_EnvInfo->m_nFileLogRetention;
+	tSID.nRemainDebugLog = 1;
 	return tSID;
 }
 //---------------------------------------------------------------------------
@@ -485,7 +487,8 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltMgrSID(INT32 nSSLMode)
 	tSID.nRemainDebugLog	= t_EnvInfo->m_nRemainSockLog;
 
 	strncpy(tSID.szLogFilePath, t_EnvInfo->m_strRootPath.c_str(), MAX_PATH-1);
-
+	tSID.m_nFileLogRetention = t_EnvInfo->m_nFileLogRetention;
+	tSID.nRemainDebugLog = 1;
 	return tSID;
 }
 //---------------------------------------------------------------------------
@@ -544,6 +547,8 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltUdtSID(INT32 nSSLMode)
 	tSID.nRemainDebugLog	= t_EnvInfo->m_nRemainSockLog;
 
 	strncpy(tSID.szLogFilePath, t_EnvInfo->m_strRootPath.c_str(), MAX_PATH);
+	tSID.m_nFileLogRetention = t_EnvInfo->m_nFileLogRetention;
+	tSID.nRemainDebugLog = 1;
 	return tSID;
 }
 //---------------------------------------------------------------------------
@@ -575,7 +580,7 @@ SOCK_INIT_DATA	CEnvironmentOp::GetSvrLinkSID(INT32 nSSLMode)
 			tSID.nOpTypeSvr			= ASI_SVR_TCP_IOCP_OP_TYPE_DEFAULT;
 			tSID.nSessionKey		= DEFAULT_SESSION_AGENT_KEY;
 
-			strncpy(tSID.szLogFileName, "/log/nanny_agt_link_socket_log_", MAX_PATH);
+			strncpy(tSID.szLogFileName, "/log/nanny_agt_link_socket_log_", MAX_PATH-1);
 			break;
 		}
 		case 1:
@@ -586,13 +591,13 @@ SOCK_INIT_DATA	CEnvironmentOp::GetSvrLinkSID(INT32 nSSLMode)
 
 			tSID.nSessionKey		= DEFAULT_SESSION_AGENT_KEY;
 
-			strncpy(tSID.szPemFileCertPath, t_EnvInfo->m_strPemCertFileName.c_str(), MAX_PATH);
-			strncpy(tSID.szPemFileKeyPath, t_EnvInfo->m_strPemKeyFileName.c_str(), MAX_PATH);
-			strncpy(tSID.szLogFileName, "/log/nanny_agt_link_ssl_socket_log_", MAX_PATH);
+			strncpy(tSID.szPemFileCertPath, t_EnvInfo->m_strPemCertFileName.c_str(), MAX_PATH-1);
+			strncpy(tSID.szPemFileKeyPath, t_EnvInfo->m_strPemKeyFileName.c_str(), MAX_PATH-1);
+			strncpy(tSID.szLogFileName, "/log/nanny_agt_link_ssl_socket_log_", MAX_PATH-1);
 			break;
 		}
 	}
-	strncpy(tSID.szOpenAddress, ANY_OPEN_ADDRESS, MAX_PATH);
+	strncpy(tSID.szOpenAddress, ANY_OPEN_ADDRESS, MAX_PATH-1);
 	tSID.nOpenPort			= t_EnvInfo->m_nIFPort;
 
 	tSID.nPktTransMode		= ASI_SVR_PKT_TRANS_START_TYPE_AUTO_START;
@@ -602,8 +607,9 @@ SOCK_INIT_DATA	CEnvironmentOp::GetSvrLinkSID(INT32 nSSLMode)
 	tSID.nMaxComPortNum		= 1;
 	tSID.nRemainDebugLog	= t_EnvInfo->m_nRemainSockLog;
 
-	strncpy(tSID.szLogFilePath, t_EnvInfo->m_strRootPath.c_str(), MAX_PATH);
-
+	strncpy(tSID.szLogFilePath, t_EnvInfo->m_strRootPath.c_str(), MAX_PATH-1);
+	tSID.m_nFileLogRetention = t_EnvInfo->m_nFileLogRetention;
+	tSID.nRemainDebugLog = 1;
 	return tSID;
 }
 //---------------------------------------------------------------------------
@@ -659,6 +665,7 @@ void			CEnvironmentOp::GetFFInitData(ASI_FF_INIT_INFO& tAFII)
 {
 	memset(&tAFII, 0, sizeof(ASI_FF_INIT_INFO));
 	tAFII.nRemainLog		= 1;
+	tAFII.nFileLogRetention		= t_EnvInfo->m_nFileLogRetention;
 	tAFII.nFinderThreadMaxNum = 0;
 	tAFII.nAutoSearchDirLevel = 3;
 	strncpy(tAFII.szLogFile, "/nanny_agt_ff_log_", MAX_PATH-1);
