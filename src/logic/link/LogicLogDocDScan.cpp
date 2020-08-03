@@ -85,10 +85,7 @@ INT32		CLogicLogDocDScan::AnalyzePkt_FromLink_Ext_Scan()
 				tDPFCU.nFilePtnType = SS_PO_FA_CLEAR_PTN_TYPE_LOCAL;
 
 				//tDPFCU.tDPH.nExtOption |= SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_SCAN_DOC_FILE_FMT;
-				tDPFCU.tDPH.nExtOption |= SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_DEFAULT_PATH;
-
-				// 20200728 add jhjung
-				tDPFCU.tDPH.nNotifyInfoID |= t_EnvInfo->m_nHostSysType;
+				tDPFCU.tDPH.nExtOption |= SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_DEFAULT_PATH;				
 
 				tDPFCU.strExPath		= dldd.strScanPath;
 				tDPFCU.strFilePtnLocal	= dldd.strScanPtn;
