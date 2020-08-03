@@ -56,6 +56,8 @@ public:
 	UINT32		m_nLastOffType;
 	UINT32		m_nLastOffTime;
 	INT32		m_nTsDebugMode;
+	UINT32		m_nDbLogRetention;
+	UINT32		m_nFileLogRetention;
 
 	UINT32		m_nHostSysType;
 

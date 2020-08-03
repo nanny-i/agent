@@ -83,4 +83,9 @@ INT32 SetHomePath(LPCTSTR lpHomePathList, UINT32 nLen)
 {
 	return tDownloadUtil.SetHomePath(lpHomePathList, nLen);
 }
+
+INT32 SetDLLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention)
+{
+	return tDownloadUtil.SetDLLogPath(pLogPath, pLogFile, nRemainLog, nFileLogRetention);
+}
 //--------------------------------------------------------------

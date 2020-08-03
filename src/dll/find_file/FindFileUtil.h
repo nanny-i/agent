@@ -45,7 +45,7 @@ private:
 	CMutexExt				m_tFindFileDirItemMutex;
 
 	TMapFindFileWork		m_tFindFileWorkMap;
-	CMutexExt				m_tFindFileWorkMutex;
+//	CMutexExt				m_tFindFileWorkMutex;
 	CSemExt 				m_SemExt;
 	
 private:
@@ -53,6 +53,11 @@ private:
 	CASIFIDLLUtil*			m_tASIFIDLLUtil;
 
 private:
+	INT32		m_nRemainDebugLog;
+	UINT32		m_nFileLogRetention;
+	pthread_mutex_t m_log_mutex;
+	char		m_acLogPath[MAX_PATH];
+	char		m_acLogFile[MAX_PATH];
 	UINT32		m_nPreSearchLevel;
 	UINT32		GetPreSearchLevel(String strSearchPath);
 
@@ -62,7 +67,8 @@ private:
 public:
 	INT32		Init(PASI_FF_INIT_INFO pafii);
 	INT32		Release();
-
+	void		SetLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention);
+	void		WriteLog(char* fmt,...);
 private:
 	INT32		StopThread_Common(CThreadBase* tThreadObject, UINT32 nWaitTime = 5/*sec*/);
 

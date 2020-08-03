@@ -547,13 +547,13 @@ int read_lsb_release(char *acOsName, int nMaxLen, UINT64 *pddwOsID, UINT32 *pdwO
 		return -1;
 
 	/* pipe() or fork() failed, failure! */
-	pPipe = popen("/usr/bin/lsb_release -d -s > /dev/null", "r");
+	pPipe = popen("/usr/bin/lsb_release -d -s", "r");
 	if(pPipe == NULL)
 	{
 		return -2;
 	}
 
-	fgets(acFirst, 128, pPipe);
+	fgets(acFirst, MAX_QHBUFF-1, pPipe);
 	nLen = strlen(acFirst);
 	pclose(pPipe);
 	if(nLen < 1)

@@ -7,7 +7,7 @@ CPPFILES = DocFileFmt.cpp DocFileFmtUtil.cpp
 OBJ = $(CPPFILES:.cpp=.o)
 
 all: $(OBJ)
-	$(CC) -shared $(CFLAGS) -o asi_dff.so $(OBJ) ../../extension/LogUtil.o ../../extension/MutexExt.o ../../lib/as_lib/src/libascomm.a
+	$(CC) -shared $(CFLAGS) -o asi_dff.so $(OBJ) ../../extension/MutexExt.o ../../lib/as_lib/src/libascomm.a
 
 .cpp.o:
 	$(CC) $(CFLAGS) -c $(CPPFILES)

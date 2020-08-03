@@ -218,6 +218,22 @@ void			GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf)
 	else
 		snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d %.2d:%.2d:%.2d",	dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday, dt->tm_hour, dt->tm_min, dt->tm_sec);
 }
+
+void GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf)
+{
+	time_t t;
+	struct tm *dt = NULL;
+	if(nIndex < 1)
+		return;
+
+	t = time(NULL)-nIndex*60*60*24;
+	dt = localtime(&t);
+	if(dt == NULL)
+		return;
+
+	snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d", dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday);
+}
+
 //-------------------------------------------------------------------------
 
 UINT32	GetCurrentYearMonDay(UINT32 nShort)

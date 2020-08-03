@@ -54,78 +54,69 @@ INT32		CNetworkDLLUtil::LoadLibraryExt(LPCSTR lpDLLName)
 
 	if(lpDLLName == NULL)
 	{
-		WriteLogE("[LoadLibraryExt] invalid input data");
 		return -1;
 	}
 	
 	m_hDLL = LoadLibrary(lpDLLName);
 	if(m_hDLL == NULL)
 	{
-		WriteLogE("[LoadLibraryExt] fail to load library %s [%d]", lpDLLName, errno);
-		return -1;
+		return -2;
 	}
 
 	f_GetInterfaceCount = (GetInterfaceCountType)GetProcAddress(m_hDLL, "GetInterfaceCount");
 	if(f_GetInterfaceCount == 0)
 	{
-		WriteLogE("[LoadLibraryExt] fail to get GetInterfaceCount address [%d]", errno);
-		FreeLibrary(m_hDLL);
-		m_hDLL	= NULL;
-		return -2;
-	}
-
-	f_GetIPAddr = (GetIPAddrType)GetProcAddress(m_hDLL, "GetIPAddr");
-	if(f_GetIPAddr == 0)
-	{
-		WriteLogE("[LoadLibraryExt] fail to get GetIPAddr address [%d]", errno);
 		FreeLibrary(m_hDLL);
 		m_hDLL	= NULL;
 		return -3;
 	}
 
-	f_GetMacAddress = (GetMacAddressType)GetProcAddress(m_hDLL, "GetMacAddress");
-	if(f_GetMacAddress == 0)
+	f_GetIPAddr = (GetIPAddrType)GetProcAddress(m_hDLL, "GetIPAddr");
+	if(f_GetIPAddr == 0)
 	{
-		WriteLogE("[LoadLibraryExt] fail to get GetMacAddress address [%d]", errno);
 		FreeLibrary(m_hDLL);
 		m_hDLL	= NULL;
 		return -4;
 	}
 
-	f_GetInterfaceSubNet = (GetInterfaceSubNetType)GetProcAddress(m_hDLL, "GetInterfaceSubNet");
-	if(f_GetInterfaceSubNet == 0)
+	f_GetMacAddress = (GetMacAddressType)GetProcAddress(m_hDLL, "GetMacAddress");
+	if(f_GetMacAddress == 0)
 	{
-		WriteLogE("[LoadLibraryExt] fail to get GetInterfaceSubNet address [%d]", errno);
 		FreeLibrary(m_hDLL);
 		m_hDLL	= NULL;
 		return -5;
 	}
 
-	f_GetNetWorkGroup = (GetNetWorkGroupType)GetProcAddress(m_hDLL, "GetNetWorkGroup");
-	if(f_GetNetWorkGroup == 0)
+	f_GetInterfaceSubNet = (GetInterfaceSubNetType)GetProcAddress(m_hDLL, "GetInterfaceSubNet");
+	if(f_GetInterfaceSubNet == 0)
 	{
-		WriteLogE("[LoadLibraryExt] fail to get GetNetWorkGroup address [%d]", errno);
 		FreeLibrary(m_hDLL);
 		m_hDLL	= NULL;
 		return -6;
 	}
 
-	f_GetHostByNameAddress = (GetHostByNameAddressType)GetProcAddress(m_hDLL, "GetHostByNameAddress");
-	if(f_GetHostByNameAddress == 0)
+	f_GetNetWorkGroup = (GetNetWorkGroupType)GetProcAddress(m_hDLL, "GetNetWorkGroup");
+	if(f_GetNetWorkGroup == 0)
 	{
-		WriteLogE("[LoadLibrarySo_Ext] fail to get GetHostByNameAddress address [%d]", errno);
 		FreeLibrary(m_hDLL);
 		m_hDLL	= NULL;
 		return -7;
 	}
 
-	f_GetSubNetByAddress = (GetSubNetByAddressType)GetProcAddress(m_hDLL, "GetSubNetByAddress");
-	if(f_GetSubNetByAddress == 0)
+	f_GetHostByNameAddress = (GetHostByNameAddressType)GetProcAddress(m_hDLL, "GetHostByNameAddress");
+	if(f_GetHostByNameAddress == 0)
 	{
-		WriteLogE("[LoadLibraryExt] fail to get GetSubNetByAddress address [%d]", errno);
 		FreeLibrary(m_hDLL);
 		m_hDLL	= NULL;
 		return -8;
+	}
+
+	f_GetSubNetByAddress = (GetSubNetByAddressType)GetProcAddress(m_hDLL, "GetSubNetByAddress");
+	if(f_GetSubNetByAddress == 0)
+	{
+		FreeLibrary(m_hDLL);
+		m_hDLL	= NULL;
+		return -9;
 	}
 
 	return 0;

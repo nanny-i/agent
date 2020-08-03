@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "as_parse.h"
+#include "as_time.h"
 #include "as_file.h"
 
 
@@ -490,5 +491,23 @@ void FreeLibrary(HMODULE hModule)
 	}
 }
 
-
+void	ClearOldLogFile(char *acLogPath, char *acLogFile, UINT32 m_nFileLogRetention)
+{
+	UINT32 i=0;
+	char acDeleteFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	if(acLogPath == NULL || acLogFile == NULL || m_nFileLogRetention == 0)
+	{
+		return;
+	}
+	for(i=m_nFileLogRetention; i<m_nFileLogRetention+3; i++)
+	{
+		GetDateTimeByIndex(i, acTimeBuf);
+		snprintf(acDeleteFile, MAX_PATH-1, "%s%s%s.txt", acLogPath, acLogFile, acTimeBuf);
+		if(is_file(acDeleteFile) == 0)
+		{
+			unlink(acDeleteFile);
+		}
+	}
+}
 

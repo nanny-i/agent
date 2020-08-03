@@ -91,6 +91,7 @@
 #include 	"ValidTimeUtil.h"
 #include 	"TokenString.h"
 #include 	"DownLoadFile.h"
+#include 	"DownLoadUtil.h"
 #include 	"EncodeUtil.h"
 
 

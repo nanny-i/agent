@@ -26,9 +26,9 @@ extern "C" {
 typedef struct DeleteFileList_t {
 
 	int nChkDay;
-	char FilePath[CHAR_MAX_SIZE];
-	char FileName[CHAR_MAX_SIZE];
-	DeleteFileList_t *next;
+	char acFilePath[CHAR_MAX_SIZE];
+	char acFileName[CHAR_MAX_SIZE];
+	DeleteFileList_t *pNext;
 
 }DeleteFileList;
 

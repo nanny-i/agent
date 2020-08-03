@@ -27,12 +27,6 @@
 
 INT32 ASIDF_SetDFFmtInit(PASI_DFILE_FMT_INIT pADFFI)
 {
-	ASI_DFILE_FMT_INIT tADFI;
-	if(pADFFI == NULL)
-		return -1;
-	memcpy(&tADFI, pADFFI, sizeof(tADFI));
-	
-	SetLogFileInfo(tADFI.szLogPath, tADFI.szLogFile, tADFI.nRemainLog);
 	return 0;
 }
 //---------------------------------------------------------------------------------

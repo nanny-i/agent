@@ -40,6 +40,7 @@ using namespace std;
 class CHttpFileGetUtil  
 {
 public:
+	void SetLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention);
 	INT32 SendData(INT32 nSock, char *pMessage);
 	INT32 GetFile_Address(LPSTR lpAddress, LPSTR lpFile, LPSTR lpSaveedFileName, INT32 nPort = 80);
 	INT32 GetFile_Host(LPSTR lpHostName, LPSTR lpFile, LPSTR lpSaveedFileName, INT32 nPort = 80);
@@ -50,11 +51,16 @@ public:
 
 private:
 	INT32   m_nContinue;
+	CMutexExt m_MutexHttpLog;
+
+	INT32	m_nRemainDebugLog;
+	UINT32	m_nFileLogRetention;
+	char	m_acLogPath[MAX_PATH];
+	char	m_acLogFile[MAX_PATH];
 
 private:
 	INT32 GetHeaderResult(string strHeader);
 	INT32 GetRecvFileSize(string strHeader);
-	String GetCurrentDateTime(INT32 nDateTime = 0);
 	void WriteLog(char *fmt,...);
 };
 

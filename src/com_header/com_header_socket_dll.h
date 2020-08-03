@@ -292,6 +292,7 @@ typedef struct _sock_init_data
 	UINT32			nMaxComPortNum;			//  SERVER
 	UINT32			nRemainSockEvt;			//  SERVER & CLIENT
 	UINT32			nRemainDebugLog;		//  SERVER & CLIENT
+	UINT32			m_nFileLogRetention;	//  SERVER & CLIENT
 	UINT32			nChkAutoDisConRunTime;	// SERVER
 	UINT32			nChkAutoDisConTime;		// SERVER
 

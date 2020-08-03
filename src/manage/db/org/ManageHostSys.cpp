@@ -45,7 +45,7 @@ INT32		CManageHostSys::LoadDBMS()
 {	
 	TListDBHostSys tDBHostSysList;
     TListDBHostSysItor begin, end;
-	
+	DB_HOST_SYS dhs;
 	if(SetER(t_DBMgrHostSys->LoadExecute(&tDBHostSysList)))
     {
 		if(tDBHostSysList.size() == 0)
@@ -66,7 +66,6 @@ INT32		CManageHostSys::LoadDBMS()
 	// 20200724  edit jhjung
 	if(tDBHostSysList.size() == 0)
 	{
-		DB_HOST_SYS dhs;
 		memset(&dhs, 0, sizeof(DB_HOST_SYS));
 		dhs.nUsedFlag = 1;
 		AddHostSys(dhs);

@@ -57,7 +57,7 @@ extern void UnixTimeToDBTime(time_t* pt, PTIMSTM pst);
 extern void DBTimeToUnixTime(PTIMSTM pst, time_t* pt);
 extern time_t LocalTimeToGlobalTime(time_t& nTime);
 extern time_t GlobalTimeToLocalTime(time_t& nTime);
-
+extern void GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf);
 extern void	GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf);
 extern UINT32	GetCurrentDateTimeInt();
 extern INT32 GetFileTimeInfo(LPCSTR pcPath, UINT32 *pdwCreateTime, UINT32 *pdwModifyTime, UINT32 *pdwAccessTime);

@@ -52,5 +52,6 @@ INT32 SetDLInit(PASI_FDL_INIT pafdli);
 INT32 SetDLSvrType(UINT32 nDLSvrType);
 INT32 SetDLSvrInfo(UINT32 nItemType, LPCTSTR szSvrInfo);
 INT32 SetHomePath(LPCTSTR lpHomePathList, UINT32 nLen);
+INT32 SetDLLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention);
 	
 #endif /*_DOWNLOAD_FILE_H__*/

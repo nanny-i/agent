@@ -188,7 +188,7 @@ INT32					CManagePoFaOp::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkg
 		PDB_PO_FA_OP_PKG pdpfop = t_ManagePoFaOpPkg->FindItem(begin->first);
 		if(!pdpfop)	continue;
 
-		PDB_PO_FA_OP_UNIT pdpfou = t_ManagePoFaProcUnit->FindItem(pdpfop->tDPH.nUnitID);
+		PDB_PO_FA_OP_UNIT pdpfou = t_ManagePoFaOpUnit->FindItem(pdpfop->tDPH.nUnitID);
 		if(!pdpfou)	continue;
 
 		if(t_EnvInfo->m_nHostSysType & pdpfou->tDPH.nNotifyInfoID)
