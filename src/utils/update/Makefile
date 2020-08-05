@@ -5,7 +5,7 @@ CPPFILES = mz_ioapi.cpp mz_unzip.cpp mz_zip.cpp zip.cpp update.cpp
 OBJ = $(CPPFILES:.cpp=.o)
 
 all: $(OBJ)
-	$(CC) $(CFLAGS) -g -o update $(OBJ) ../../lib/as_lib/src/libascomm.a -lz -ldl
+	$(CC) $(CFLAGS) -g -o update $(OBJ) ../../lib/as_lib/src/libascomm.a -lz -ldl -static-libgcc -static-libstdc++
 
 .cpp.o:
 	$(CC) $(CFLAGS) -c $(CPPFILES)
