@@ -53,4 +53,4 @@ sys_all:
 
 sys_install:
 	cp -f nannysvc /usr/local/ashin/nanny/sbin
-	cp -f nannysvc $(AS_PKG_HOME)/nanny
+	cp -f nannysvc $(AS_PKG_HOME)/nanny/sbin
