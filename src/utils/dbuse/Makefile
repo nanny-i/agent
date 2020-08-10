@@ -19,4 +19,4 @@ install:
 	cp -f dbuse $(AS_PKG_HOME)/tool
 	
 build:
-	$(CC) $(CFLAGS) -g -o dbuse dbuse.o ../../lib/as_lib/src/libascomm.a -lodbc -ldl
+	$(CC) $(CFLAGS) -g -o dbuse dbuse.o ../../lib/as_lib/src/libascomm.a -lodbc -ldl  -static-libgcc -static-libstdc++

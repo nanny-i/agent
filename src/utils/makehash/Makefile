@@ -20,4 +20,4 @@ install:
 	cp -f makehash $(AS_PKG_HOME)/tool	
 
 build:
-	$(CC) $(CFLAGS) -L$(CURL_PATH)/lib -o makehash makehash.o ../../lib/as_lib/src/libascomm.a	
+	$(CC) $(CFLAGS) -L$(CURL_PATH)/lib -o makehash makehash.o ../../lib/as_lib/src/libascomm.a -static-libgcc -static-libstdc++

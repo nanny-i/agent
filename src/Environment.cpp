@@ -171,7 +171,7 @@ INT32       CEnvironment::LoadEnv_Local()
 		m_strLogPath = SPrintf("%s/log", m_strRootPath.c_str());
 		CreateDirectory(m_strLogPath.c_str(), NULL);
 		SetLogFileInfo((char *)m_strLogPath.c_str(), "/nanny_agt_sys_log_", 1, m_nFileLogRetention);
-		SetDLLogPath((char *)m_strLogPath.c_str(), "nanny_agt_http_log_", 1, m_nFileLogRetention);
+		SetDLLogPath((char *)m_strLogPath.c_str(), "/nanny_agt_http_log_", 1, m_nFileLogRetention);
 	}
 
 	{

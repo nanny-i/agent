@@ -18,4 +18,4 @@ install:
 	cp -f editconf $(AS_PKG_HOME)/tool	
 
 build:
-	$(CC) $(CFLAGS) -g -o editconf editconf.o ../../lib/as_lib/src/libascomm.a -lodbc -luuid -ldl -static-libstdc++
+	$(CC) $(CFLAGS) -g -o editconf editconf.o ../../lib/as_lib/src/libascomm.a -lodbc -luuid -ldl  -static-libgcc -static-libstdc++
