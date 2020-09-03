@@ -27,7 +27,7 @@ class CLogicPoFaClear	: public CLogicBase
 {
 private:
 	INT32		AnalyzePkt_FromLink_Ext();
-	INT32		AnalyzePkt_FromLink_Ext_Init();
+	INT32		AnalyzePkt_FromLink_Ext_Scan();
 
 	INT32		AnalyzePkt_FromLink_Del_Ext();
 

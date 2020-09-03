@@ -27,7 +27,9 @@
 #define SS_COMMON_REMOTE_ORDER_TYPE_NO_PTN_RE_SEND_FILE_INFO					0x00000001
 #define SS_COMMON_REMOTE_ORDER_TYPE_NC_PTN_GET_FILE_INFO						0x00000010
 #define SS_COMMON_REMOTE_ORDER_TYPE_NI_RECOVERY_BK_FILE							0x00000020
-
+#define SS_COMMON_REMOTE_ORDER_TYPE_RE_GET_SYSTEMINFO							0x00000040
+#define SS_COMMON_REMOTE_ORDER_TYPE_NP_SCAN_PATCH								0x00000050
+#define SS_COMMON_REMOTE_ORDER_TYPE_NO_VUIN_SCAN								0x00000060
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

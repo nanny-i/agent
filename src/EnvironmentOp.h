@@ -62,7 +62,11 @@ public:
 	UINT32					m_nSysOffFlag;
 	DWORD					m_nSysOffReason;
 	UINT32					m_nSysOffTime;
+	UINT32					m_nSysLocaleID;
 
+private:
+	UINT32					m_nInjectFlag;
+	UINT32					m_nStopOpBySysOff;
 
 public:
 	INT32			InitEnvOp();
@@ -73,6 +77,8 @@ public:
 	HWND			GetMainHandle()							{	return m_hMainDlg;			};
 	void			SetMainContinue(INT32 nFlag = 0)		{	m_nMainContinue = nFlag;	};
 	INT32			GetMainContinue()						{	return m_nMainContinue;		};	
+	void			SetStopOpBySysOff(UINT32 nFlag = 0)		{	m_nStopOpBySysOff = nFlag;	};
+	UINT32&			GetStopOpBySysOff()						{	return m_nStopOpBySysOff;	};
 
 public:
 	String			GetComputerName();
@@ -101,7 +107,7 @@ public:
 	INT32			SetServiceRecoveryOption(INT32 nResetCount = 86400 /*sec*/, INT32 nActionMilisecond = 1800000 /*milisec*/);
 	INT32			SetSysBootChkMode(UINT32 nChkType = 0, UINT32 nBootTime = 0);
 	INT32			SetSysBootMode(UINT32 nSysBootMode = 1);
-	INT32			IsSysBootTime()		{	return m_nSysBootMode;	};
+	INT32			IsSysBootTime();
 
 public:
 	INT32			SetSysOffMode(UINT32 nLogOffMode = 1, UINT32 nFlag = 0, DWORD dwReason = 0);

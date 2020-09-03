@@ -2,7 +2,7 @@ include ../../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = ManageHost.cpp ManageHostHw.cpp ManageHostKey.cpp ManageHostPolicy.cpp ManageHostStatusPo.cpp ManageHostSw.cpp ManageHostSys.cpp ManageUser.cpp ManageUserPolicy.cpp
+CPPFILES = ManageHost.cpp ManageHostHw.cpp ManageHostKey.cpp ManageHostPatch.cpp ManageHostPolicy.cpp ManageHostStatusPo.cpp ManageHostSw.cpp ManageHostSys.cpp ManageUser.cpp ManageUserPolicy.cpp ManageHostVulnRst.cpp ManageHostVulnRstUnit.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 

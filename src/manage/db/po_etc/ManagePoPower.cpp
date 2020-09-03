@@ -284,6 +284,7 @@ INT32					CManagePoPower::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
 INT32					CManagePoPower::SetPkt(PDB_PO_POWER pdpp, MemToken& SendToken)
 {
 	SendToken.TokenAdd_DPH(pdpp->tDPH);
+	SendToken.TokenAdd_32(pdpp->nFastBoot);
 
 	SendToken.TokenSet_Block();
     return 0;
@@ -293,6 +294,7 @@ INT32					CManagePoPower::SetPkt(PDB_PO_POWER pdpp, MemToken& SendToken)
 INT32					CManagePoPower::GetPkt(MemToken& RecvToken, DB_PO_POWER& dpp)
 {
 	if (!RecvToken.TokenDel_DPH(dpp.tDPH))				goto	INVALID_PKT;
+	if (!RecvToken.TokenDel_32(dpp.nFastBoot))			goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

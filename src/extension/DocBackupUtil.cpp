@@ -128,8 +128,9 @@ INT32		CDocBackupUtil::RemoveBackupFile(PDB_LOG_DOC pdld)
 	{
 		if (unlink(strBkFileName.c_str()) == -1)
 		{
-			Sleep(10);
-			delete(strBkFileName.c_str());
+			WriteLogN("[%s] remove doc file delete fail : [%d]:[%s]", m_strUtilName.c_str(), errno, strBkFileName.c_str());
+			if(t_LogicMgrPoFaDelFileAfterBoot != NULL)
+				t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(strBkFileName.c_str());
 		}
 	}
 	pdld->nRemoveTime = t_ValidTimeUtil->GetValidTime();
@@ -207,7 +208,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 			nMode = nMode | S_IWOTH;
 		if (chmod(strFullPath.c_str(), nMode) == -1)
 		{
-			WriteLogE("[%s] fail to chmode (%s) (%d)", m_strUtilName.c_str(), strFullPath.c_str(), errno);
+			WriteLogE("[%s] fail to chmod (%s) (%d)", m_strUtilName.c_str(), strFullPath.c_str(), errno);
 		}
 	}
 	else
@@ -226,7 +227,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 			pdld->strBkFileName = GetGUID();
 
 			UINT32 nCompTime = GetTickCount();
-			WriteLogA("[%s] doc file backup start: [%d][%s]:[%s]", m_strUtilName.c_str(), nRtn, strFullPath.c_str(), pdld->strBkFileName.c_str());
+			WriteLogN("[%s] doc file backup start: [%d][%s]:[%s]", m_strUtilName.c_str(), nRtn, strFullPath.c_str(), pdld->strBkFileName.c_str());
 
 			strTarFile = SPrintf("%s/%s", strBkDir.c_str(), pdld->strBkFileName.c_str());
 
@@ -251,11 +252,12 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 
 		if(tFileUtil.FileExists(strFullPath.c_str()) == TRUE)
 		{
-			if(unlink(strFullPath.c_str()) == -1)
+			//if(unlink(strFullPath.c_str()) == -1)
 			{
 				if(nRemainLog)
 					WriteLogN("[%s] doc file delete fail : [%d]:[%d][%s]", m_strUtilName.c_str(), errno, nDelCnt, strFullPath.c_str());
-//				MoveFileExW(pdld->strObjectPathW, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
+				if(t_LogicMgrPoFaDelFileAfterBoot)
+					t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(strFullPath.c_str());
 			}
 		}
 		WriteLogN("[%s] doc file delete success : [%s]", m_strUtilName.c_str(), strFullPath.c_str());
@@ -272,13 +274,15 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 		t_FileDeleteUtil->SecureDeleteFile(strFullPath.c_str(), nDelMethod, nDelCnt, TRUE, true, nLimitSize, nLimitDelCnt);
 		if(tFileUtil.FileExists(strFullPath.c_str()) == TRUE)
 		{
-			if(unlink(strFullPath.c_str()) == -1)
+			//if(unlink(strFullPath.c_str()) == -1)
 			{
 				if(nRemainLog)
 					WriteLogN("[%s] doc file delete fail : [%d]:[%d][%s]", m_strUtilName.c_str(), errno, nDelCnt, strFullPath.c_str());
-//				MoveFileExW(pdld->strObjectPathW, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
+				if(t_LogicMgrPoFaDelFileAfterBoot)
+					t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(strFullPath.c_str());
 			}
 		}
+        t_ManageDocDeleteInfo->DocDeleteCount(pdld->nOpType);
 	}
 
 	m_tBkMutex.UnLock();
@@ -300,8 +304,8 @@ INT32		CDocBackupUtil::RecoveryFile(PDB_LOG_DOC pdld)
 	if(pdld->nBackupType == SS_PO_FA_BK_BACKUP_TYPE_COMP_SEED)
 	{
 		//nRtn = t_ASICOMPDLLUtil->ASICOMP_DecompFileW(W2A(strBkFile), NULL, NULL);
-		strNewFileName = tFileUtil.GetNewFileName(pdld->strObjectPath, 0, "recover_");
-		strSvFilePath = tFileUtil.FindFilePath(pdld->strObjectPath);
+		strNewFileName = tFileUtil.GetNewFileName(pdld->strObjectPath, pdld->strObjectName, 0, "recover_");
+		strSvFilePath = pdld->strObjectPath;
 							
 		strncpy(tACS.acSrcFile, strBkFile.c_str(), MAX_PATH-1);
 		strncpy(tACS.acTarPath, strSvFilePath.c_str(), MAX_PATH-1); 
@@ -314,8 +318,8 @@ INT32		CDocBackupUtil::RecoveryFile(PDB_LOG_DOC pdld)
 		{
 			pdld->strObjectName = strNewFileName;
 			pdld->strObjectPath = SPrintf("%s/%s", strSvFilePath.c_str(), strNewFileName.c_str());
-			WriteLogN("[%s] success to recovery file : [%d][%d:%d][%s]->[%s/%s]", m_strUtilName.c_str(), nRtn, pdld->nID, pdld->nRegSvrID, 
-				pdld->strBkFileName.c_str(), pdld->strObjectPath.c_str(), pdld->strObjectName.c_str());
+			WriteLogN("[%s] success to recovery file : [%d][%d:%d][%s]->[%s]", m_strUtilName.c_str(), nRtn, pdld->nID, pdld->nRegSvrID, 
+				pdld->strBkFileName.c_str(), pdld->strObjectPath.c_str());
 		}
 		else
 		{
@@ -340,15 +344,16 @@ INT32		CDocBackupUtil::RecoveryFile(PDB_LOG_DOC pdld)
 	else
 	{	
 		//t_FileDeleteUtil->SecureDeleteFileW((LPWSTR)(LPCWSTR)pdld->strObjectPathW);
-		if(unlink(pdld->strObjectPath.c_str()) == -1)
+		strNewFileName = SPrintf("%s/%s", pdld->strObjectPath.c_str(), pdld->strObjectName.c_str());
+		if(unlink(strNewFileName.c_str()) != -1)
 		{
-			CopyFile(strBkFile.c_str(), pdld->strObjectPath.c_str(), TRUE);	
+			CopyFile(strBkFile.c_str(), strNewFileName.c_str(), TRUE);	
 			WriteLogN("[%s] doc file recovery(copy) end: [%d][%d:%d][%s]->[%s]", m_strUtilName.c_str(), nRtn, pdld->nID, pdld->nRegSvrID,
-				strBkFile.c_str(), pdld->strObjectPath.c_str());
+				strBkFile.c_str(), strNewFileName.c_str());
 		}
 		else
 		{
-			WriteLogE("[%s] fail to delete (%s) (%d)", m_strUtilName.c_str(), pdld->strObjectPath.c_str(), errno);
+			WriteLogE("[%s] fail to delete (%s) (%d)", m_strUtilName.c_str(), strNewFileName.c_str(), errno);
 		}
 	}
 
@@ -387,7 +392,7 @@ INT32		CDocBackupUtil::SetBkSeedKey(PBYTE pSeedKey, UINT32 nMode)
 }
 //---------------------------------------------------------------------------
 
-INT32		CDocBackupUtil::RemoveBackupFilesByNonExistLog()
+INT32		CDocBackupUtil::RemoveBackupFilesByNonExistLog(UINT32& nContinue)
 {
 	CFileUtil tFileUtil;
 	String strDirectory;
@@ -412,7 +417,7 @@ INT32		CDocBackupUtil::RemoveBackupFilesByNonExistLog()
 		WriteLogN("start remove remain doc backup file by non exist log");
 
 		begin = tListFiles.begin();  end = tListFiles.end();
-		for(begin; begin != end; begin++)
+		for(begin; begin != end && !nContinue; begin++)
 		{
 			strFilePath = *begin;
 			if (strFilePath.empty())
@@ -437,7 +442,8 @@ INT32		CDocBackupUtil::RemoveBackupFilesByNonExistLog()
 					if (unlink(strFilePath.c_str()) == -1)
 					{
 						WriteLogN("remove remain bk file delete fail and set del file reservation delay until reboot : [%d]:[%s]", errno, strFilePath.c_str());
-//						MoveFileEx(strFileName, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
+						if(t_LogicMgrPoFaDelFileAfterBoot)
+							t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(strFilePath.c_str());
 					}
 				}
 				WriteLogN("remove remain doc backup file : delflag[%d] bkpath[%s]", nDelFlag, strFilePath.c_str());

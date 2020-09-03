@@ -43,9 +43,23 @@ CManageLogSecu::~CManageLogSecu()
 
 INT32		CManageLogSecu::LoadDBMS()
 {
+	UINT32 nLogMode = 0, nLogNum = 0;
+	{
+		PDB_ENV_LOG pdel = t_ManageEnvLog->FindItem(DEFAULT_ID);
+		if(pdel)
+		{
+			nLogMode = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadModeMap, SS_ENV_LOG_INDEX_SECU);
+			nLogNum = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadNumMap, SS_ENV_LOG_INDEX_SECU);
+			if(nLogMode == SS_ENV_LOG_LOAD_MODE_TYPE_DAY && nLogNum)
+			{
+				nLogNum = ((GetCurrentDateTimeInt() / 86400) - nLogNum) * 86400;
+			}
+		}
+	}
+
 	TListDBLogSecu tDBLogSecuList;	
 	TListDBLogSecuItor begin, end;
-	if(SetER(t_DBMgrLogSecu->LoadExecute(&tDBLogSecuList)))
+	if(SetER(t_DBMgrLogSecu->LoadDB(nLogMode, nLogNum, tDBLogSecuList)))
     {
     	return g_nErrRtn;
     }
@@ -112,6 +126,28 @@ INT32					CManageLogSecu::DelLogSecu(UINT32 nID)
     DeleteItem(nID);
     return 0;
 }
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32			CManageLogSecu::SetPktSync(TListPVOID& tIDList)
+{
+	{
+		TMapDBLogSecuItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if(ISSYNCSTEP(begin->second.nSyncSvrStep) || 
+				(begin->second.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))	continue;
+
+			tIDList.push_back(&(begin->second));
+		}
+
+		if(tIDList.empty())	return -1;
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -189,6 +225,8 @@ INT32					CManageLogSecu::SetPkt(PDB_LOG_SECU pdls, MemToken& SendToken)
 	SendToken.TokenAdd_String(pdls->strObjectName);
 	SendToken.TokenAdd_StringW(pdls->strObjectPathW);
 
+	SendToken.TokenAdd_32(pdls->nUserID);
+
 	SendToken.TokenSet_Block();
 
     return 0;
@@ -220,6 +258,8 @@ INT32					CManageLogSecu::GetPkt(MemToken& RecvToken, DB_LOG_SECU& dls)
 	if ( RecvToken.TokenDel_String(dls.strObjectPath) < 0)		goto	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dls.strObjectName) < 0)		goto	INVALID_PKT;
 	if ( RecvToken.TokenDel_StringW(dls.strObjectPathW) < 0)	goto	INVALID_PKT;
+
+	if (!RecvToken.TokenDel_32(dls.nUserID))					goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

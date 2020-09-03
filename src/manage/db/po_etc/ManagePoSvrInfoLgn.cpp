@@ -88,12 +88,14 @@ INT32					CManagePoSvrInfoLgn::InitHash(UINT32 nID)
 	}
 
 	{
-		strOrgValue = SPrintf("%s\f", pdpsil->strSvrInfoList.c_str());
+		pdpsil->tDPH.strHash = pdpsil->strSvrInfoList;
 	}
 
-	{
-		pdpsil->tDPH.strHash = strOrgValue;
-	}
+// 	{
+// 		char pszHashValue[CHAR_MAX_SIZE] = {0, };
+// 		SHAString(ASIHASH_SHA_LEN_TYPE_128, strOrgValue.c_str(), strOrgValue.length(), pszHashValue, CHAR_MAX_SIZE);
+// 		pdpsil->tDPH.strHash = pszHashValue;
+// 	}
 	return 0;
 }
 //---------------------------------------------------------------------------

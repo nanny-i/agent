@@ -72,6 +72,7 @@ void		CLogicInitLink::AnalyzePkt_Init_Request()
 		if((nRequestInfo & G_INIT_REQUEST_TYPE_GROUP) != 0)					{		SendPkt_Init_Group();			}  
 		if((nRequestInfo & G_INIT_REQUEST_TYPE_USER) != 0)					{		SendPkt_Init_User();			}
 		if((nRequestInfo & G_INIT_REQUEST_TYPE_ENV) != 0)					{		SendPkt_Init_Env();				}       
+		if((nRequestInfo & G_INIT_REQUEST_TYPE_PTN) != 0)					{		SendPkt_Init_Ptn();				}       
 		if((nRequestInfo & G_INIT_REQUEST_TYPE_LOCAL_ENV) != 0)				{		SendPkt_Init_LocalEnv();		}       
 		if((nRequestInfo & G_INIT_REQUEST_TYPE_POLICY) != 0)				{		SendPkt_Init_Policy();			}       
 	}	
@@ -108,7 +109,7 @@ void		CLogicInitLink::AnalyzePkt_Init_Last()
 void		CLogicInitLink::SendPkt_Init_Data()
 {
 	{	
-		t_ManageLogEvent->SetPkt(SendToken);
+		t_ManageLogEvent->SetPktSyncMode(SendToken, SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
 		SendData_Link(m_nSessionID, G_TYPE_INIT, G_CODE_INIT_LOG_EVENT, SendToken);
 		SendToken.Clear();
 		WriteLogN("[logic init] send init link data [log_event]");
@@ -140,6 +141,27 @@ void		CLogicInitLink::SendPkt_Init_Data()
 		SendData_Link(m_nSessionID, G_TYPE_INIT, G_CODE_INIT_LOG_DOC_DSCAN, SendToken);
 		SendToken.Clear();
 		WriteLogN("[logic init] send init link data [log_doc_dscan]");
+	}
+
+	{
+		t_ManageLogPatch->SetPkt_Link(SendToken);
+		SendData_Link(m_nSessionID, G_TYPE_INIT, G_CODE_INIT_LOG_PATCH, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [log_patch]");
+	}
+
+	{
+		t_ManageLogDevice->SetPkt_Link(SendToken);
+		SendData_Link(m_nSessionID, G_TYPE_INIT, G_CODE_INIT_LOG_DEVICE, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [log_device]");
+	}
+
+	{
+		t_ManageLogRs->SetPkt_Link(SendToken);
+		SendData_Link(m_nSessionID, G_TYPE_INIT, G_CODE_INIT_LOG_RS, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [log_rs]");
 	}
 
 	return;
@@ -179,20 +201,20 @@ void		CLogicInitLink::SendPkt_Init_Common()
 		SendToken.Clear();
 		WriteLogN("[logic init] send init link data [site_vuln_scan][%d]", t_ManageSiteVulnScan->Count());
 	}
-	{
-		m_tPktData->hdr.code = G_CODE_INIT_SITE_VULN_REPAIR;
-		t_ManageSiteVulnRepair->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [site_vuln_repair][%d]", t_ManageSiteVulnRepair->Count());
-	}
-	{
-		m_tPktData->hdr.code = G_CODE_INIT_SITE_VULN_LOCK;
-		t_ManageSiteVulnLock->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [site_vuln_lock][%d]", t_ManageSiteVulnLock->Count());
-	}
+// 	{
+// 		m_tPktData->hdr.code = G_CODE_INIT_SITE_VULN_REPAIR;
+// 		t_ManageSiteVulnRepair->SetPkt(SendToken);
+// 		SendData_Link(m_tPktData, SendToken);
+// 		SendToken.Clear();
+// 		WriteLogN("[logic init] send init link data [site_vuln_repair][%d]", t_ManageSiteVulnRepair->Count());
+// 	}
+// 	{
+// 		m_tPktData->hdr.code = G_CODE_INIT_SITE_VULN_LOCK;
+// 		t_ManageSiteVulnLock->SetPkt(SendToken);
+// 		SendData_Link(m_tPktData, SendToken);
+// 		SendToken.Clear();
+// 		WriteLogN("[logic init] send init link data [site_vuln_lock][%d]", t_ManageSiteVulnLock->Count());
+// 	}
 	return;
 }
 //---------------------------------------------------------------------------
@@ -229,6 +251,28 @@ void		CLogicInitLink::SendPkt_Init_Host()
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
 		WriteLogN("[logic init] send init link data [host_sw][%d]", t_ManageHostSw->Count());
+	}
+
+	{
+		m_tPktData->hdr.code = G_CODE_INIT_HOST_PATCH;
+		t_ManageHostPatch->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [host_patch][%d]", t_ManageHostPatch->Count());
+	}
+
+	{
+		m_tPktData->hdr.code = G_CODE_INIT_HOST_VULN_RST;
+		t_ManageHostVulnRst->SetPkt_Link(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [host_vuln_rst][%d]", t_ManageHostVulnRst->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_HOST_VULN_RST_UNIT;
+		t_ManageHostVulnRstUnit->SetPkt_Link(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [host_vuln_rst_unit][%d]", t_ManageHostVulnRstUnit->Count());
 	}
 	
     return;
@@ -335,4 +379,30 @@ void		CLogicInitLink::SendPkt_Init_LocalEnv()
 }
 //---------------------------------------------------------------------------
 
+void		CLogicInitLink::SendPkt_Init_Ptn()
+{
+	{
+		TMapID tIDMap;
+		t_ManageLinkEnv->GetKeyIDMap(G_TYPE_PTN_PATCH, tIDMap);
+		
+		m_tPktData->hdr.code = G_CODE_INIT_PTN_PATCH;
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [ptn_patch][%d]", tIDMap.size());	
+	}
+
+	{
+		m_tPktData->hdr.code = G_CODE_INIT_PTN_VULN;
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+	}
+
+	{
+		m_tPktData->hdr.code = G_CODE_INIT_PTN_VULN_SCAN;
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+	}
+	return;
+}
+//---------------------------------------------------------------------------
 

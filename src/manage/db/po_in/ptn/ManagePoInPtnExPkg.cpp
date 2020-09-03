@@ -54,7 +54,7 @@ INT32		CManagePoInPtnExPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -105,7 +105,7 @@ INT32					CManagePoInPtnExPkg::AddPoInPtnExPkg(DB_PO_IN_PTN_EX_PKG&	datap)
     }
 
 	AddItem(datap.tDPH.nID, datap);
-	AddKeyIDList(&datap);
+	AddKeyIDListPkg(&datap);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoInPtnExPkg::DelPoInPtnExPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdatap);
+	DelKeyIDListPkg(pdatap);
     DeleteItem(nID);
     return 0;
 }

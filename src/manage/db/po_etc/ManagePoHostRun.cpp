@@ -91,11 +91,13 @@ INT32					CManagePoHostRun::InitHash(UINT32 nID)
 		strOrgValue = SPrintf("%s,"
 							"%u,%u,"
 							"%u,%u,%u,%u,"
-							"%u,%u,", 
+							"%u,%u,"
+                            "%u,",
 							GetHdrHashInfo(pdphr).c_str(),
 							pdphr->nRunOption, pdphr->nRmLogDay, 
 							pdphr->nLgnConPeriod, pdphr->nMgrShowType, pdphr->nShowLogDay, pdphr->nBootChkType,
-							pdphr->nIntegrityMode, pdphr->nCrossAuthMode);
+							pdphr->nIntegrityMode, pdphr->nCrossAuthMode,
+                            pdphr->nOncePktNum);
 	}
 
 	{
@@ -218,6 +220,7 @@ INT32					CManagePoHostRun::SetPkt(PDB_PO_HOST_RUN pdphr, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdphr->nBootChkType);
 	SendToken.TokenAdd_32(pdphr->nIntegrityMode);
 	SendToken.TokenAdd_32(pdphr->nCrossAuthMode);
+	SendToken.TokenAdd_32(pdphr->nOncePktNum);
 
 	SendToken.TokenSet_Block();
     return 0;
@@ -236,6 +239,7 @@ INT32					CManagePoHostRun::GetPkt(MemToken& RecvToken, DB_PO_HOST_RUN& dphr)
 	if (!RecvToken.TokenDel_32(dphr.nBootChkType))		goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dphr.nIntegrityMode))	goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dphr.nCrossAuthMode))	goto	INVALID_PKT;
+	if (!RecvToken.TokenDel_32(dphr.nOncePktNum))		goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

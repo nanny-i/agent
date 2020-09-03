@@ -138,12 +138,12 @@ typedef struct _asi_comp_secu_file_hdr
 	}
 	UINT32		nCompVer;
 	UINT32		nEncType;
-	String		strEncHash;
-	String		strRelativePath;
-	String		strFileName;
-	UINT64		nFileSize;
 	UINT32		nFileMode;
 	UINT32		nTokenSize;
+	UINT64		nFileSize;
+	char		acEncHash[MAX_QBUFF];
+	char		acRelativePath[MAX_QBUFF];
+	char		acFileName[MAX_QBUFF];
 }ASI_COMP_SECU_FILE_HDR, *PASI_COMP_SECU_FILE_HDR;
 //-----------------------------------------------------------------------------------
 

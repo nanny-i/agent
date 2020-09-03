@@ -43,9 +43,23 @@ CManageLogDoc::~CManageLogDoc()
 
 INT32		CManageLogDoc::LoadDBMS()
 {
+	UINT32 nLogMode = 0, nLogNum = 0;
+	{
+		PDB_ENV_LOG pdel = t_ManageEnvLog->FindItem(DEFAULT_ID);
+		if(pdel)
+		{
+			nLogMode = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadModeMap, SS_ENV_LOG_INDEX_DOC);
+			nLogNum = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadNumMap, SS_ENV_LOG_INDEX_DOC);
+			if(nLogMode == SS_ENV_LOG_LOAD_MODE_TYPE_DAY && nLogNum)
+			{
+				nLogNum = ((GetCurrentDateTimeInt() / 86400) - nLogNum) * 86400;
+			}
+		}
+	}
+
 	TListDBLogDoc tDBLogDocList;
 	TListDBLogDocItor begin, end;
-	if(SetER(t_DBMgrLogDoc->LoadExecute(&tDBLogDocList)))
+	if(SetER(t_DBMgrLogDoc->LoadDB(nLogMode, nLogNum, tDBLogDocList)))
     {
     	return g_nErrRtn;
     }
@@ -67,7 +81,7 @@ INT32		CManageLogDoc::LoadDBMS()
 		{
 			if(begin->nRegDate < nShowLogDay)	continue;
 		}
-		else if(ISSYNCSTEP(begin->nSyncSvrStep) && (begin->nRegDate < nShowLogDay))
+		else if(ISSYNCSTEP(begin->nSyncSvrStep) && begin->nRegDate && (begin->nRegDate < nShowLogDay))
 		{
 			if(begin->nRemoveTime)		continue;
 		}
@@ -85,7 +99,6 @@ INT32					CManageLogDoc::AddLogDoc(DB_LOG_DOC&	dld)
     {
     	return g_nErrRtn;
     }
-
     AddItem(dld);
 	AddKeyID(dld.nRegSvrID, dld.nID);
 
@@ -220,6 +233,25 @@ INT32					CManageLogDoc::EditLogDocWithHost(DB_LOG_DOC&	dld)
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+
+INT32			CManageLogDoc::SetPktSync(TListPVOID& tIDList)
+{
+	{
+		TMapDBLogDocItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if(ISSYNCSTEP(begin->second.nSyncSvrStep) || 
+				(begin->second.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))	continue;
+
+			tIDList.push_back(&(begin->second));
+		}
+
+		if(tIDList.empty())	return -1;
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -259,6 +291,7 @@ INT32					CManageLogDoc::SetPkt(MemToken& SendToken)
 
 INT32					CManageLogDoc::SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken)
 {
+	String strEucData;
 	SendToken.TokenAdd_32(pdld->nID);
 	SendToken.TokenAdd_32(pdld->nRegDate);
 	SendToken.TokenAdd_32(pdld->nEvtTime);
@@ -279,11 +312,33 @@ INT32					CManageLogDoc::SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdld->nBackupTime);
 
 	SendToken.TokenAdd_String(pdld->strSubjectPath);
+
 	SendToken.TokenAdd_String(pdld->strSubjectName);
-	SendToken.TokenAdd_String(pdld->strObjectPath);
-	SendToken.TokenAdd_String(pdld->strObjectName);
-	SendToken.TokenAdd_String(pdld->strBkFileName);
+
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdld->strObjectPath, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdld->strObjectPath);
+
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdld->strObjectName, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdld->strObjectName);
+
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdld->strBkFileName, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdld->strBkFileName);
+
 	SendToken.TokenAdd_StringW(pdld->strObjectPathW);
+
+	SendToken.TokenAdd_32(pdld->nUserID);
 
 	SendToken.TokenSet_Block();
 
@@ -293,6 +348,7 @@ INT32					CManageLogDoc::SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken)
 
 INT32					CManageLogDoc::GetPkt(MemToken& RecvToken, DB_LOG_DOC& dld)
 {
+	String strUtfData;
 	if (!RecvToken.TokenDel_32(dld.nID))						goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dld.nRegDate))					goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dld.nEvtTime))					goto	INVALID_PKT;
@@ -313,11 +369,27 @@ INT32					CManageLogDoc::GetPkt(MemToken& RecvToken, DB_LOG_DOC& dld)
 	if (!RecvToken.TokenDel_32(dld.nBackupTime))				goto 	INVALID_PKT;
 
 	if ( RecvToken.TokenDel_String(dld.strSubjectPath) < 0)		goto	INVALID_PKT;
+
 	if ( RecvToken.TokenDel_String(dld.strSubjectName) < 0)		goto	INVALID_PKT;
+
 	if ( RecvToken.TokenDel_String(dld.strObjectPath) < 0)		goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dld.strObjectPath, strUtfData) == 0)
+	{
+		dld.strObjectPath = strUtfData;
+	}
 	if ( RecvToken.TokenDel_String(dld.strObjectName) < 0)		goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dld.strObjectName, strUtfData) == 0)
+	{
+		dld.strObjectName = strUtfData;
+	}
 	if ( RecvToken.TokenDel_String(dld.strBkFileName) < 0)		goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dld.strBkFileName, strUtfData) == 0)
+	{
+		dld.strBkFileName = strUtfData;
+	}
 	if ( RecvToken.TokenDel_StringW(dld.strObjectPathW) < 0)	goto	INVALID_PKT;
+
+	if (!RecvToken.TokenDel_32(dld.nUserID))					goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;
@@ -376,6 +448,8 @@ INT32					CManageLogDoc::SetPkt_Link(PDB_LOG_DOC pdld, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdld->nFileMdTime);
 	SendToken.TokenAdd_32(pdld->nFileAcTime);
 
+	SendToken.TokenAdd_32(pdld->nUserID);
+
 	SendToken.TokenSet_Block();
 
 	return 0;
@@ -413,6 +487,8 @@ INT32					CManageLogDoc::GetPkt_Link(MemToken& RecvToken, DB_LOG_DOC& dld)
 	if (!RecvToken.TokenDel_32(dld.nFileCrTime))				goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dld.nFileMdTime))				goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dld.nFileAcTime))				goto	INVALID_PKT;
+
+	if (!RecvToken.TokenDel_32(dld.nUserID))					goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

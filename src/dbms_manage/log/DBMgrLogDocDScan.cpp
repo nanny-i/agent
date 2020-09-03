@@ -169,8 +169,55 @@ INT32	CDBMgrLogDocDScan::DeleteExecute(UINT32 nID)
 }
 //---------------------------------------------------------------------------
 
+INT32	CDBMgrLogDocDScan::LoadDB(UINT32 nLogMode, UINT32 nLogNum, TListDBLogDocDScan& tDBLogDocDScanList)
+{
+	UINT32 nReadCnt = 0;
+	DB_LOG_DOC_DSCAN dldd;
 
+	INT32 nIndex = 0;
+	INT32 nContinue = 0;
 
+	m_strQuery = SPrintf("SELECT id, used_flag, reg_date, ext_option, scan_path, scan_ptn, find_num, del_num FROM log_doc_dscan WHERE used_flag = 1");
+	if(DBOP_Check(ExecuteQuery(m_strQuery)))
+		return ERR_DBMS_SELECT_FAIL;
 
+    do
+    {
+		nContinue	= 0;
+		nIndex		= 0;
 
+		dldd.nID				= GetDBField_Int(nIndex++);
+		dldd.nUsedFlag			= GetDBField_Int(nIndex++);
+		dldd.nRegDate			= GetDBField_Int(nIndex++);
 
+		switch(nLogMode)
+		{
+		case SS_ENV_LOG_LOAD_MODE_TYPE_DAY:	
+			{
+				if(nLogNum && dldd.nRegDate < nLogNum)	nContinue = 1;
+				break;
+			}
+		case SS_ENV_LOG_LOAD_MODE_TYPE_COUNT:
+			{
+				if(nLogNum && nReadCnt > nLogNum)		nContinue = 1;
+				break;
+			}
+		}
+
+		if(nContinue)	continue;
+
+		dldd.nExtOption			= GetDBField_Int(nIndex++);
+		dldd.strScanPath		= GetDBField_String(nIndex++);
+		dldd.strScanPtn			= GetDBField_String(nIndex++);
+		dldd.nFindNum			= GetDBField_Int(nIndex++);
+		dldd.nDelNum			= GetDBField_Int(nIndex++);
+
+		tDBLogDocDScanList.push_back(dldd);
+		if(m_nLoadMaxID < UINT32(dldd.nID))	m_nLoadMaxID = dldd.nID;
+		nReadCnt++;
+	}while(Next());
+	m_nLoadNumber = tDBLogDocDScanList.size();
+	WriteLogN("load database : [%s][%u]", m_strDBTName.c_str(), m_nLoadNumber);
+	return 0;
+}
+//---------------------------------------------------------------------------

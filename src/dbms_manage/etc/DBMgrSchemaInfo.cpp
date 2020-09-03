@@ -22,12 +22,6 @@
 #include "com_struct.h"
 #include "DBMgrSchemaInfo.h"
 
-//---------------------------------------------------------------------------
-
-//CDBMgrSchemaInfo*		t_DBMgrSchemaInfo;
-
-//---------------------------------------------------------------------------
-
 CDBMgrSchemaInfo::CDBMgrSchemaInfo()
 {
 	m_strDBTName = "schema_info";

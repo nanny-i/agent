@@ -64,7 +64,7 @@ INT32			CDBMgrPoInVulnOpPkg::LoadDB(TListDBPoInVulnOpPkg& tDBPoInVulnOpPkgList)
 		DB_PO_HEADER& tDPH = data.tDPH;
 
 		tDPH						= GetDBField_PoPkgHDR(nIndex);
-		data.nSiteScore				= GetDBField_UInt(nIndex);
+		data.nScore					= GetDBField_UInt(nIndex);
 		
         tDBPoInVulnOpPkgList.push_back(data);
         if(m_nLoadMaxID < UINT32(tDPH.nID))
@@ -88,7 +88,7 @@ INT32			CDBMgrPoInVulnOpPkg::InsertPoInVulnOpPkg(DB_PO_IN_VULN_OP_PKG& data)
 						", %u"
 						");",
 						GetPoPkgHDRQuery_InsertValue(tDPH).c_str(),
-						data.nSiteScore);
+						data.nScore);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -108,7 +108,7 @@ INT32			CDBMgrPoInVulnOpPkg::UpdatePoInVulnOpPkg(DB_PO_IN_VULN_OP_PKG& data)
 						", site_score=%u"
 						" WHERE id=%u;",
 						GetPoPkgHDRQuery_Update(tDPH).c_str(), 
-						data.nSiteScore,
+						data.nScore,
 						tDPH.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

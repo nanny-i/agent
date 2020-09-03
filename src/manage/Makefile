@@ -30,4 +30,4 @@ mgr_clean:
 	rm -f *.o
 
 mgr_all:
-	$(CC) $(CFLAGS) -c ManageBaseUtil.cpp
+	$(CC) $(CFLAGS) -c ManageBaseUtil.cpp Manage_Struct.cpp

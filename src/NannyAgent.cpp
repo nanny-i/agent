@@ -30,20 +30,13 @@
 #endif
 
 
-void SignalHandler(int nSig)
+void SignalTermHandler(int nSig)
 {
-	if(nSig == SIGINT || nSig == SIGTERM)
+	if(nSig == SIGTERM && t_MainDlg)
 	{
-		if(t_EnvInfo)
-		{
-			t_EnvInfo->m_nContinueOP ^= NA_RUN_THREAD_TYPE_MAIN;
-			t_EnvInfo->m_nContinueOP ^= NA_RUN_THREAD_TYPE_DBMS_QUERY;
-		}
-		if(t_MainDlg)
-		{
-			t_MainDlg->PostMessage(WM_CLOSE, 0, 0);
-			t_MainDlg->PostMessage(WM_QUIT, 0, 0);
-		}
+		t_MainDlg->CloseMain();
+		Sleep(500);
+		t_MainDlg->PostMessage(WM_QUIT, 0, 0);
 	}
 }
 
@@ -135,11 +128,13 @@ int main(int argc, char* argv[])
 #endif
 
 	// Setting Signal Handler
-	sigact.sa_handler = SignalHandler;
+	sigact.sa_handler = SignalTermHandler;
 	sigfillset(&sigact.sa_mask);
-	sigaction(SIGINT, &sigact, NULL);
+	
 	sigaction(SIGTERM, &sigact, NULL);
 	signal(SIGPIPE, SIG_IGN);
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
 
 	// Starting Application Class
 	t_MainDlg = new CMainDlg();

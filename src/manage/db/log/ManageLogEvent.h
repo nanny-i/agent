@@ -38,7 +38,12 @@ private:
 	INT32					GetInitPktList(UINT32 nAdminID, TListPVOID& tInitPktList);
 
 public:
+	INT32					SetPktSync(TListPVOID& tIDList);
+
+public:
 	INT32					SetPkt(MemToken& SendToken);
+	INT32					SetPktSyncMode(MemToken& SendToken, UINT32 nSyncMode);
+	INT32					SetPktSync(MemToken& SendToken);
 	INT32					SetPkt(MemToken& SendToken, UINT32 nAdminID);
 	INT32					SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_LOG_EVENT& dle);

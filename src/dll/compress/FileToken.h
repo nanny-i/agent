@@ -46,6 +46,7 @@ public :
 	BOOL TokenAdd_16(INT16 aSrc);
     BOOL TokenAdd_32(INT32 aSrc);
 	BOOL TokenAdd_64(INT64 aSrc);
+	BOOL TokenAdd_Char(char *acData);
 	BOOL TokenAdd_String(String aSrc);
 	BOOL TokenAdd_StringW(StringW aSrc);
 	BOOL TokenAdd_PVOID(PVOID aSrc, INT32 nLen);
@@ -58,6 +59,7 @@ public :
 	BOOL TokenDel_64(UINT64 &aDest);
 	INT16 TokenDel_String(String& aSrc);
 	INT16 TokenDel_StringW(StringW& aSrc);
+	INT16 TokenDel_Char(char *acData, INT16 nMaxLen);
     INT32 TokenDel_PVOID(PVOID aSrc, INT32 nSrcLen);
     INT32 GetFD();
     INT32 GetLength(); 

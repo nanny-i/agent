@@ -104,7 +104,7 @@ INT32			CDBMgrPoSchUnit::InsertPoSchUnit(DB_PO_SCH_UNIT& dphpsu)
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
 						", package_type, policy_info, start_time, end_time"
 						") VALUES (%s"
-                        ", '%I64u', '%s', %u, %u);",
+                        ", '%llu', '%s', %u, %u);",
                         GetPoHDRQuery_InsertValue(tDPH).c_str(), 
 						dphpsu.nPackageType, strPolicyInfo.c_str(), dphpsu.nStDate, dphpsu.nEdDate);
 
@@ -127,7 +127,7 @@ INT32			CDBMgrPoSchUnit::UpdatePoSchUnit(DB_PO_SCH_UNIT& dphpsu)
 	strPolicyInfo = MapStrToStr(tStrMap);
 
 	m_strQuery = SPrintf("UPDATE po_sch_unit SET %s"
-						", package_type='%I64u', policy_info='%s', start_time=%u, end_time=%u"
+						", package_type='%llu', policy_info='%s', start_time=%u, end_time=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(),
 						dphpsu.nPackageType, strPolicyInfo.c_str(), dphpsu.nStDate, dphpsu.nEdDate,

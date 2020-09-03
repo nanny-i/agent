@@ -2,7 +2,7 @@ include ../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = LogicAuth.cpp LogicEnvNotifyInfo.cpp LogicInitLink.cpp LogicInitLink_Policy.cpp LogicLogDeployFile.cpp LogicLogDoc.cpp LogicLogDocDScan.cpp LogicLogEvent.cpp LogicLogSecu.cpp LogicLogStatus.cpp LogicPoFaClear.cpp LogicPoInPtnSPRule.cpp LogicSiteFile.cpp LogicSiteVuln.cpp LogicSiteVulnLock.cpp LogicSiteVulnRepair.cpp LogicSiteVulnScan.cpp LogicUser.cpp
+CPPFILES = LogicAuth.cpp LogicCtrlVuln.cpp LogicCtrlVuln_EditProg.cpp LogicCtrlVuln_Hwp.cpp LogicCtrlVuln_NonConfirmProg.cpp LogicCtrlVuln_PDF.cpp LogicCtrlVuln_Patch.cpp LogicCtrlVuln_SecuUSBProg.cpp LogicEnvNotifyInfo.cpp LogicHostVulnRst.cpp LogicInitLink.cpp LogicInitLink_Policy.cpp LogicLogDeployFile.cpp LogicLogDevice.cpp LogicLogDoc.cpp LogicLogDocDScan.cpp LogicLogEvent.cpp LogicLogPatch.cpp LogicLogRs.cpp LogicLogRsBk.cpp LogicLogSecu.cpp LogicLogStatus.cpp LogicPoFaClear.cpp LogicPoInPtnSPRule.cpp LogicPtnPatch.cpp LogicPtnVuln.cpp LogicSiteFile.cpp LogicSiteVuln.cpp LogicSiteVulnScan.cpp LogicUser.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 

@@ -85,7 +85,6 @@ INT32		CLogicMgrHostSw::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if( t_ManageHostSw->GetPkt(RecvToken, dhs))		return AZPKT_CB_RTN_PKT_INVALID;
 
-		dhs.nID = 0;
 		tDBHostSwList.push_back(dhs);
 	}
 
@@ -95,7 +94,7 @@ INT32		CLogicMgrHostSw::AnalyzePkt_FromMgr_Edit_Ext()
 		begin = tDBHostSwList.begin();	end = tDBHostSwList.end();
 		for(begin; begin != end; begin++)
 		{
-			if( (pdhs = t_ManageHostSw->FindChkKey(begin->strChkKey)) == NULL)
+			if( (pdhs = t_ManageHostSw->FindChkKeyVerItem(begin->strChkKey, begin->strVersion)) == NULL)
 			{
 				t_ManageHostSw->AddHostSw(*begin);
 			}
@@ -139,17 +138,15 @@ void		CLogicMgrHostSw::SendPkt_HostSw()
 		begin = tSwInfoList.begin();	end = tSwInfoList.end();
 		for(begin; begin != end; begin++)
 		{
-			PDB_HOST_SW pdhs = t_ManageHostSw->FindChkKey(begin->szChkKey);
+			PDB_HOST_SW pdhs = t_ManageHostSw->FindChkKeyVerItem(begin->szChkKey, begin->szVersion);
 			if(pdhs)
 			{
 				if(pdhs->strName.compare(begin->szName) == 0 &&
 					pdhs->strInsDate.compare(begin->szInsDate) == 0 &&
-					pdhs->strVersion.compare(begin->szVersion) == 0 &&
 					pdhs->nProcArch == begin->nProcArchitect)			continue;
 
 				pdhs->strName = begin->szName;
 				pdhs->strInsDate = begin->szInsDate;
-				pdhs->strVersion = begin->szVersion;
 				pdhs->nProcArch = begin->nProcArchitect;
 
 				tDBHostSwList.push_back(*pdhs);
@@ -180,7 +177,7 @@ void		CLogicMgrHostSw::SendPkt_HostSw()
 			PDB_HOST_SW pdhs = t_ManageHostSw->FindItem(*begin);
 			if(!pdhs)	continue;
 
-			if(t_ManageHostSw->IsExistLocalSw(&tSwInfoList, pdhs->strName))		continue;
+			if(t_ManageHostSw->IsExistLocalSwKeyVer(&tSwInfoList, pdhs->strChkKey, pdhs->strVersion))		continue;
 
 			pdhs->nUsedFlag = 0;
 			tDBHostSwList.push_back(*pdhs);
@@ -195,7 +192,7 @@ void		CLogicMgrHostSw::SendPkt_HostSw()
 
 	SendToken.Clear();
 	t_ManageHostSw->SetPkt(tDBHostSwList, SendToken);
-	SendData(G_TYPE_HOST_SW, G_CODE_COMMON_EDIT, SendToken);
+	SendData_Mgr(G_TYPE_HOST_SW, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
 
 	return;
@@ -214,3 +211,35 @@ VOID		CLogicMgrHostSw::ASISI_GetSwInfo(PASISI_SW_INFO pasi, INT32 nSize, PVOID l
 	return;
 }
 //---------------------------------------------------------------------------
+
+void		CLogicMgrHostSw::SendPkt_HostSw_Cur()
+{
+	TListDBHostSw tDBHostSwList; 
+
+	{
+		TListID tIDList;
+		t_ManageHostSw->GetItemIDList(tIDList);
+
+		TListIDItor begin, end;
+		begin = tIDList.begin();	end = tIDList.end();
+		for(begin; begin != end; begin++)
+		{
+			PDB_HOST_SW pdhs = t_ManageHostSw->FindItem(*begin);
+			if(!pdhs)	continue;
+			tDBHostSwList.push_back(*pdhs);
+		}
+	}
+
+	if(tDBHostSwList.size() == 0)
+	{
+		WriteLogN("[%s] host software item does not exist...", m_strLogicName.c_str());
+		return;
+	}
+
+	SendToken.Clear();
+	t_ManageHostSw->SetPkt(tDBHostSwList, SendToken);
+	SendData_Mgr(G_TYPE_HOST_SW, G_CODE_COMMON_EDIT, SendToken);
+	SendToken.Clear();
+
+	return;
+}

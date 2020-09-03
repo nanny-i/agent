@@ -230,10 +230,17 @@ INT32		CThreadChkHkNoti::ChkMemFileList()
 		pAHEW->nChkFlag |= ASI_HK_EXIT_WIN_CHK_TYPE_DONE;
 		if(t_EnvInfoOp->IsSysOffMode() == 0)
 		{
-			t_EnvInfoOp->SetSysOffMode(1, pAHEW->nFlags, pAHEW->dwReason);			
-			t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_SYS_OFF_OPERATION);
-			RunLockProcess();
-			WriteLogN("start sys log off operation..[%x][%x]", pAHEW->nFlags, pAHEW->dwReason);
+			t_EnvInfoOp->SetSysOffMode(1, pAHEW->nFlags, pAHEW->dwReason);
+
+			WriteLogN("start sys log off operation by exitwindow..[%x][%x]", pAHEW->nFlags, pAHEW->dwReason);
+
+			t_EnvInfoOp->SetStopOpBySysOff(1);
+			WriteLogN("set stop operation flag by exitwindow..[%x][%x]", pAHEW->nFlags, pAHEW->dwReason);
+
+			t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_SYS_OFF_OPERATION_END);
+
+//			if(t_ThreadSubTimer)	t_ThreadSubTimer->t_TimerUtil.EnableTimer(TIMER_ID_SYS_OFF_OPERATION_CHK_WORK_TIME);
+
 			t_EnvInfoOp->m_nApplyPolicyStatus = STATUS_USED_MODE_OFF;
 		}
 		m_tMemFileExitWin.UnmapViewFile();

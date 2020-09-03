@@ -30,29 +30,35 @@ typedef struct _db_site_vuln
 		nUsedMode		= 0;
 		nAdminID		= 0;
 		nExtOption		= 0;
-	
-		nOsType			= ASI_SYSTEM_TYPE_ALL;
-		nOsID			= ASI_SYSTEM_ID_ALL;
-		nOsPa			= ASI_SYSTEM_ARCH_ALL;	
 
+		nClass			= 0;
+
+		nSysType		= 0;
+		nSysSPType		= 0;
+		nSysArchType	= 0;
+
+		nSupportOption	= 0;
 		nRiskLevel		= SS_SITE_VULN_RISK_LEVEL_NONE;
 		nDefScore		= 0;
 	} 
 
-	UINT32			nID ;
-	UINT32			nUsedFlag;
-	UINT32			nRegDate;
-	UINT32			nUsedMode;
-	UINT32			nAdminID;
-	UINT32			nExtOption;
+	UINT32		nID ;
+	UINT32		nUsedFlag;
+	UINT32		nRegDate;
+	UINT32		nUsedMode;
+	UINT32		nAdminID;
+	UINT32		nExtOption;
 
-	String			strName;
-	String			strDescr;
-	
-	UINT32			nOsType;	// ASI_SYSTEM_TYPE_XXXX
-	UINT64			nOsID;		// ASI_SYSTEM_ID_XXXX	
-	UINT32			nOsPa;		// ASI_SYSTEM_ARCH_XXXX	
+	UINT32		nClass;
 
+	String		strName;
+	String		strDescr;
+
+	UINT64		nSysType;
+	UINT32		nSysSPType;
+	UINT32		nSysArchType;
+
+	UINT32		    nSupportOption;
 	UINT32			nRiskLevel;		// SS_SITE_VULN_RISK_LEVEL_XXX
 	UINT32			nDefScore;		
 	

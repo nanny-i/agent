@@ -33,6 +33,7 @@ public:
 	INT32		ApplyPolicy();
 	INT32		OnTimer_Logic();
 	INT32		CheckRunEnv();
+	INT32		LoadPtn();
 
 private:
 	INT32		AddDpDownInfo();

@@ -164,8 +164,8 @@ INT32		CLogicMgrCtrlRemotePower::ApplyPolicy(PMEM_CTRL_REMOTE_POWER pInfo)
 	}
 
 	{
-		InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, 0, strCtrlType, m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLE_OBJ(0, strCtrlType);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 	
 	return nRet;

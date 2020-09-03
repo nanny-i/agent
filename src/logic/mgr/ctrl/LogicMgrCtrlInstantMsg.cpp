@@ -130,8 +130,8 @@ INT32		CLogicMgrCtrlInstantMsg::ApplyPolicy(PMEM_CTRL_INSTANT_MSG pInfo)
 	t_ExecuteFileUtil->ExecuteFileByUser(tATI, tATMP);
 
 	{
-		InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, 0, pInfo->strTitle, m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLE_OBJ(0, pInfo->strTitle);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 	
 	return nRet; 

@@ -92,12 +92,12 @@ INT32					CManageUser::InitHash(UINT32 nID)
 		strOrgValue = SPrintf("%u,%u,%u,"
 							"%u,%u,%s,%s,%s,"
 							"%s,%s,%s,"
-							"%s,%s,%s,%s,%s,"
+							"%s,%s,%s,%s,%s,%s,"
 							"%s,%u,", 
 							pDU->nUsedFlag, pDU->nRegDate, pDU->nInsType, 
 							pDU->nGroupID, pDU->nUGroupID, pDU->strUniCode.c_str(), pDU->strAccountID.c_str(), pDU->strAccountPW.c_str(),
 							pDU->strGCode.c_str(), pDU->strName.c_str(), pDU->strCoID.c_str(),
-							pDU->strCoRank.c_str(), pDU->strCoRespon.c_str(), pDU->strCoEMail.c_str(), pDU->strCoPhone.c_str(), pDU->strUserHPhone.c_str(),
+							pDU->strCoRank.c_str(), pDU->strCoRespon.c_str(), pDU->strCoEMail.c_str(), pDU->strCoPhone.c_str(), pDU->strUserHPhone.c_str(), pDU->strSrcGroupName.c_str(),
 							pDU->strDescr.c_str(), pDU->nExtOption);	
 	}
 
@@ -324,6 +324,8 @@ INT32		CManageUser::SetPkt(PDB_USER pdu, MemToken& SendToken)
 
 	SendToken.TokenAdd_32(pdu->nExtOption);
 
+	SendToken.TokenAdd_String(pdu->strSrcGroupName);
+
 	SendToken.TokenSet_Block();
  	return 0;
 }
@@ -353,6 +355,8 @@ INT32	CManageUser::GetPkt(MemToken& RecvToken, DB_USER& du)
 	if ( RecvToken.TokenDel_String(du.strDescr) < 0)			goto INVALID_PKT;
 
 	if (!RecvToken.TokenDel_32(du.nExtOption))					goto INVALID_PKT;
+
+	if ( RecvToken.TokenDel_String(du.strSrcGroupName) < 0)			goto INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

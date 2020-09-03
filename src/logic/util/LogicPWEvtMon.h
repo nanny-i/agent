@@ -33,6 +33,8 @@ public:
 	INT32		ExecuteEventHandler();
 	INT32		RecordTimeStamp();
 
+	INT32		IsNotExcutePwevt();
+
 public:
 	INT32		InitEnv();
 		

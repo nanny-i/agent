@@ -86,7 +86,7 @@ INT32		CLogicMgrPoFePtnLo::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if(SetER(t_ManagePoFePtnLo->ApplyPoFePtnLo(dpfpl)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -165,7 +165,7 @@ INT32		CLogicMgrPoFePtnLo::MakePtnEnd(PDB_PO_FE_PTN_LO pDPFPO)
 	{
 		if(SetER(t_ManagePoFePtnLo->ApplyPoFePtnLo(*pdpfpl)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return -1;
 		}

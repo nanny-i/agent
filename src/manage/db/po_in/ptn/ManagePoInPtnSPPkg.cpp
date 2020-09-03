@@ -54,7 +54,7 @@ INT32		CManagePoInPtnSPPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -69,7 +69,7 @@ INT32					CManagePoInPtnSPPkg::InitPkg()
 		PDB_PO_IN_PTN_SP pdata = t_ManagePoInPtnSP->FindItem(begin->second.tDPH.nPolicyID);
 		if(!pdata)
 		{
-			WriteLogE("not find po_in_ptn_sp_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+//			WriteLogE("not find po_in_ptn_sp_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -105,7 +105,7 @@ INT32					CManagePoInPtnSPPkg::AddPoInPtnSPPkg(DB_PO_IN_PTN_SP_PKG&	datap)
     }
 
 	AddItem(datap.tDPH.nID, datap);
-	AddKeyIDList(&datap);
+	AddKeyIDListPkg(&datap);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoInPtnSPPkg::DelPoInPtnSPPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdatap);
+	DelKeyIDListPkg(pdatap);
     DeleteItem(nID);
     return 0;
 }

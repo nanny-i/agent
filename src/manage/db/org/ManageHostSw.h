@@ -36,10 +36,13 @@ public:
     PDB_HOST_SW		FindHostKey(UINT32 nHostID);
 
 public:
-	PDB_HOST_SW		FindChkKey(String strChkKey);
+	UINT32			FindChkVerID(PDB_HOST_SW pdata);
+	UINT32			FindChkVerID(String strChkKey, String strVersion);
+	PDB_HOST_SW		FindChkKeyVerItem(String strChkKey, String strVersion);
 
 public:
 	INT32			IsExistLocalSw(TListSwInfo* tSwInfoList, String strName);
+	INT32			IsExistLocalSwKeyVer(TListSwInfo* tSwInfoList, String strChkKey, String strVersion);
 
 public:
 	INT32			GetPkt(MemToken& RecvToken, DB_HOST_SW& dhs);

@@ -72,7 +72,7 @@ INT32					CManagePoInPtnOpUnit::GetHash(UINT32 nID, String& strOrgValue)
 
 	{
 		strOrgValue = SPrintf("%s,"
-							"%I64u,"
+							"%llu,"
 							"%s,%u,",							
 							GetHdrHashInfo(pdata).c_str(),			
 							pdata->nSchTime, 

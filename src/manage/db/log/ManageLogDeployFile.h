@@ -38,6 +38,9 @@ public:
 	PDB_LOG_DEPLOY_FILE		FindItemByDFInfo(DB_LOG_DEPLOY_FILE&	dldf);
 
 public:
+	INT32					SetPktSync(TListPVOID& tIDList);
+
+public:
 	INT32					SetPkt(MemToken& SendToken);
 	INT32					SetPkt(PDB_LOG_DEPLOY_FILE pdldf, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_LOG_DEPLOY_FILE& dldf);

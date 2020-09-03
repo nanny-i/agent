@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2020-2025 ASHINi corp. 
- * 
- * This library is free software; you can redistribute it and/or 
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
- * version 2.1 of the License, or (at your option) any later version. 
- * 
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * Lesser General Public License for more details. 
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this library; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
- * 
- */
-
 
 #ifndef COM_DEFINE_DB_SITE_VULN_H_938EF200_F60B_452A_BD30_A10E8507EDCC
 #define COM_DEFINE_DB_SITE_VULN_H_938EF200_F60B_452A_BD30_A10E8507EDCC
@@ -46,31 +27,6 @@ typedef enum
 #define SS_SITE_VULN_RISK_LEVEL_LOW						0x00000001
 #define SS_SITE_VULN_RISK_LEVEL_MEDIUM					0x00000002
 #define SS_SITE_VULN_RISK_LEVEL_HIGH					0x00000003
-//--------------------------------------------------------------------
-
-typedef enum
-{
-	SS_SITE_VULN_CUSTOM_ID_NONE					= 0,
-	SS_SITE_VULN_CUSTOM_ID_VC_PROCESS,
-	SS_SITE_VULN_CUSTOM_ID_VC_PATCH,
-	SS_SITE_VULN_CUSTOM_ID_WIN_UPDATE,
-	SS_SITE_VULN_CUSTOM_ID_HWP_UPDATE,
-	SS_SITE_VULN_CUSTOM_ID_WIN_PW_SAFE,
-	SS_SITE_VULN_CUSTOM_ID_WIN_PW_CHANGE,
-	SS_SITE_VULN_CUSTOM_ID_WIN_SCREEN_SAFE,
-	SS_SITE_VULN_CUSTOM_ID_WIN_SHARE_FOLDER,
-	SS_SITE_VULN_CUSTOM_ID_WIN_USB_RUN,
-	SS_SITE_VULN_CUSTOM_ID_WIN_ACTIVEX,
-	SS_SITE_VULN_CUSTOM_ID_PDF_UPDATE,
-	SS_SITE_VULN_CUSTOM_ID_EDIT_PROGRAM,
-	SS_SITE_VULN_CUSTOM_ID_WIRELESS_CARD,
-	SS_SITE_VULN_CUSTOM_ID_SECU_USB_PROGRAM,
-	SS_SITE_VULN_CUSTOM_ID_NONCONFIRM_PROGRAM,
-
-	SS_SITE_VULN_CUSTOM_ID_ACTIVE_FIREWALL = 100,
-	SS_SITE_VULN_CUSTOM_ID_SECURITY_CENTER_ALERT,
-
-}SS_SITE_VULN_CUSTOM_ID;
 //--------------------------------------------------------------------
 
 #define SS_SITE_VULN_VALUE_TYPE_UNKNOWN				0x00000000
@@ -126,6 +82,47 @@ typedef enum
 #define SS_SITE_VULN_DECISION_CRITERIA_OR			1
 
 //--------------------------------------------------------------------
+
+typedef enum
+{
+	SS_SITE_VULN_PTN_TYPE_UNKNOWN					= -1,
+	SS_SITE_VULN_PTN_TYPE_SW,
+	SS_SITE_VULN_PTN_TYPE_SW_VERSION,
+	SS_SITE_VULN_PTN_TYPE_EDIT_APP,
+	SS_SITE_VULN_PTN_TYPE_SECU_USB,
+	SS_SITE_VULN_PTN_TYPE_ACTIVEX,
+	SS_SITE_VULN_PTN_TYPE_DICT_PATH,
+	SS_SITE_VULN_PTN_TYPE_MAX,
+}SS_SITE_VULN_PTN_TYPE;
+//--------------------------------------------------------------------
+
+typedef enum
+{
+	SS_SITE_VULN_CUSTOM_ID_NONE					= 0,
+	SS_SITE_VULN_CUSTOM_ID_VC_PROCESS,
+	SS_SITE_VULN_CUSTOM_ID_VC_PATCH,
+	SS_SITE_VULN_CUSTOM_ID_WIN_UPDATE,
+	SS_SITE_VULN_CUSTOM_ID_HWP_UPDATE,
+	SS_SITE_VULN_CUSTOM_ID_WIN_PW_SAFE,
+	SS_SITE_VULN_CUSTOM_ID_WIN_PW_CHANGE,
+	SS_SITE_VULN_CUSTOM_ID_WIN_SCREEN_SAFE,
+	SS_SITE_VULN_CUSTOM_ID_WIN_SHARE_FOLDER,
+	SS_SITE_VULN_CUSTOM_ID_WIN_USB_RUN,
+	SS_SITE_VULN_CUSTOM_ID_WIN_ACTIVEX,
+	SS_SITE_VULN_CUSTOM_ID_EDIT_PROGRAM,
+	SS_SITE_VULN_CUSTOM_ID_PDF_UPDATE,
+	SS_SITE_VULN_CUSTOM_ID_SECU_USB_PROGRAM,
+	SS_SITE_VULN_CUSTOM_ID_WIRELESS_CARD,
+	SS_SITE_VULN_CUSTOM_ID_NONCONFIRM_PROGRAM,
+	SS_SITE_VULN_CUSTOM_ID_USER_PROCESS_LIST,
+
+	SS_SITE_VULN_CUSTOM_ID_ACTIVE_FIREWALL = 100,
+	SS_SITE_VULN_CUSTOM_ID_SECURITY_CENTER_ALERT,
+
+}SS_SITE_VULN_CUSTOM_ID;
+//--------------------------------------------------------------------
+
+
 
 #define SS_SITE_VULN_PERM_RENEXT						0x00000800
 #define SS_SITE_VULN_PERM_FILELOG						0x00000400

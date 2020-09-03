@@ -43,10 +43,12 @@ public:
 
 public:
 	PDB_ENV_LOG_UNIT	FindRecordLogEvtUnit(PDB_LOG_EVENT pdle);
-	PDB_ENV_LOG_UNIT	FindRecordLogStatusUnit(PDB_LOG_STATUS pdls);
 	PDB_ENV_LOG_UNIT	FindRecordLogDocUnit(PDB_LOG_DOC pdld);
 	PDB_ENV_LOG_UNIT	FindRecordLogSecuUnit(PDB_LOG_SECU pdls);
 	PDB_ENV_LOG_UNIT	FindRecordLogDeployFileUnit(PDB_LOG_DEPLOY_FILE pdldf);
+	PDB_ENV_LOG_UNIT	FindRecordLogPatchUnit(PDB_LOG_PATCH pdlp);
+	PDB_ENV_LOG_UNIT	FindRecordLogDeviceUnit(PDB_LOG_DEVICE pdld);
+	PDB_ENV_LOG_UNIT	FindRecordLogRsUnit(PDB_LOG_RS pdata);
 
 public:
 	INT32					SetPkt(MemToken& SendToken);

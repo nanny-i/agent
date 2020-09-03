@@ -2,7 +2,7 @@ include ../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = LogicLocalEnvAuth.cpp LogicLocalEnvLog.cpp LogicPWEvtMon.cpp
+CPPFILES = LogicDocDeleteInfo.cpp LogicLocalEnvAuth.cpp LogicLocalEnvLog.cpp LogicPWEvtMon.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 

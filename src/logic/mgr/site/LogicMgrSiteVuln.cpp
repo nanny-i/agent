@@ -94,7 +94,7 @@ INT32		CLogicMgrSiteVuln::AnalyzePkt_FromMgr_Edit_Ext()
 		{
 			if(t_ManageSiteVuln->ApplySiteVuln(*begin))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				continue;
 			}

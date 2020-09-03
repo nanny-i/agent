@@ -86,17 +86,18 @@ INT32					CManageEnvLicense::InitHash()
 	}
 
 	{
-		String strRightPackage, strRightPolicy, strRightControl;
+		String strRightPackage, strRightClass, strRightPolicy, strRightControl;
 
 		MapToHex_64(pdel->tRightPackageMap, strRightPackage, SS_ADMIN_RIGHT_TYPE_CLASS_NUM_PACKAGE);
+		MapToHex_64(pdel->tRightClassMap, strRightClass, SS_ADMIN_RIGHT_TYPE_CLASS_NUM_PACKAGE);
 		MapToHex_64(pdel->tRightPolicyMap,  strRightPolicy, SS_ADMIN_RIGHT_TYPE_CLASS_NUM_POLICY);
 		MapToHex_64(pdel->tRightControlMap, strRightControl, SS_ADMIN_RIGHT_TYPE_CLASS_NUM_CONTROL);
 
 
 		strOrgValue = SPrintf("%s,"
-							"%s,%s,%s,%s,", 
+							"%s,%s,%s,%s,%s,", 
 							GetHdrHashInfo(pdel).c_str(),
-							pdel->strLicenseKey.c_str(), strRightPackage.c_str(), strRightPolicy.c_str(), strRightControl.c_str());
+							pdel->strLicenseKey.c_str(), strRightPackage.c_str(), strRightClass.c_str(), strRightPolicy.c_str(), strRightControl.c_str());
 	}
 
 	{
@@ -187,18 +188,36 @@ String					CManageEnvLicense::GetName(UINT32 nID)
 }
 //---------------------------------------------------------------------------
 
+UINT64				CManageEnvLicense::IsValidRight(UINT64 nPackage, UINT64 nPolicy, UINT64 nControl)
+{
+	return !(IsInvalidRight(nPackage, nPolicy, nControl));
+}
+//---------------------------------------------------------------------------
+
 UINT64				CManageEnvLicense::IsInvalidRight(UINT64 nPackage, UINT64 nPolicy, UINT64 nControl)
 {
 	PDB_ENV_LICENSE pdel = FirstItem();
 	if(!pdel)	return 1;
 
+	return IsInvalidRight(pdel, nPackage, nPolicy, nControl);	
+}
+//---------------------------------------------------------------------------
+
+UINT64				CManageEnvLicense::IsValidRight(PDB_ENV_LICENSE pdata, UINT64 nPackage, UINT64 nPolicy, UINT64 nControl)
+{
+	return !(IsInvalidRight(pdata, nPackage, nPolicy, nControl));
+}
+//---------------------------------------------------------------------------
+
+UINT64				CManageEnvLicense::IsInvalidRight(PDB_ENV_LICENSE pdata, UINT64 nPackage, UINT64 nPolicy, UINT64 nControl)
+{
 	TMapID64Itor find;	
 	UINT64 nRightValue;;
 	if(nPackage)
 	{
 		nRightValue = 0;
-		find = pdel->tRightPackageMap.find(GET_RIGHT_POS(nPackage));
-		if(find != pdel->tRightPackageMap.end())
+		find = pdata->tRightPackageMap.find(GET_RIGHT_POS(nPackage));
+		if(find != pdata->tRightPackageMap.end())
 		{
 			nRightValue = GET_RIGHT_VALUE(find->second);
 		}
@@ -207,8 +226,8 @@ UINT64				CManageEnvLicense::IsInvalidRight(UINT64 nPackage, UINT64 nPolicy, UIN
 	if(nPolicy)
 	{
 		nRightValue = 0;
-		find = pdel->tRightPolicyMap.find(GET_RIGHT_POS(nPolicy));
-		if(find != pdel->tRightPolicyMap.end())
+		find = pdata->tRightPolicyMap.find(GET_RIGHT_POS(nPolicy));
+		if(find != pdata->tRightPolicyMap.end())
 		{
 			nRightValue = GET_RIGHT_VALUE(find->second);
 		}
@@ -217,8 +236,8 @@ UINT64				CManageEnvLicense::IsInvalidRight(UINT64 nPackage, UINT64 nPolicy, UIN
 	if(nControl)
 	{
 		nRightValue = 0;
-		find = pdel->tRightControlMap.find(GET_RIGHT_POS(nControl));
-		if(find != pdel->tRightControlMap.end())
+		find = pdata->tRightControlMap.find(GET_RIGHT_POS(nControl));
+		if(find != pdata->tRightControlMap.end())
 		{
 			nRightValue = GET_RIGHT_VALUE(find->second);
 		}
@@ -268,6 +287,7 @@ INT32					CManageEnvLicense::SetPkt(PDB_ENV_LICENSE pdel, MemToken& SendToken)
 	SendToken.TokenAdd_String(pdel->strLicenseKey);
 
 	SendToken.TokenAdd_ID64Map(pdel->tRightPackageMap);
+	SendToken.TokenAdd_ID64Map(pdel->tRightClassMap);
 	SendToken.TokenAdd_ID64Map(pdel->tRightPolicyMap);
 	SendToken.TokenAdd_ID64Map(pdel->tRightControlMap);
 
@@ -284,6 +304,7 @@ INT32					CManageEnvLicense::GetPkt(MemToken& RecvToken, DB_ENV_LICENSE& del)
 	if ( RecvToken.TokenDel_String(del.strLicenseKey) < 0)		goto	INVALID_PKT;
 	
 	if ( RecvToken.TokenDel_ID64Map(del.tRightPackageMap) < 0)	goto	INVALID_PKT;
+	if ( RecvToken.TokenDel_ID64Map(del.tRightClassMap) < 0)	goto	INVALID_PKT;
 	if ( RecvToken.TokenDel_ID64Map(del.tRightPolicyMap) < 0)	goto	INVALID_PKT;
 	if ( RecvToken.TokenDel_ID64Map(del.tRightControlMap) < 0)	goto	INVALID_PKT;
 

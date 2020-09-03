@@ -74,9 +74,10 @@ INT32 Send_CLD(PVOID pObject, UINT16 nType, UINT16 nCode, UINT32 length , PVOID 
 	CTCP_Client* pTCP_Client = (CTCP_Client*)pObject;
 	if(pTCP_Client == NULL)
 		return -1;
+/*
 	if(pTCP_Client->IsRunClient() == 0)
 		return 0;
-		
+*/		
 	return pTCP_Client->Send(nType, nCode, length, data);
 }
 //------------------------------------------------------------------------------------------------------------------------

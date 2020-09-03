@@ -49,7 +49,13 @@ public:
 	virtual INT32		EditEditDataMap(_T& data);
 	virtual INT32		DelEditDataMap(UINT32 nEditID);
 	virtual _T*			FindEditData(UINT32 nEditID);
+	virtual INT32		ClearEditDataMap();
 	virtual INT32		GetEditDataIDList(TListID& tEIDList);
+
+public:
+	virtual void		SetEditData(UINT32 nID);
+	virtual void		SetEditData(_T& data);
+	virtual _T*			GetEditData();
 
 
 public:
@@ -1305,6 +1311,12 @@ TEMPLATE	_T*			CManageEdBase<_T>::FindEditData(UINT32 nEditID)
 	return &(find->second);
 }
 
+TEMPLATE	INT32		CManageEdBase<_T>::ClearEditDataMap()
+{
+	m_tEditDataMap.clear();
+	return 0;
+}
+
 TEMPLATE	INT32		CManageEdBase<_T>::GetEditDataIDList(TListID& tEIDList)
 {
 	map <unsigned int, _T>::iterator begin, end;
@@ -1315,6 +1327,29 @@ TEMPLATE	INT32		CManageEdBase<_T>::GetEditDataIDList(TListID& tEIDList)
 		tEIDList.push_back(begin->second.nEditID);
 	}
 	return tEIDList.size();
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+TEMPLATE	void		CManageEdBase<_T>::SetEditData(UINT32 nID)
+{
+	_T* pdata = FindItem(nID);
+	if(!pdata)	return;
+
+	SetEditData(*pdata);
+}
+
+TEMPLATE	void		CManageEdBase<_T>::SetEditData(_T& data)
+{
+	m_tEditData = data;
+	return;
+}
+
+TEMPLATE	_T*			CManageEdBase<_T>::GetEditData()
+{
+	return &(m_tEditData);
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

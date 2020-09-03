@@ -46,7 +46,12 @@ public:
 	INT32		RecoveryFile(PDB_LOG_DOC pdld);
 
 public:
-	INT32		RemoveBackupFilesByNonExistLog();
+	INT32		BackupFile(PDB_LOG_RS_BK pdata);
+	INT32		RecoveryFile(PDB_LOG_RS_BK pdata);
+	INT32		RemoveBackupFile(PDB_LOG_RS_BK pdata);
+
+public:
+	INT32		RemoveBackupFilesByNonExistLog(UINT32& nContinue);
 
 private:
 	INT32		SetBkSeedKey(PBYTE pSeedKey, UINT32 nMode = 0);

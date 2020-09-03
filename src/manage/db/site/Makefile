@@ -2,14 +2,14 @@ include ../../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = ManageSiteFile.cpp ManageSiteVuln.cpp ManageSiteVulnLock.cpp ManageSiteVulnRepair.cpp ManageSiteVulnScan.cpp
+CPPFILES = ManageSiteFile.cpp ManageSiteVuln.cpp ManageSiteVulnScan.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 
 all: $(OBJ)
 
 .cpp.o:
-	$(CC) $(CFLAGS) -c $*.cpp
+	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 clean:
-	rm -f ./*.o
+	rm -f $(OBJ)

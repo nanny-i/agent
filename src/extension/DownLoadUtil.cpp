@@ -534,7 +534,8 @@ INT32			CDownLoadUtil::TryDownloadFile(PASI_FDL_INFO pafi)
 				}
 				else
 				{
-					WriteLogE("dl file fails from site svr : id[%d],type[%d],item_id[%d],ref[%d],rtn[%d]:[%s]", pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt, nHttpRtn, pafi->szDLPath);
+					if(_stricmp(pafi->szDLPath, "/wptn"))
+						WriteLogE("dl file fails from site svr : id[%d],type[%d],item_id[%d],ref[%d],rtn[%d]:[%s]", pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt, nHttpRtn, pafi->szDLPath);
 				}
 			}
 			m_tDLSvrInfoMutex.UnLock();

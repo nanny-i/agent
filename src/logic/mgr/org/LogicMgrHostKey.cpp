@@ -119,7 +119,7 @@ void		CLogicMgrHostKey::SendPkt_Hash()
 	SendToken.Clear();
 	SendToken.TokenAdd_String(t_ManageHostKey->GetHash());
 
-	SendData(G_TYPE_HOST_KEY, G_CODE_COMMON_HASH, SendToken);
+	SendData_Mgr(G_TYPE_HOST_KEY, G_CODE_COMMON_HASH, SendToken);
 	SendToken.Clear();
 
 	t_ManageHostKey->ClearHostKey_RcKey();

@@ -33,8 +33,10 @@ void		CLogicInitLink::SendPkt_Init_Policy()
 	SendPkt_Init_Policy_FA();
 	SendPkt_Init_Policy_FE();
 	SendPkt_Init_Policy_IN();
-	SendPkt_Init_Policy_IN_AC();
 	SendPkt_Init_Policy_IN_VULN();
+	SendPkt_Init_Policy_IN_RS();
+	SendPkt_Init_Policy_PM();
+	SendPkt_Init_Policy_IN_DEVO();
 
 	return;
 }
@@ -652,156 +654,75 @@ void		CLogicInitLink::SendPkt_Init_Policy_IN()
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-void		CLogicInitLink::SendPkt_Init_Policy_IN_AC()
+void		CLogicInitLink::SendPkt_Init_Policy_IN_RS()
 {
 	{
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC;
-		t_ManagePoInAcDoc->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP;
+		t_ManagePoInRsOp->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc][%d]", t_ManagePoInAcDoc->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op][%d]", t_ManagePoInRsOp->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC_PKG;
-		t_ManagePoInAcDocPkg->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP_PKG;
+		t_ManagePoInRsOpPkg->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_pkg][%d]", t_ManagePoInAcDocPkg->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op_pkg][%d]", t_ManagePoInRsOpPkg->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC_UNIT;
-		t_ManagePoInAcDocUnit->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP_UNIT;
+		t_ManagePoInRsOpUnit->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_unit][%d]", t_ManagePoInAcDocUnit->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op_unit][%d]", t_ManagePoInRsOpUnit->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC_UNIT_SUB_PKG;
-		t_ManagePoInAcDocUnitSubPkg->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP_UNIT_SUB_PKG;
+		t_ManagePoInRsOpUnitSubPkg->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_unit_sub_pkg][%d]", t_ManagePoInAcDocUnitSubPkg->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op_unit_sub_pkg][%d]", t_ManagePoInRsOpUnitSubPkg->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC_UNIT_OBJ_PKG;
-		t_ManagePoInAcDocUnitObjPkg->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP_UNIT_OBJ_PKG;
+		t_ManagePoInRsOpUnitObjPkg->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_unit_obj_pkg][%d]", t_ManagePoInAcDocUnitObjPkg->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op_unit_obj_pkg][%d]", t_ManagePoInRsOpUnitObjPkg->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC_SUB_UNIT;
-		t_ManagePoInAcDocSubUnit->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP_SUB_UNIT;
+		t_ManagePoInRsOpSubUnit->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_sub_unit][%d]", t_ManagePoInAcDocSubUnit->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op_sub_unit][%d]", t_ManagePoInRsOpSubUnit->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_DOC_OBJ_UNIT;
-		t_ManagePoInAcDocObjUnit->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_OP_OBJ_UNIT;
+		t_ManagePoInRsOpObjUnit->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_obj_unit][%d]", t_ManagePoInAcDocObjUnit->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_op_obj_unit][%d]", t_ManagePoInRsOpObjUnit->Count());	
 		///////////////////////////////////////////////////////////////////////////////////////////////	
 		///////////////////////////////////////////////////////////////////////////////////////////////
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF;
-		t_ManagePoInAcSf->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_BK;
+		t_ManagePoInRsBk->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf][%d]", t_ManagePoInAcSf->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF_PKG;
-		t_ManagePoInAcSfPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf_pkg][%d]", t_ManagePoInAcSfPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF_UNIT;
-		t_ManagePoInAcSfUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf_unit][%d]", t_ManagePoInAcSfUnit->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF_UNIT_SUB_PKG;
-		t_ManagePoInAcSfUnitSubPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf_unit_sub_pkg][%d]", t_ManagePoInAcSfUnitSubPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF_UNIT_OBJ_PKG;
-		t_ManagePoInAcSfUnitObjPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf_unit_obj_pkg][%d]", t_ManagePoInAcSfUnitObjPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF_SUB_UNIT;
-		t_ManagePoInAcSfSubUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf_sub_unit][%d]", t_ManagePoInAcSfSubUnit->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_SF_OBJ_UNIT;
-		t_ManagePoInAcSfObjUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_sf_obj_unit][%d]", t_ManagePoInAcSfObjUnit->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_bk][%d]", t_ManagePoInRsBk->Count());	
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////	
 		///////////////////////////////////////////////////////////////////////////////////////////////
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE;
-		t_ManagePoInAcFile->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_NO;
+		t_ManagePoInRsNo->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file][%d]", t_ManagePoInAcFile->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_no][%d]", t_ManagePoInRsNo->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_PKG;
-		t_ManagePoInAcFilePkg->SetPkt(SendToken);
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_RS_NO_PKG;
+		t_ManagePoInRsNoPkg->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_pkg][%d]", t_ManagePoInAcFilePkg->Count());	
+		WriteLogN("[logic init] send init link data [po_in_rs_no_pkg][%d]", t_ManagePoInRsNoPkg->Count());	
 
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_UNIT;
-		t_ManagePoInAcFileUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_unit][%d]", t_ManagePoInAcFileUnit->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_UNIT_SUB_PKG;
-		t_ManagePoInAcFileUnitSubPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_unit_sub_pkg][%d]", t_ManagePoInAcFileUnitSubPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_UNIT_OBJ_PKG;
-		t_ManagePoInAcFileUnitObjPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_unit_obj_pkg][%d]", t_ManagePoInAcFileUnitObjPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_UNIT_SCH_PKG;
-		t_ManagePoInAcFileUnitSchPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_unit_sch_pkg][%d]", t_ManagePoInAcFileUnitSchPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_UNIT_RUL_PKG;
-		t_ManagePoInAcFileUnitRulPkg->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_unit_rule_pkg][%d]", t_ManagePoInAcFileUnitRulPkg->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_SUB_UNIT;
-		t_ManagePoInAcFileSubUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_file_sub_unit][%d]", t_ManagePoInAcFileSubUnit->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_OBJ_UNIT;
-		t_ManagePoInAcFileObjUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_file_unit][%d]", t_ManagePoInAcFileObjUnit->Count());	
-
-		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_AC_FILE_SCH_UNIT;
-		t_ManagePoInAcFileSchUnit->SetPkt(SendToken);
-		SendData_Link(m_tPktData, SendToken);
-		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_ac_doc_sch_unit][%d]", t_ManagePoInAcFileSchUnit->Count());	
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////	
 		///////////////////////////////////////////////////////////////////////////////////////////////
 	}
@@ -816,17 +737,77 @@ void		CLogicInitLink::SendPkt_Init_Policy_IN_AC()
 void		CLogicInitLink::SendPkt_Init_Policy_IN_VULN()
 {
 	{
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_AX;
+		t_ManagePoInVulnAx->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_ax][%d]", t_ManagePoInVulnAx->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_AX_PKG;
+		t_ManagePoInVulnAxPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_ax_pkg][%d]", t_ManagePoInVulnAxPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_AX_UNIT;
+		t_ManagePoInVulnAxUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_ax_unit][%d]", t_ManagePoInVulnAxUnit->Count());
+		///////////////////////////////////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////////////////////////////////
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_EDIT_APP;
+		t_ManagePoInVulnEditApp->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_edit_app][%d]", t_ManagePoInVulnEditApp->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_EDIT_APP_PKG;
+		t_ManagePoInVulnEditAppPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_edit_app_pkg][%d]", t_ManagePoInVulnEditAppPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_EDIT_APP_UNIT;
+		t_ManagePoInVulnEditAppUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_edit_app_unit][%d]", t_ManagePoInVulnEditAppUnit->Count());
+		///////////////////////////////////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////////////////////////////////
+
 		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_OP;
 		t_ManagePoInVulnOp->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
-		WriteLogN("[logic init] send init link data [po_in_vuln_op][%d]", t_ManagePoInVulnOp->Count());	
+		WriteLogN("[logic init] send init link data [po_in_vuln_op][%d]", t_ManagePoInVulnOp->Count());
 
 		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_OP_PKG;
 		t_ManagePoInVulnOpPkg->SetPkt(SendToken);
 		SendData_Link(m_tPktData, SendToken);
 		SendToken.Clear();
 		WriteLogN("[logic init] send init link data [po_in_vuln_op_pkg][%d]", t_ManagePoInVulnOpPkg->Count());	
+		///////////////////////////////////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////////////////////////////////
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_QNA;
+		t_ManagePoInVulnQna->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_qna][%d]", t_ManagePoInVulnQna->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_QNA_PKG;
+		t_ManagePoInVulnQnaPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_ax_qna][%d]", t_ManagePoInVulnQnaPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_QNA_UNIT;
+		t_ManagePoInVulnQnaUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_qna_unit][%d]", t_ManagePoInVulnQnaUnit->Count());
 		///////////////////////////////////////////////////////////////////////////////////////////////	
 		///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -856,8 +837,175 @@ void		CLogicInitLink::SendPkt_Init_Policy_IN_VULN()
 		///////////////////////////////////////////////////////////////////////////////////////////////	
 		///////////////////////////////////////////////////////////////////////////////////////////////
 
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_SECU_USB;
+		t_ManagePoInVulnSecuUsb->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_secu_usb][%d]", t_ManagePoInVulnSecuUsb->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_SECU_USB_PKG;
+		t_ManagePoInVulnSecuUsbPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_secu_usb_pkg][%d]", t_ManagePoInVulnSecuUsbPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_SECU_USB_UNIT;
+		t_ManagePoInVulnSecuUsbUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_secu_usb_unit][%d]", t_ManagePoInVulnSecuUsbUnit->Count());
+		///////////////////////////////////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////////////////////////////////
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_SW;
+		t_ManagePoInVulnSw->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_sw][%d]", t_ManagePoInVulnSw->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_SW_PKG;
+		t_ManagePoInVulnSwPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_sw_pkg][%d]", t_ManagePoInVulnSwPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_SW_UNIT;
+		t_ManagePoInVulnSwUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_sw_unit][%d]", t_ManagePoInVulnSwUnit->Count());
+		///////////////////////////////////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////////////////////////////////
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_PATCH_EXCEPTION;
+		t_ManagePoInVulnPatchException->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_patch_exception][%d]", t_ManagePoInVulnPatchException->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_PATCH_EXCEPTION_PKG;
+		t_ManagePoInVulnPatchExceptionPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_patch_exception_pkg][%d]", t_ManagePoInVulnPatchExceptionPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_IN_VULN_PATCH_EXCEPTION_UNIT;
+		t_ManagePoInVulnPatchExceptionUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_vuln_patch_exception_unit][%d]", t_ManagePoInVulnPatchExceptionUnit->Count());
+		///////////////////////////////////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////////////////////////////////
 	}	
 
+
+	return;
+}
+//---------------------------------------------------------------------------
+
+void		CLogicInitLink::SendPkt_Init_Policy_IN_DEVO()
+{
+	{
+		m_tPktData->hdr.code = G_CODE_INIT_PO_DV_NOTIFY;
+		t_ManagePoInDevONotify->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_devo_notify][%d]", t_ManagePoInDevONotify->Count());	
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_DV_NOTIFY_PKG;
+		t_ManagePoInDevONotifyPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_in_devo_notify_pkg][%d]", t_ManagePoInDevONotifyPkg->Count());	
+	}
+	return;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+void		CLogicInitLink::SendPkt_Init_Policy_PM()
+{
+	{
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_OP;
+		t_ManagePoPmOp->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_op][%d]", t_ManagePoPmOp->Count());	
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_DM;
+		t_ManagePoPmDm->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_dm][%d]", t_ManagePoPmDm->Count());	
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_DM_PKG;
+		t_ManagePoPmDmPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_dm_pkg][%d]", t_ManagePoPmDmPkg->Count());	
+		
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_DM_UNIT;
+		t_ManagePoPmDmUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_dm_unit][%d]", t_ManagePoPmDmUnit->Count());
+
+
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_EX;
+		t_ManagePoPmEx->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_ex][%d]", t_ManagePoPmEx->Count());	
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_EX_PKG;
+		t_ManagePoPmExPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_ex_pkg][%d]", t_ManagePoPmExPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_EX_UNIT;
+		t_ManagePoPmExUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_ex_unit][%d]", t_ManagePoPmExUnit->Count());
+
+
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_SCAN;
+		t_ManagePoPmScan->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_scan][%d]", t_ManagePoPmScan->Count());	
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_SCAN_PKG;
+		t_ManagePoPmScanPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_scan_pkg][%d]", t_ManagePoPmScanPkg->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_SCAN_UNIT;
+		t_ManagePoPmScanUnit->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_scan_unit][%d]", t_ManagePoPmScanUnit->Count());
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_NO;
+		t_ManagePoPmNo->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_no][%d]", t_ManagePoPmNo->Count());	
+
+		m_tPktData->hdr.code = G_CODE_INIT_PO_PM_NO_PKG;
+		t_ManagePoPmNoPkg->SetPkt(SendToken);
+		SendData_Link(m_tPktData, SendToken);
+		SendToken.Clear();
+		WriteLogN("[logic init] send init link data [po_pm_no_pkg][%d]", t_ManagePoPmNoPkg->Count());
+
+	}
 	return;
 }
 //---------------------------------------------------------------------------

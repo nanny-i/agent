@@ -29,12 +29,7 @@ private:
 
 public:
 	void		AnalyzePkt_LogEvent(PPKT_DATA pkt_data);
-
-public:
-	void		InitDLEALL(UINT32 nOpType, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc = "");
-	void		SetLogEvent();
-	void		SetLogEvent(DB_LOG_EVENT& dle);
-	void		SetLogEvent(TListDBLogEvent& tDELNList);
+	void		AnalyzePkt_LogEvent_Ext_Sync();
 
 
 public:

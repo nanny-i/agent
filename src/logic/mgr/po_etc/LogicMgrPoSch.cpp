@@ -110,7 +110,7 @@ INT32		CLogicMgrPoSch::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoSchUnit->ApplyPoSchUnit(*begin))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -124,7 +124,7 @@ INT32		CLogicMgrPoSch::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoSchPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -135,7 +135,7 @@ INT32		CLogicMgrPoSch::AnalyzePkt_FromMgr_Edit_Ext()
 
 			if(SetER(t_ManagePoSch->ApplyPoSch(dphps)))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 			}
@@ -146,6 +146,7 @@ INT32		CLogicMgrPoSch::AnalyzePkt_FromMgr_Edit_Ext()
 		{
 			WriteLogN("[%s] sync policy start by edit po sch", m_strLogicName.c_str());
 			t_LogicMgrAuth->SendMgrInitData_Polcy();
+			t_LogicMgrAuth->SendMgrInitData_Sync();
 		}
 	}
 

@@ -54,7 +54,7 @@ INT32		CManagePoInVulnOpPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -95,7 +95,7 @@ INT32					CManagePoInVulnOpPkg::GetHash(UINT32 nID, String& strOrgValue)
 		strItemHash = SPrintf("%u,"
 							"%u,", 
 							pdata->tDPH.nUnitID,
-							pdata->nSiteScore);
+							pdata->nScore);
 
 		strOrgValue += strItemHash;
 	}
@@ -111,7 +111,7 @@ INT32					CManagePoInVulnOpPkg::AddPoInVulnOpPkg(DB_PO_IN_VULN_OP_PKG&	data)
     }
 
 	AddItem(data.tDPH.nID, data);
-	AddKeyIDList(&data);
+	AddKeyIDListPkg(&data);
 
     return 0;
 }
@@ -143,7 +143,7 @@ INT32					CManagePoInVulnOpPkg::DelPoInVulnOpPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdata);
+	DelKeyIDListPkg(pdata);
     DeleteItem(nID);
     return 0;
 }
@@ -222,7 +222,7 @@ INT32					CManagePoInVulnOpPkg::SetPkt(PDB_PO_IN_VULN_OP_PKG pdata, MemToken& Se
 {
 	SendToken.TokenAdd_DPH(pdata->tDPH);
 
-	SendToken.TokenAdd_32(pdata->nSiteScore);
+	SendToken.TokenAdd_32(pdata->nScore);
 
 	SendToken.TokenSet_Block();
     return 0;
@@ -233,7 +233,7 @@ INT32					CManagePoInVulnOpPkg::GetPkt(MemToken& RecvToken, DB_PO_IN_VULN_OP_PKG
 {
 	if (!RecvToken.TokenDel_DPH(data.tDPH))				goto INVALID_PKT;
 
-	if(!RecvToken.TokenDel_32(data.nSiteScore))			goto INVALID_PKT;
+	if(!RecvToken.TokenDel_32(data.nScore))				goto INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

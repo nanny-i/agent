@@ -72,7 +72,7 @@ INT32					CManagePoInVulnScanUnit::GetHash(UINT32 nID, String& strOrgValue)
 
 	{
 		strOrgValue = SPrintf("%s,"
-							"%I64u,%u,", 
+							"%llu,%u,", 
 							GetHdrHashInfo(pdata).c_str(),
 							pdata->nSchTime, pdata->nScanType);
 	}

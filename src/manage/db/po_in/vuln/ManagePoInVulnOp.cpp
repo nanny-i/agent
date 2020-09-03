@@ -90,8 +90,12 @@ INT32					CManagePoInVulnOp::InitHash(UINT32 nID)
 	}
 
 	{
-		strOrgValue = SPrintf("%s,", 
-							GetHdrHashInfo(pdata).c_str());
+		strOrgValue = SPrintf("%s,"
+							"%s,%s,%s,%s,"
+							"%u,%s,%s,",
+							GetHdrHashInfo(pdata).c_str(),
+							pdata->tDPIVOPF.strPtnFileSvName.c_str(), pdata->tDPIVOPF.strPtnVersion.c_str(), pdata->tDPIVOPF.strPtnFileName.c_str(), pdata->tDPIVOPF.strPtnFileHash.c_str(),
+							pdata->tDPIVOPF.nPtnDnFileType, pdata->tDPIVOPF.strPtnDnFileName.c_str(), pdata->tDPIVOPF.strPtnDnFileHash.c_str());
 
 		{
 			TMapIDItor begin, end;
@@ -177,6 +181,39 @@ String					CManagePoInVulnOp::GetName(UINT32 nID)
     return pdata->tDPH.strName;
 }
 //---------------------------------------------------------------------------
+
+INT32					CManagePoInVulnOp::IsValidPtnFile(UINT32 nID)
+{	
+	PDB_PO_IN_VULN_OP pdata = FindItem(nID);
+	if(!pdata)	return 0;
+
+	if(pdata->tDPH.nUsedMode == STATUS_USED_MODE_OFF)		return 0;	
+
+	return IsValidPtnFile(pdata);
+}
+//---------------------------------------------------------------------------
+
+INT32					CManagePoInVulnOp::IsValidPtnFile(PDB_PO_IN_VULN_OP pdata)
+{
+	CFileUtil tFileUtil;	
+	String strFullFile = "";
+	strFullFile = SPrintf("%s/%s/%s", t_EnvInfo->m_strRootPath.c_str(), STR_PTN_VULN_FILE, pdata->tDPIVOPF.strPtnFileName.c_str());
+
+	if(tFileUtil.FileExists(strFullFile.c_str()) == 0)			
+		return 0;
+
+	{
+		CHAR szHash[CHAR_MAX_SIZE] = {0, };
+		SHAFile(ASIHASH_SHA_LEN_TYPE_256, strFullFile.c_str(), szHash, CHAR_MAX_SIZE);
+		if(_stricmp(pdata->tDPIVOPF.strPtnFileHash.c_str(), szHash))
+		{
+			WriteLogE("po in vuln op ptn invalid hash : [%s][%s]", szHash, pdata->tDPIVOPF.strPtnFileHash.c_str());
+			return 0;
+		}
+	}	
+	return 1;
+}
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
@@ -215,6 +252,18 @@ INT32					CManagePoInVulnOp::SetPkt(UINT32 nID, MemToken& SendToken)
 }
 //---------------------------------------------------------------------------
 
+INT32					CManagePoInVulnOp::SetPkt(PDB_PO_IN_VULN_OP pdata, MemToken& SendToken)
+{
+	SendToken.TokenAdd_DPH(pdata->tDPH);
+
+	SendToken.TokenSet_Block();
+	return 0;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
 INT32					CManagePoInVulnOp::SetPktHost(UINT32 nID, MemToken& SendToken)
 {
 	PDB_PO_IN_VULN_OP pdata = FindItem(nID);
@@ -237,18 +286,41 @@ INT32					CManagePoInVulnOp::SetPktHost(UINT32 nID, MemToken& SendToken)
 }
 //---------------------------------------------------------------------------
 
-INT32					CManagePoInVulnOp::SetPkt(PDB_PO_IN_VULN_OP pdata, MemToken& SendToken)
+INT32					CManagePoInVulnOp::SetPktHost(PDB_PO_IN_VULN_OP pdata, MemToken& SendToken)
 {
 	SendToken.TokenAdd_DPH(pdata->tDPH);
 
+	SendToken.TokenAdd_String(pdata->tDPIVOPF.strPtnFileSvName);
+
+	SendToken.TokenAdd_String(pdata->tDPIVOPF.strPtnVersion);
+	SendToken.TokenAdd_String(pdata->tDPIVOPF.strPtnFileName);
+	SendToken.TokenAdd_String(pdata->tDPIVOPF.strPtnFileHash);
+
+	SendToken.TokenAdd_32(pdata->tDPIVOPF.nPtnDnFileType);
+	SendToken.TokenAdd_String(pdata->tDPIVOPF.strPtnDnFileName);
+	SendToken.TokenAdd_String(pdata->tDPIVOPF.strPtnDnFileHash);
+
 	SendToken.TokenSet_Block();
-    return 0;
+	return 0;
 }
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
 INT32					CManagePoInVulnOp::GetPkt(MemToken& RecvToken, DB_PO_IN_VULN_OP& data)
 {
 	if(!RecvToken.TokenDel_DPH(data.tDPH))			goto INVALID_PKT;
+
+	if ( RecvToken.TokenDel_String(data.tDPIVOPF.strPtnFileSvName) < 0)	goto INVALID_PKT;
+	if ( RecvToken.TokenDel_String(data.tDPIVOPF.strPtnVersion) < 0)	goto INVALID_PKT;
+	if ( RecvToken.TokenDel_String(data.tDPIVOPF.strPtnFileName) < 0)	goto INVALID_PKT;
+	if ( RecvToken.TokenDel_String(data.tDPIVOPF.strPtnFileHash) < 0)	goto INVALID_PKT;
+
+	if (!RecvToken.TokenDel_32(data.tDPIVOPF.nPtnDnFileType))			goto INVALID_PKT;
+	if ( RecvToken.TokenDel_String(data.tDPIVOPF.strPtnDnFileName) < 0)	goto INVALID_PKT;
+	if ( RecvToken.TokenDel_String(data.tDPIVOPF.strPtnDnFileHash) < 0)	goto INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

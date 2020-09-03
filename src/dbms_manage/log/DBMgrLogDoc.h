@@ -45,6 +45,9 @@ public:
 	virtual INT32	UpdateExecute(PVOID lpTemplet);
 	virtual INT32	DeleteExecute(UINT32 nID);
 
+public:
+	INT32			LoadDB(UINT32 nLogMode, UINT32 nLogNum, TListDBLogDoc& tDBLogDocList);
+
 
 public:
 	CDBMgrLogDoc();

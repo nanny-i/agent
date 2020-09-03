@@ -72,7 +72,7 @@ INT32					CManagePoDeployFileTarUnit::GetHash(UINT32 nID, String& strOrgValue)
 
 	{
 		m_strHashValue = SPrintf("%s,"
-							"%I64u,%I64u,", 
+							"%llu,%llu,", 
 							GetHdrHashInfo(pdpdfcu).c_str(),
 							pdpdfcu->nSysMode, pdpdfcu->nSysInfo);
 

@@ -106,18 +106,31 @@ PDB_HOST_SW			CManageHostSw::FindHostKey(UINT32 nHostID)
 }
 //---------------------------------------------------------------------------
 
-PDB_HOST_SW		CManageHostSw::FindChkKey(String strChkKey)
+UINT32			CManageHostSw::FindChkVerID(PDB_HOST_SW pdata)
+{
+	return FindChkVerID(pdata->strChkKey, pdata->strVersion);
+}
+//---------------------------------------------------------------------------
+
+UINT32			CManageHostSw::FindChkVerID(String strChkKey, String strVersion)
 {
 	TMapDBHostSwItor begin, end;
 	begin = m_tMap.begin();	end = m_tMap.end();
 	for(begin; begin != end; begin++)
 	{
-		if(begin->second.strChkKey.compare(strChkKey))
-			continue;
+		PDB_HOST_SW pdata = &(begin->second);
+		if(pdata->strChkKey.compare(strChkKey) ||
+			pdata->strVersion.compare(strVersion))	continue;
 
-		return &(begin->second);
+		return pdata->nID;
 	}
-	return NULL;
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+PDB_HOST_SW		CManageHostSw::FindChkKeyVerItem(String strChkKey, String strVersion)
+{
+	return FindItem(FindChkVerID(strChkKey, strVersion));
 }
 //---------------------------------------------------------------------------
 
@@ -133,13 +146,26 @@ INT32			CManageHostSw::IsExistLocalSw(TListSwInfo* tSwInfoList, String strName)
 }
 //---------------------------------------------------------------------------
 
+INT32			CManageHostSw::IsExistLocalSwKeyVer(TListSwInfo* tSwInfoList, String strChkKey, String strVersion)
+{
+	TListSwInfoItor begin, end;
+	begin = tSwInfoList->begin();	end = tSwInfoList->end();
+	for(begin; begin != end; begin++)
+	{
+		if(strChkKey.compare(begin->szChkKey) == 0 &&
+			strVersion.compare(begin->szVersion) == 0)		return 1;
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+
 INT32	CManageHostSw::GetPkt(MemToken& RecvToken, DB_HOST_SW& dhs)
 {
-	if (!RecvToken.TokenDel_32(dhs.nHostID))				goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(dhs.nID))					goto INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dhs.nUsedFlag))				goto INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dhs.nRegDate))				goto INVALID_PKT;
-	
-	if (!RecvToken.TokenDel_32(dhs.nID))					goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(dhs.nHostID))				goto INVALID_PKT;
+
 	if (!RecvToken.TokenDel_32(dhs.nProcArch))				goto INVALID_PKT;
 
 	if ( RecvToken.TokenDel_String(dhs.strChkKey) < 0)		goto INVALID_PKT;
@@ -192,11 +218,11 @@ INT32		CManageHostSw::SetPkt(TListDBHostSw& tDBHostSwList, MemToken& SendToken)
 
 INT32		CManageHostSw::SetPkt(PDB_HOST_SW pdhs, MemToken& SendToken)
 {
-	SendToken.TokenAdd_32(pdhs->nHostID);
+	SendToken.TokenAdd_32(pdhs->nID);
 	SendToken.TokenAdd_32(pdhs->nUsedFlag);
 	SendToken.TokenAdd_32(pdhs->nRegDate);
+	SendToken.TokenAdd_32(pdhs->nHostID);
 
-	SendToken.TokenAdd_32(pdhs->nID);
 	SendToken.TokenAdd_32(pdhs->nProcArch);
 	SendToken.TokenAdd_String(pdhs->strChkKey);
 	SendToken.TokenAdd_String(pdhs->strName);

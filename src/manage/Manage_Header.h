@@ -22,6 +22,7 @@
 #define	MANAGE_HEADER_H_12CC793F_06F3_411C_9419_61F453A83EDC
 
 #include "ManageBase.h"
+//#include "ManageEdBase.h"
 #include "ManagePoBase.h"
 
 #include "ManageBaseUtil.h"
@@ -33,6 +34,9 @@
 #include "ManageHostStatusPo.h"
 #include "ManageHostPolicy.h"
 #include "ManageHostKey.h"
+#include "ManageHostPatch.h"
+#include "ManageHostVulnRst.h"
+#include "ManageHostVulnRstUnit.h"
 
 #include "ManageUser.h"
 #include "ManageUserPolicy.h"
@@ -45,14 +49,15 @@
 #include "ManageEnvSOrgLink.h"
 #include "ManageEnvTrustSubject.h"
 #include "ManageEnvPolicy.h"
+#include "ManageEnvLocal.h"
+#include "ManageEnvSocket.h"
 
 #include "ManageErrorCode.h"
 #include "ManageOsType.h"
 #include "ManageSiteFile.h"
 #include "ManageSiteVuln.h"
 #include "ManageSiteVulnScan.h"
-#include "ManageSiteVulnRepair.h"
-#include "ManageSiteVulnLock.h"
+#include "ManageDocDeleteInfo.h"
 
 #include "ManageLinkLicense.h"
 
@@ -62,7 +67,10 @@
 #include "ManageLogSecu.h"
 #include "ManageLogDocDScan.h"
 #include "ManageLogDocHost.h"
-#include "ManageLogStatus.h"
+#include "ManageLogPatch.h"
+#include "ManageLogDevice.h"
+#include "ManageLogRs.h"
+#include "ManageLogRsBk.h"
 
 #include "ManagePoCtlPanel.h"
 #include "ManagePoCtlPanelPkg.h"
@@ -88,6 +96,9 @@
 #include "ManagePoSchPkg.h"
 #include "ManagePoSchUnit.h"
 
+#include "ManagePoHostNotify.h"
+#include "ManagePoHostNotifyPkg.h"
+#include "ManagePoHostNotifyUnit.h"
 #include "ManagePoPower.h"
 #include "ManagePoPowerPkg.h"
 #include "ManagePoPowerUnit.h"
@@ -119,6 +130,7 @@
 #include "ManagePoFaBk.h"
 #include "ManagePoFaNotify.h"
 #include "ManagePoFaNotifyPkg.h"
+#include "ManagePoFaDelFileAfterBoot.h"
 
 #include "ManagePoFePtnOp.h"
 #include "ManagePoFePtnLo.h"
@@ -134,13 +146,6 @@
 
 #include "ManageLocalEnvLog.h"
 #include "ManageLocalEnvAuth.h"
-
-#include "ManageFileDown.h"
-#include "ManageLogicTimer.h"
-#include "ManageWinSession.h"
-#include "ManageSysDrive.h"
-#include "ManageEvtMon.h"
-//#include "ManageDeviceMedia.h"
 
 // Nanny-On Manage
 #include "ManagePoInPtnOp.h"
@@ -163,36 +168,114 @@
 #include "ManagePoInPtnNo.h"
 #include "ManagePoInPtnNoPkg.h"
 
-#include "ManagePoInAcDoc.h"
-#include "ManagePoInAcDocPkg.h"
-#include "ManagePoInAcDocUnit.h"
-#include "ManagePoInAcDocUnitObjPkg.h"
-#include "ManagePoInAcDocUnitSubPkg.h"
-#include "ManagePoInAcDocObjUnit.h"
-#include "ManagePoInAcDocSubUnit.h"
-#include "ManagePoInAcSf.h"
-#include "ManagePoInAcSfPkg.h"
-#include "ManagePoInAcSfUnit.h"
-#include "ManagePoInAcSfUnitObjPkg.h"
-#include "ManagePoInAcSfUnitSubPkg.h"
-#include "ManagePoInAcSfObjUnit.h"
-#include "ManagePoInAcSfSubUnit.h"
-#include "ManagePoInAcFile.h"
-#include "ManagePoInAcFilePkg.h"
-#include "ManagePoInAcFileUnit.h"
-#include "ManagePoInAcFileUnitObjPkg.h"
-#include "ManagePoInAcFileUnitSubPkg.h"
-#include "ManagePoInAcFileUnitSchPkg.h"
-#include "ManagePoInAcFileUnitRulPkg.h"
-#include "ManagePoInAcFileObjUnit.h"
-#include "ManagePoInAcFileSubUnit.h"
-#include "ManagePoInAcFileSchUnit.h"
-
+#include "ManagePoInVulnAx.h"
+#include "ManagePoInVulnAxPkg.h"
+#include "ManagePoInVulnAxUnit.h"
+#include "ManagePoInVulnEditApp.h"
+#include "ManagePoInVulnEditAppPkg.h"
+#include "ManagePoInVulnEditAppUnit.h"
 #include "ManagePoInVulnOp.h"
 #include "ManagePoInVulnOpPkg.h"
+#include "ManagePoInVulnQna.h"
+#include "ManagePoInVulnQnaPkg.h"
+#include "ManagePoInVulnQnaUnit.h"
 #include "ManagePoInVulnScan.h"
 #include "ManagePoInVulnScanPkg.h"
 #include "ManagePoInVulnScanUnit.h"
 #include "ManagePoInVulnScanUnitPkg.h"
+#include "ManagePoInVulnSecuUsb.h"
+#include "ManagePoInVulnSecuUsbPkg.h"
+#include "ManagePoInVulnSecuUsbUnit.h"
+#include "ManagePoInVulnSw.h"
+#include "ManagePoInVulnSwPkg.h"
+#include "ManagePoInVulnSwUnit.h"
+#include "ManagePoInVulnPatchException.h"
+#include "ManagePoInVulnPatchExceptionPkg.h"
+#include "ManagePoInVulnPatchExceptionUnit.h"
+
+#include "ManagePoInRsOp.h"
+#include "ManagePoInRsOpPkg.h"
+#include "ManagePoInRsOpUnit.h"
+#include "ManagePoInRsOpUnitObjPkg.h"
+#include "ManagePoInRsOpUnitSubPkg.h"
+#include "ManagePoInRsOpObjUnit.h"
+#include "ManagePoInRsOpSubUnit.h"
+#include "ManagePoInRsNo.h"
+#include "ManagePoInRsBk.h"
+#include "ManagePoInRsNoPkg.h"
+
+
+#include "ManagePoInDevOOp.h"
+#include "ManagePoInDevOBL.h"
+#include "ManagePoInDevOBLPkg.h"
+#include "ManagePoInDevOWL.h"
+#include "ManagePoInDevOWLPkg.h"
+#include "ManagePoInDevOEx.h"
+#include "ManagePoInDevOExPkg.h"
+#include "ManagePoInDevOExUnit.h"
+#include "ManagePoInDevOInfo.h"
+#include "ManagePoInDevONotify.h"
+#include "ManagePoInDevONotifyPkg.h"
+#include "ManagePoDvDefault.h"
+
+#include "ManagePoPmOp.h"
+#include "ManagePoPmDm.h"
+#include "ManagePoPmDmPkg.h"
+#include "ManagePoPmDmUnit.h"
+#include "ManagePoPmScan.h"
+#include "ManagePoPmScanPkg.h"
+#include "ManagePoPmScanUnit.h"
+#include "ManagePoPmEx.h"
+#include "ManagePoPmExPkg.h"
+#include "ManagePoPmExUnit.h"
+#include "ManagePoPmNo.h"
+#include "ManagePoPmNoPkg.h"
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+#include "ManageFileDown.h"
+#include "ManageLogicTimer.h"
+#include "ManageWinSession.h"
+#include "ManageSysDrive.h"
+#include "ManageEvtMon.h"
+#include "ManageDeviceMedia.h"
+#include "ManageDevOInfo.h"
+#include "ManagePMSWork.h"
+#include "ManageLinkEnv.h"
+#include "ManagePatchFile.h"
+#include "ManageChkExistInterval.h"
+#include "ManageVulnRegProtect.h"
+#include "ManageVulnFileProtect.h"
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#include "ManagePtnVersion.h"
+
+#include "ManagePtnPatch.h"
+#include "ManagePtnPatchFile.h"
+#include "ManagePtnPatchWsus.h"
+#include "ManagePtnPatchScan.h"
+#include "ManagePtnPatchScanEnv.h"
+#include "ManagePtnPatchScanEnvUnit.h"
+#include "ManagePtnDeploy.h"
+#include "ManagePtnVuln.h"
+#include "ManagePtnVulnScan.h"
+#include "ManagePtnVulnMP.h"
+#include "ManagePtnProcFile.h"
+
+// #include "ManagePtnPatchScan.h"
+// #include "ManagePtnPatchEnv.h"
+// #include "ManagePtnPatchCmd.h"
+// #include "ManagePtnPatchUtil.h"
+// #include "ManagePtnMimsPatch.h"
 
 #endif //MANAGE_HEADER_H_12CC793F_06F3_411C_9419_61F453A83EDC

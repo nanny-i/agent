@@ -212,48 +212,6 @@ PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogEvtUnit(PDB_LOG_EVENT pdle)
 }
 //---------------------------------------------------------------------------
 
-PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogStatusUnit(PDB_LOG_STATUS pdlst)
-{
-	UINT32 nRtnID = 0, nAdminLevel = 0;	
-	String strDesc;
-
-	if(!pdlst)
-		return NULL;
-
-	strDesc = t_ManageLogStatus->GetFullDesc(*pdlst);
-
-	TMapDBEnvLogUnitItor begin, end;
-	begin = m_tMap.begin();	end = m_tMap.end();
-	for(begin; begin != end; begin++)
-	{
-		PDB_ENV_LOG_UNIT pdeleu_chk = &(begin->second);
-		if(	(pdeleu_chk->nEvtType			&& ((pdeleu_chk->nEvtType & SS_ENV_LOG_TYPE_STATUS) == 0))	||
-			(pdeleu_chk->nEvtErrCode		&& (pdeleu_chk->nEvtErrCode != pdlst->nEvtErrCode))	||
-			(pdeleu_chk->nSubjectType		&& (pdeleu_chk->nSubjectType != pdlst->nSubjectType))	||
-			(pdeleu_chk->nTargetType		&& (pdeleu_chk->nTargetType != pdlst->nTargetType))		||
-			(pdeleu_chk->nObjectType		&& (pdeleu_chk->nObjectType != pdlst->nObjectType))		||
-			(pdeleu_chk->nObjectCode		&& (pdeleu_chk->nObjectCode != pdlst->nObjectCode))		||
-			(pdeleu_chk->nOperationType		&& (pdeleu_chk->nOperationType != pdlst->nOperationType))	)
-		{
-			continue;
-		}
-
-		if((pdeleu_chk->strSubjectInfo.empty() == FALSE	&& StrMatchSpec(pdlst->strSubjectInfo.c_str(), pdeleu_chk->strSubjectInfo.c_str()) == 0) ||
-			(pdeleu_chk->strTargetInfo.empty() == FALSE	&& StrMatchSpec(pdlst->strTargetInfo.c_str(), pdeleu_chk->strTargetInfo.c_str()) == 0)	||
-			(pdeleu_chk->strObjectInfo.empty() == FALSE	&& StrMatchSpec(pdlst->strObjectInfo.c_str(), pdeleu_chk->strObjectInfo.c_str()) == 0)	||
-			(strDesc.empty() == FALSE		&& StrMatchSpec(strDesc.c_str(), pdeleu_chk->strEvtDescr.c_str()) == 0))
-		{
-			continue;
-		}
-
-
-		nRtnID = pdeleu_chk->tDPH.nID;
-	}
-
-	return FindItem(nRtnID);
-}
-//---------------------------------------------------------------------------
-
 PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogDocUnit(PDB_LOG_DOC pdld)
 {
 	UINT32 nRtnID = 0;
@@ -377,6 +335,96 @@ PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogDeployFileUnit(PDB_LOG_DEPLOY_F
 		strConvertObjInfo = tFileUtil.GetEnvPathToLocalPathSingle(pdeleu_chk->strObjectInfo, 0);
 
 		if((pdeleu_chk->strObjectInfo.empty() == FALSE	&& StrMatchSpec(strObjInfo.c_str(), strConvertObjInfo.c_str()) == 0))
+		{
+			continue;
+		}
+
+		nRtnID = pdeleu_chk->tDPH.nID;
+	}
+
+	return FindItem(nRtnID);
+}
+
+PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogPatchUnit(PDB_LOG_PATCH pdlp)
+{
+	UINT32 nRtnID = 0;
+	UINT32 nAdminLevel = 0;
+
+	CFileUtil tFileUtil;
+
+	TMapDBEnvLogUnitItor begin, end;
+	begin = m_tMap.begin();	end = m_tMap.end();
+	for(begin; begin != end; begin++)
+	{
+		PDB_ENV_LOG_UNIT pdeleu_chk = &(begin->second);
+		if(	(pdeleu_chk->nEvtType			&& ((pdeleu_chk->nEvtType & SS_ENV_LOG_TYPE_PATCH) == 0))	||
+			(pdeleu_chk->nEvtErrCode		&& (pdeleu_chk->nEvtErrCode != pdlp->nEvtErrCode)) ||
+			(pdeleu_chk->nOperationType		&& (pdeleu_chk->nOperationType != pdlp->nPatchStatus)))
+		{
+			continue;
+		}
+
+// 		String strSubInfo, strObjInfo, strConvertSubInfo, strConvertObjInfo;
+// 		strSubInfo = SPrintf("%s\\%s", pdlp->strSubjectPath, pdlp->strSubjectName);
+// 		strObjInfo = SPrintf("%s\\%s", pdlp->strObjectPath, pdlp->strObjectName);
+// 
+// 		strConvertSubInfo = tFileUtil.GetEnvPathToLocalPathSingle(pdeleu_chk->strSubjectInfo, 0);
+// 		strConvertObjInfo = tFileUtil.GetEnvPathToLocalPathSingle(pdeleu_chk->strObjectInfo, 0);
+// 
+// 		if((pdeleu_chk->strSubjectInfo.empty() == FALSE	&& StrMatchSpec(strSubInfo, strConvertSubInfo) == 0) ||
+// 			(pdeleu_chk->strObjectInfo.empty() == FALSE	&& StrMatchSpec(strObjInfo, strConvertObjInfo) == 0))
+// 		{
+// 			continue;
+// 		}
+
+		nRtnID = pdeleu_chk->tDPH.nID;
+	}
+
+	return FindItem(nRtnID);
+}
+//---------------------------------------------------------------------------
+
+PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogDeviceUnit(PDB_LOG_DEVICE pdld)
+{
+	UINT32 nRtnID = 0;
+	UINT32 nAdminLevel = 0;	
+
+	CFileUtil tFileUtil;
+
+	TMapDBEnvLogUnitItor begin, end;
+	begin = m_tMap.begin();	end = m_tMap.end();
+	for(begin; begin != end; begin++)
+	{
+		PDB_ENV_LOG_UNIT pdeleu_chk = &(begin->second);
+		if(	(pdeleu_chk->nEvtType			&& ((pdeleu_chk->nEvtType & SS_ENV_LOG_TYPE_DEVICE) == 0))	||
+			(pdeleu_chk->nEvtErrCode		&& (pdeleu_chk->nEvtErrCode != pdld->nEvtErrCode)) ||
+			(pdeleu_chk->nOperationType		&& (pdeleu_chk->nOperationType != pdld->nOpType)))
+		{
+			continue;
+		}
+
+		nRtnID = pdeleu_chk->tDPH.nID;
+	}
+
+	return FindItem(nRtnID);
+}
+//---------------------------------------------------------------------------
+
+PDB_ENV_LOG_UNIT	CManageEnvLogUnit::FindRecordLogRsUnit(PDB_LOG_RS pdata)
+{
+	UINT32 nRtnID = 0;
+	UINT32 nAdminLevel = 0;	
+
+	CFileUtil tFileUtil;
+
+	TMapDBEnvLogUnitItor begin, end;
+	begin = m_tMap.begin();	end = m_tMap.end();
+	for(begin; begin != end; begin++)
+	{
+		PDB_ENV_LOG_UNIT pdeleu_chk = &(begin->second);
+		if(	(pdeleu_chk->nEvtType			&& ((pdeleu_chk->nEvtType & SS_ENV_LOG_TYPE_RS) == 0))	||
+			(pdeleu_chk->nEvtErrCode		&& (pdeleu_chk->nEvtErrCode != pdata->nEvtErrCode)) ||
+			(pdeleu_chk->nOperationType		&& (pdeleu_chk->nOperationType != pdata->nOpType)))
 		{
 			continue;
 		}

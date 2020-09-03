@@ -78,6 +78,11 @@ INT32					CManagePoInPtnSPRule::InitHash()
 				WriteLogE("not find po_in_ptn_sp_rule by hash : [%d]", ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 				return ERR_INFO_NOT_OP_BECAUSE_NOT_FIND;
 			}
+
+			if(pdata->tDPH.nID >= SS_PO_IN_PTN_SP_RULE_LOCAL_START_ID)
+			{
+				continue;
+			}
 		}
 
 		{
@@ -176,6 +181,18 @@ String					CManagePoInPtnSPRule::GetName(UINT32 nID)
     return pdata->tDPH.strName;
 }
 //---------------------------------------------------------------------------
+
+UINT32					CManagePoInPtnSPRule::GetNextLocalID()
+{
+	UINT32 nNextID = SS_PO_IN_PTN_SP_RULE_LOCAL_START_ID;
+	TMapDBPoInPtnSPRuleItor begin, end;
+	begin = m_tMap.begin();	end = m_tMap.end();
+	for(begin; begin != end; begin++)
+	{
+		if(begin->first >= nNextID)		nNextID += 1;
+	}
+	return nNextID;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
@@ -255,6 +272,24 @@ INVALID_PKT:
 	return -1;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32			CManagePoInPtnSPRule::SetPktSync(TListPVOID& tIDList)
+{
+	{
+		TMapDBPoInPtnSPRuleItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if(begin->first < SS_PO_IN_PTN_SP_RULE_LOCAL_START_ID)			continue;
+
+			tIDList.push_back(&(begin->second));
+		}
+
+		if(tIDList.empty())	return -1;
+	}
+	return 0;
+}
 //---------------------------------------------------------------------------
 
 

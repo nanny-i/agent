@@ -34,8 +34,9 @@ CLogicPoFaClear::CLogicPoFaClear()
 {	
 	m_strLogicName		= "link po fa clear";
 		
-	m_nEvtObjType		= 0;
-	m_nEvtObjCode		= 0;
+	m_nEvtSubType		= EVENT_SUBJECT_TYPE_USER;
+	m_nEvtObjType		= EVENT_OBJECT_TYPE_USER;
+	m_nEvtObjCode		= EVENT_OBJECT_CODE_POLICY_FA_CLEAR;
 }
 //---------------------------------------------------------------------------
 
@@ -49,15 +50,16 @@ INT32	CLogicPoFaClear::AnalyzePkt_FromLink_Ext()
 {
 	switch(m_nPktCode)
 	{
-		case G_CODE_COMMON_INIT:		AnalyzePkt_FromLink_Ext_Init();		break;
+		case G_CODE_COMMON_SCAN:		AnalyzePkt_FromLink_Ext_Scan();		break;
 		default:						break;		
 	}
 	return 0;
 }
 //---------------------------------------------------------------------------
 
-INT32		CLogicPoFaClear::AnalyzePkt_FromLink_Ext_Init()
+INT32		CLogicPoFaClear::AnalyzePkt_FromLink_Ext_Scan()
 {
+	m_nEvtOpType = EVENT_OPERATION_TYPE_SCAN;
 	PDB_PO_FA_CLEAR_UNIT pdpfcu = NULL;
 
 	if(!RecvToken.TokenDel_32(m_nRecvID))		return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);
@@ -81,6 +83,13 @@ INT32		CLogicPoFaClear::AnalyzePkt_FromLink_Ext_Init()
 		}
 		
 		t_LogicMgrPoFaClear->ApplyPolicy_Unit(pdpfcu, tMFOI);
+	}
+
+	{
+		SendToken.TokenAdd_32(m_nRecvID);
+		SendToken.TokenAdd_32(GetCurrentDateTimeInt());
+		SendData_Link(m_nPktType, m_nPktCode, SendToken);
+		SendToken.Clear();
 	}
 	
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
@@ -117,6 +126,8 @@ INT32		CLogicPoFaClear::AnalyzePkt_FromLink_Del_Ext()
 			}
 			m_tIDList.push_back(nTempID);
 		}
+		t_ManageDocDeleteInfo->UpdateDocDeleteInfo();
+		t_LogicDocDeleteInfo->SendPkt_DocDeleteInfo_Edit();
 	}
 
 	{

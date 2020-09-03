@@ -59,7 +59,7 @@ UINT64	StrToUInt64(LPCTSTR lpValue)
 String UInt64ToStr(UINT64 nValue)
 {
 	String strValue;
-	strValue = SPrintf("%I64u", nValue);
+	strValue = SPrintf("%llu", nValue);
 	return strValue;
 }
 //---------------------------------------------------------------------------

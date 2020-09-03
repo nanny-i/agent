@@ -1,0 +1,16 @@
+
+#ifndef COM_DEFINE_DB_PO_IN_DEVO_H_938EF200_F60B_452A_BD30_A10E8507EDCC
+#define COM_DEFINE_DB_PO_IN_DEVO_H_938EF200_F60B_452A_BD30_A10E8507EDCC
+
+//-------------------------------------------------------------------
+
+#define	SS_PO_IN_PTN_DV_TYPE_PORT						0x00000001
+#define	SS_PO_IN_PTN_DV_TYPE_DISC						0x00000002
+#define	SS_PO_IN_PTN_DV_TYPE_CDROM						0x00000004
+#define	SS_PO_IN_PTN_DV_TYPE_NETWORK					0x00000008
+#define	SS_PO_IN_PTN_DV_TYPE_PORTABLE					0x00000010
+#define	SS_PO_IN_PTN_DV_TYPE_BLUETOOTH					0x00000020
+#define	SS_PO_IN_PTN_DV_TYPE_ETC						0x00008000
+
+//--------------------------------------------------------------------
+#endif	//COM_DEFINE_DB_PO_IN_DEVO_PTN_OP_H_938EF200_F60B_452A_BD30_A10E8507EDCC

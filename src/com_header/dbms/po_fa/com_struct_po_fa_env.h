@@ -23,10 +23,12 @@
 typedef struct _db_po_fa_env
 {
 	_db_po_fa_env()
-	{	  
+	{
+        nSysOffMaxWorkTime	= 0;
 	}
 
-	DB_PO_HEADER		tDPH;	
+	DB_PO_HEADER		tDPH;
+    UINT32				nSysOffMaxWorkTime;
 
 }DB_PO_FA_ENV, *PDB_PO_FA_ENV;
 

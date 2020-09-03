@@ -37,30 +37,39 @@ CMainDlg* t_MainDlg;
 BOOL CMainDlg::GetMessage(MSG* pMsg)
 {
 	MSG* pGetMsg = NULL;
-	if(pMsg == NULL)
-	{
-		return FALSE;
-	}
+	BOOL bRetVal = TRUE;
+
+	do{
+		if(pMsg == NULL)
+		{
+			bRetVal = FALSE;
+			break;
+		}
 	
-	pthread_mutex_lock(&g_mutex);
-	if(g_appQueue.empty())
-	{
-		pthread_cond_wait(&g_cond, &g_mutex);
-	}
-	pGetMsg = g_appQueue.front();
-	g_appQueue.pop();
-	pthread_mutex_unlock(&g_mutex);
-	if(pGetMsg == NULL)
-	{
-		return FALSE;
-	}
-	memcpy(pMsg, pGetMsg, sizeof(MSG));
-	delete pGetMsg;
-	if(pMsg->message == WM_QUIT)
-	{
-		return FALSE;
-	}
-	return TRUE;
+		pthread_mutex_lock(&g_mutex);
+		if(g_appQueue.empty())
+		{
+			pthread_cond_wait(&g_cond, &g_mutex);
+		}
+		pGetMsg = g_appQueue.front();
+		g_appQueue.pop();
+		pthread_mutex_unlock(&g_mutex);
+		if(pGetMsg == NULL)
+		{
+			bRetVal = FALSE;
+			break;
+		}
+		memcpy(pMsg, pGetMsg, sizeof(MSG));
+		delete pGetMsg;
+		if(pMsg->message == WM_QUIT)
+		{
+			bRetVal = FALSE;
+			break;
+		}
+		bRetVal = TRUE;
+	}while(FALSE);
+
+	return bRetVal;
 }
 
 BOOL CMainDlg::PostMessage(UINT dwMsgID, WPARAM wParam, LPARAM lParam)
@@ -173,7 +182,9 @@ void CMainDlg::WM_AgentInitialize(WPARAM wParam, LPARAM lParam)
 	        break;
 		}
 		WriteLogN("success to start sub class.");
-		
+
+		DelFileAfterBoot();
+			
 		nRetVal = PreStartOperation();
 	    if(nRetVal != 0)
 		{
@@ -197,9 +208,9 @@ void CMainDlg::WM_AgentInitialize(WPARAM wParam, LPARAM lParam)
 	        break;
 		}
 		
-		WriteLogN("success to start agent service.");
-		t_LogicLogEvent->InitDLEALL(EVENT_OPERATION_TYPE_START, EVENT_SUBJECT_TYPE_HOST, 0, EVENT_TARGET_TYPE_HOST, 0, EVENT_OBJECT_TYPE_HOST, 0, 0, "", "");
-		t_LogicLogEvent->SetLogEvent();
+		WriteLogN("success to start agent service. (tm_gmtoff:%ld)", GetCurrentTimeZone());
+		t_LogicMgrLogEvent->InitDLEH(EVENT_OPERATION_TYPE_START, EVENT_OBJECT_TYPE_HOST, 0, 0, "", "");
+		t_LogicMgrLogEvent->SetLogEvent();
 		nRetVal = 0;
 	}while(FALSE);
 
@@ -246,16 +257,15 @@ void CMainDlg::CloseMain()
 
 	if(t_LogicLogEvent)
 	{
-		t_LogicLogEvent->InitDLEALL(EVENT_OPERATION_TYPE_STOP, EVENT_SUBJECT_TYPE_HOST, 0, EVENT_TARGET_TYPE_HOST, 0, EVENT_OBJECT_TYPE_HOST, 0, 0, "", "");
-		t_LogicLogEvent->SetLogEvent();
+		t_LogicMgrLogEvent->InitDLEH(EVENT_OPERATION_TYPE_STOP, EVENT_OBJECT_TYPE_HOST, 0, 0, "", "");
+		t_LogicMgrLogEvent->SetLogEvent();
 	}
 	
 	SetER(StopSubClass());
 	WriteLogN("stop sub class result : [%d]", g_nErrRtn);
-	
+
 	SetER(DeleteSubClass());
 	WriteLogN("delete sub class result : [%d]", g_nErrRtn); 
-	
 }
 //---------------------------------------------------------------------------
 
@@ -268,7 +278,7 @@ int CMainDlg::Run()
 		Msg.hwnd = 0;		
 		if(Msg.message == WM_QUIT)
 		{
-			break;
+			return 1;
 		}
 		switch(Msg.message)
 		{

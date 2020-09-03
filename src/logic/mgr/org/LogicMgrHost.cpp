@@ -101,7 +101,8 @@ INT32		CLogicMgrHost::AnalyzePkt_FromMgr_Edit_Ext()
 		pdh->strUserUnicode.compare(dh.strUserUnicode) ||
 		CompareMapID(pdh->tPoIDMap, dh.tPoIDMap) ||
 		CompareMapID(pdh->tPoSeqNoMap, dh.tPoSeqNoMap) ||
-		CompareMapID(pdh->tPoTimeMap, dh.tPoTimeMap))
+		CompareMapID(pdh->tPoTimeMap, dh.tPoTimeMap) ||
+		pdh->nUserID != dh.nUserID)
 	{
 		pdh->strName = dh.strName;
 		pdh->strWorkGroup = dh.strWorkGroup;
@@ -136,6 +137,7 @@ INT32		CLogicMgrHost::AnalyzePkt_FromMgr_Ext_Sync()
 	WriteLogN("[%s] sync policy host information start", m_strLogicName.c_str());
 
 	t_LogicMgrAuth->SendMgrInitData_Polcy();
+	t_LogicMgrAuth->SendMgrInitData_Sync();
 
 
 	return AZPKT_CB_RTN_SUCCESS_END;
@@ -163,43 +165,34 @@ INT32		CLogicMgrHost::AnalyzePkt_FromMgr_Ext_Used()
 INT32		CLogicMgrHost::AnalyzePkt_FromMgr_Ext_SetName()
 {	
 	DB_HOST dh;
-	
+	INT32 nRetVal = 0;
+	FILE *fp = NULL;
+	char acHostFile[MAX_PATH] = "/etc/hostname";
+	char acHostBkFile[MAX_PATH] = "/etc/hostname.old";
 	if(CheckPktResult(RecvToken))
 	{
 		WriteLogE("[%s] check pkt result is : [%x]", m_strLogicName.c_str(), m_nPktRst);
 		return AZPKT_CB_RTN_RESULT_FAILED;
 	}
 
-	if( RecvToken.TokenDel_String(dh.strName) < 0)		return AZPKT_CB_RTN_PKT_INVALID;
-
+	if( RecvToken.TokenDel_String(dh.strName) < 0)
 	{
-		ASI_TS_INFO tATI;
-
-		ASI_TS_MGR_PARAM tATMP;
-		{
-			String strPath = "", strBatData = "";
-			strPath = SPrintf("%s/%s", t_EnvInfo->m_strRootPath.c_str(), "renamecom.bat");
-//			strBatData = SPrintf("%s\r\nwmic ComputerSystem Where Name=\"%%COMPUTERNAME%%\" Call Rename Name=\"%s\"\r\ndel \"%s\n", STR_BATCH_GETADMIN_CMD, dh.strName.c_str(), strPath.c_str());
-
-			CFileUtil tFileUtil;
-			if(tFileUtil.WriteFileBuffer(strPath, strBatData) != 0)
-			{
-				WriteLogE("[%s] computer rename batch file create fail", m_strLogicName.c_str());
-				return AZPKT_CB_RTN_SUCCESS_END;
-			}
-
-			sprintf_ext(CHAR_MAX_SIZE, tATI.szTaskName, STR_TS_NANE_RENAMECOM); 
-			tATI.nChkPeriod = ASI_TS_CHECK_PREIOD_TYPE_ONCE;
-			tATI.nStartTime	= GetCurrentDateTimeInt() + 5;
-
-			tATMP.strTSChildPath	= strPath;
-			tATMP.nTSChildHideMode	= 1;
-			tATMP.nTSSingleRun		= 1;
-			tATMP.nTSWaitMode		= 0;
-			tATMP.nTSAutoDel		= 1;
-		}
-		t_ExecuteFileUtil->ExecuteFileByUser(tATI, tATMP);
+		WriteLogE("[%s] fail to get host name", m_strLogicName.c_str());
+		return AZPKT_CB_RTN_PKT_INVALID;
 	}
+
+	if(is_file(acHostFile) == 0)
+		MoveFileEx(acHostFile, acHostBkFile);
+
+	fp = fopen(acHostFile, "w");
+	if(fp == NULL)
+	{
+		MoveFileEx(acHostBkFile, acHostFile);
+		WriteLogE("[%s] fail to open %s : [%d]", m_strLogicName.c_str(), acHostFile, errno);
+		return AZPKT_CB_RTN_RESULT_FAILED;
+	}
+	fwrite(dh.strName.c_str(), 1, dh.strName.length(), fp);
+	fclose(fp);
 	
 	return AZPKT_CB_RTN_SUCCESS_END;
 }
@@ -216,8 +209,15 @@ void		CLogicMgrHost::SendPkt_Edit()
 	INT32 nSendPkt = 1;
 	DB_HOST dh;
 	{
+//		CHAR szBuf[CHAR_MAX_SIZE] = {0, };
 
 		dh.strName		= t_EnvInfoOp->GetComputerName();
+/*
+		{
+			dh.strWorkGroup = szBuf;
+			ZeroMemoryExt(szBuf);
+		}
+*/
 		dh.strPriIP = t_EnvInfoOp->m_strPriIPAddr;
 		dh.strMac = t_EnvInfoOp->m_strPriMacAddr;
 		dh.strUserUnicode = t_EnvInfoOp->GetUserUniCode();		
@@ -232,14 +232,16 @@ void		CLogicMgrHost::SendPkt_Edit()
 	do 
 	{
 		if( pdh->strName != dh.strName ||
-			pdh->strWorkGroup != dh.strWorkGroup ||
+//			pdh->strWorkGroup != dh.strWorkGroup ||
 			pdh->strPriIP != dh.strPriIP ||
 			pdh->strMac != dh.strMac ||
 			pdh->strUserUnicode != dh.strUserUnicode)
 		{
 			break;
 		}
-
+		dh.strPriIP = t_EnvInfoOp->m_strPriIPAddr;
+		dh.strMac = t_EnvInfoOp->m_strPriMacAddr;
+		dh.strUserUnicode = t_EnvInfoOp->GetUserUniCode();		
 		nSendPkt = 0;
 	} while (FALSE);
 
@@ -248,7 +250,42 @@ void		CLogicMgrHost::SendPkt_Edit()
 SEND_PKT:
 	SendToken.Clear();
 	t_ManageHost->SetPktHost(&dh, SendToken);
-	SendData(G_TYPE_HOST, G_CODE_COMMON_EDIT, SendToken);
+	SendData_Mgr(G_TYPE_HOST, G_CODE_COMMON_EDIT, SendToken);
+	SendToken.Clear();
+
+	return;
+}
+//---------------------------------------------------------------------------
+
+void		CLogicMgrHost::SendPkt_InIt()
+{
+	DB_HOST dh;
+	{
+		CHAR szBuf[CHAR_MAX_SIZE] = {0, };
+
+		dh.strName		= t_EnvInfoOp->GetComputerName();
+		{
+			ZeroMemoryExt(szBuf);
+
+//			t_ASINETDLLUtil->GetNetworkGroupName(szBuf, CHAR_MAX_SIZE);
+			dh.strWorkGroup = szBuf;
+		}
+		dh.strPriIP = t_EnvInfoOp->m_strPriIPAddr;
+		dh.strMac = t_EnvInfoOp->m_strPriMacAddr;
+		dh.strUserUnicode = t_EnvInfoOp->GetUserUniCode();		
+	}
+
+	PDB_HOST pdh = t_ManageHost->FirstItem();
+	if(!pdh)
+	{
+		WriteLogE("[%s] not find host first item..", m_strLogicName.c_str());
+		goto SEND_PKT;
+	}
+
+SEND_PKT:
+	SendToken.Clear();
+	t_ManageHost->SetPktHost(&dh, SendToken);
+	SendData_Mgr(G_TYPE_HOST, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
 
 	return;

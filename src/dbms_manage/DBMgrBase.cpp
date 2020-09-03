@@ -732,25 +732,6 @@ StringW		CDBMgrBase::GetDBField_StringW(UINT32 nIndex)
 }
 
 
-DB_PO_HEADER	CDBMgrBase::GetDBField_PoHDR(INT32& nIndex)
-{
-	DB_PO_HEADER tDPH;
-
-	tDPH.nID					= GetDBField_UInt(nIndex++);
-	tDPH.nRegDate				= GetDBField_UInt(nIndex++);
-	tDPH.nSeqNo					= GetDBField_UInt(nIndex++);
-	tDPH.strName				= GetDBField_String(nIndex++);
-	tDPH.strDescr				= GetDBField_String(nIndex++);
-	tDPH.nAdminID				= GetDBField_UInt(nIndex++);
-	tDPH.nSubAdminLock			= GetDBField_UInt(nIndex++);
-	tDPH.nTargetLock			= GetDBField_UInt(nIndex++);
-	tDPH.nNotifyInfoID			= GetDBField_UInt(nIndex++);
-	tDPH.nExtOption				= GetDBField_UInt(nIndex++);
-	tDPH.nUsedMode				= GetDBField_UInt(nIndex++);
-
-	return tDPH;
-}
-
 DB_POLICY		CDBMgrBase::GetDBField_Po(INT32& nIndex)
 {
 	DB_POLICY tDP;
@@ -783,7 +764,6 @@ DB_POLICY		CDBMgrBase::GetDBField_Po(INT32& nIndex)
 	tDP.nPFePtnLoID			= GetDBField_UInt(nIndex++); 
 
 	tDP.nPFaNotifyID		= GetDBField_UInt(nIndex++); 
-
 	tDP.nPSchID				= GetDBField_UInt(nIndex++);
 
 	tDP.nPInPtnOpID			= GetDBField_UInt(nIndex++);
@@ -793,9 +773,9 @@ DB_POLICY		CDBMgrBase::GetDBField_Po(INT32& nIndex)
 	tDP.nPInPtnSPID			= GetDBField_UInt(nIndex++);
 	tDP.nPInPtnNoID			= GetDBField_UInt(nIndex++);
 
-	tDP.nPInAcDocID			= GetDBField_UInt(nIndex++);
-	tDP.nPInAcSfID			= GetDBField_UInt(nIndex++);
-	tDP.nPInAcFileID		= GetDBField_UInt(nIndex++);	
+	tDP.nReservedA			= GetDBField_UInt(nIndex++);
+	tDP.nReservedB			= GetDBField_UInt(nIndex++);
+	tDP.nReservedC			= GetDBField_UInt(nIndex++);	
 
 	tDP.nPInVulnOpID		= GetDBField_UInt(nIndex++);
 	tDP.nPInVulnScanID		= GetDBField_UInt(nIndex++);
@@ -805,9 +785,47 @@ DB_POLICY		CDBMgrBase::GetDBField_Po(INT32& nIndex)
 	tDP.nPInDevOWLID		= GetDBField_UInt(nIndex++);
 	tDP.nPInDevOExID		= GetDBField_UInt(nIndex++);
 
+	tDP.nPPmOpID			= GetDBField_UInt(nIndex++);
+	tDP.nPPmDmID			= GetDBField_UInt(nIndex++);
+	tDP.nPPmScanID			= GetDBField_UInt(nIndex++);
+	tDP.nPPmExID			= GetDBField_UInt(nIndex++);
+	tDP.nPPmNoID			= GetDBField_UInt(nIndex++);
+
+	tDP.nPInVulnAxID			= GetDBField_UInt(nIndex++);
+	tDP.nPInVulnEditAppID		= GetDBField_UInt(nIndex++);
+	tDP.nPInVulnQnaID			= GetDBField_UInt(nIndex++);
+	tDP.nPInVulnSecuUsbID		= GetDBField_UInt(nIndex++);
+	tDP.nPInVulnSwID			= GetDBField_UInt(nIndex++);
+	tDP.nPInVulnPatchExceptionID		= GetDBField_UInt(nIndex++);
+	tDP.nPInDevONotifyID		= GetDBField_UInt(nIndex++);
+
+	tDP.nPInRsOpID			= GetDBField_UInt(nIndex++);
+	tDP.nPInRsNoID			= GetDBField_UInt(nIndex++);
+	tDP.nPInRsBkID			= GetDBField_UInt(nIndex++);
+
 	return tDP;
 }
+//---------------------------------------------------------------------------
 
+DB_PO_HEADER	CDBMgrBase::GetDBField_PoHDR(INT32& nIndex)
+{
+	DB_PO_HEADER tDPH;
+
+	tDPH.nID					= GetDBField_UInt(nIndex++);
+	tDPH.nRegDate				= GetDBField_UInt(nIndex++);
+	tDPH.nSeqNo					= GetDBField_UInt(nIndex++);
+	tDPH.strName				= GetDBField_String(nIndex++);
+	tDPH.strDescr				= GetDBField_String(nIndex++);
+	tDPH.nAdminID				= GetDBField_UInt(nIndex++);
+	tDPH.nSubAdminLock			= GetDBField_UInt(nIndex++);
+	tDPH.nTargetLock			= GetDBField_UInt(nIndex++);
+	tDPH.nNotifyInfoID			= GetDBField_UInt(nIndex++);
+	tDPH.nExtOption				= GetDBField_UInt(nIndex++);
+	tDPH.nUsedMode				= GetDBField_UInt(nIndex++);
+
+	return tDPH;
+}
+//---------------------------------------------------------------------------
 
 DB_PO_HEADER	CDBMgrBase::GetDBField_PoPkgHDR(INT32& nIndex)
 {
@@ -839,8 +857,13 @@ String			CDBMgrBase::GetPoQuery_InsertValue(DB_POLICY& tDP)
 		tDP.nPFePtnOpID, tDP.nPFePtnBLID, tDP.nPFePtnWLID, tDP.nPFeExcludeID, tDP.nPFeNotifyID, tDP.nPFeSinglePtnID, tDP.nPFePtnLoID,
 		tDP.nPFaNotifyID, tDP.nPSchID,
 		tDP.nPInPtnOpID, tDP.nPInPtnBLID, tDP.nPInPtnWLID, tDP.nPInPtnExID, tDP.nPInPtnSPID, tDP.nPInPtnNoID,
-		tDP.nPInAcDocID, tDP.nPInAcSfID, tDP.nPInAcFileID,
-		tDP.nPInVulnOpID, tDP.nPInVulnScanID, tDP.nPHostNotifyID, tDP.nPInDevOOpID, tDP.nPInDevOBLID, tDP.nPInDevOWLID, tDP.nPInDevOExID);
+		tDP.nReservedA, tDP.nReservedB, tDP.nReservedC,
+		tDP.nPInVulnOpID, tDP.nPInVulnScanID, tDP.nPHostNotifyID,
+		tDP.nPInDevOOpID, tDP.nPInDevOBLID, tDP.nPInDevOWLID, tDP.nPInDevOExID,
+		tDP.nPPmOpID, tDP.nPPmDmID, tDP.nPPmScanID, tDP.nPPmExID, tDP.nPPmNoID,
+		tDP.nPInVulnAxID, tDP.nPInVulnEditAppID, tDP.nPInVulnQnaID, tDP.nPInVulnSecuUsbID, tDP.nPInVulnSwID, tDP.nPInVulnPatchExceptionID,
+		tDP.nPInDevONotifyID,
+		tDP.nPInRsOpID, tDP.nPInRsNoID, tDP.nPInRsBkID);
 
 	return strRtn;
 }
@@ -857,8 +880,13 @@ String			CDBMgrBase::GetPoQuery_Update(DB_POLICY& tDP)
 		tDP.nPFePtnOpID, tDP.nPFePtnBLID, tDP.nPFePtnWLID, tDP.nPFeExcludeID, tDP.nPFeNotifyID, tDP.nPFeSinglePtnID, tDP.nPFePtnLoID,
 		tDP.nPFaNotifyID, tDP.nPSchID,
 		tDP.nPInPtnOpID, tDP.nPInPtnBLID, tDP.nPInPtnWLID, tDP.nPInPtnExID, tDP.nPInPtnSPID, tDP.nPInPtnNoID,
-		tDP.nPInAcDocID, tDP.nPInAcSfID, tDP.nPInAcFileID,
-		tDP.nPInVulnOpID, tDP.nPInVulnScanID, tDP.nPHostNotifyID, tDP.nPInDevOOpID, tDP.nPInDevOBLID, tDP.nPInDevOWLID, tDP.nPInDevOExID);
+		tDP.nReservedA, tDP.nReservedB, tDP.nReservedC,
+		tDP.nPInVulnOpID, tDP.nPInVulnScanID, tDP.nPHostNotifyID, 
+		tDP.nPInDevOOpID, tDP.nPInDevOBLID, tDP.nPInDevOWLID, tDP.nPInDevOExID,
+		tDP.nPPmOpID, tDP.nPPmDmID, tDP.nPPmScanID, tDP.nPPmExID, tDP.nPPmNoID,
+		tDP.nPInVulnAxID, tDP.nPInVulnEditAppID, tDP.nPInVulnQnaID, tDP.nPInVulnSecuUsbID, tDP.nPInVulnSwID, tDP.nPInVulnPatchExceptionID,
+		tDP.nPInDevONotifyID,
+		tDP.nPInRsOpID, tDP.nPInRsNoID, tDP.nPInRsBkID);
 
 	return strRtn;
 }
@@ -877,6 +905,17 @@ String			CDBMgrBase::GetPoHDRQuery_InsertValue(DB_PO_HEADER& tDPH)
 
 	return strRtn;
 }
+//---------------------------------------------------------------------------
+String			CDBMgrBase::GetPoHDRQuery_Update(DB_PO_HEADER& tDPH)
+{
+	String strRtn;
+	strRtn = SPrintf(DBMS_POLICY_QUERY_HDR_UPDATE, 
+					tDPH.nRegDate, tDPH.nSeqNo, 
+					tDPH.strName, tDPH.strDescr, 
+					tDPH.nAdminID, tDPH.nSubAdminLock, tDPH.nTargetLock, tDPH.nNotifyInfoID, tDPH.nExtOption, tDPH.nUsedMode);
+
+	return strRtn;
+}
 
 String			CDBMgrBase::GetPoPkgHDRQuery_InsertValue(DB_PO_HEADER& tDPH)
 {
@@ -890,17 +929,6 @@ String			CDBMgrBase::GetPoPkgHDRQuery_InsertValue(DB_PO_HEADER& tDPH)
 		tDPH.strName.c_str(), tDPH.strDescr.c_str(), 
 		tDPH.nAdminID, tDPH.nSubAdminLock, tDPH.nPolicyID, tDPH.nUnitID, tDPH.nNotifyInfoID, tDPH.nExtOption, tDPH.nUsedMode);
 
-	return strRtn;
-}
-
-//---------------------------------------------------------------------------
-String			CDBMgrBase::GetPoHDRQuery_Update(DB_PO_HEADER& tDPH)
-{
-	String strRtn;
-	strRtn = SPrintf(DBMS_POLICY_QUERY_HDR_UPDATE, 
-					tDPH.nRegDate, tDPH.nSeqNo, 
-					tDPH.strName.c_str(), tDPH.strDescr.c_str(), 
-					tDPH.nAdminID, tDPH.nSubAdminLock, tDPH.nTargetLock, tDPH.nNotifyInfoID, tDPH.nExtOption, tDPH.nUsedMode);
 	return strRtn;
 }
 

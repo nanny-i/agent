@@ -113,7 +113,7 @@ INT32		CLogicUser::AnalyzePkt_FromLink_Ext_End()
 
 		if(SetER(t_ManageLocalEnvAuth->EditLocalEnvAuth(dlea)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] edit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			goto SEND_PKT;
 		}
@@ -145,8 +145,8 @@ INT32		CLogicUser::AnalyzePkt_FromLink_Ext_End()
 			goto SEND_PKT;
 		}
 
-		InitDLEALL(m_nEvtOpType, EVENT_SUBJECT_TYPE_USER, m_nSessionID, EVENT_TARGET_TYPE_HOST, pdh->nID , EVENT_OBJECT_TYPE_USER, 0, pdu->nID, pdu->strAccountID , m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLEU(m_nEvtOpType, EVENT_OBJECT_TYPE_USER, 0, pdu->nID, pdu->strAccountID,  m_strEvtDesc);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	goto SEND_PKT;

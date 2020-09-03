@@ -52,8 +52,9 @@ INT32			CDBMgrLogEvent::LoadDB(TListDBLogEvent& tDBLogEventList)
 
     INT32 nIndex = 0;
 
-	m_strQuery = SPrintf("SELECT id, reg_date, evt_time, evt_ecode, "
+	m_strQuery = SPrintf("SELECT id, reg_date, evt_time, evt_ecode, skip_target, "
 						"notify_type, notify_id, "
+						"host_id, user_id, reg_svr_id, sync_svr_mode, sync_svr_step, "
 						"subject_type, subject_id, subject_info, "
 						"target_type, target_id, target_info, "
 						"object_type, object_code, object_id, object_info, "
@@ -70,9 +71,16 @@ INT32			CDBMgrLogEvent::LoadDB(TListDBLogEvent& tDBLogEventList)
 		dle.nRegDate				= GetDBField_Int(nIndex++);
 		dle.nEvtTime				= GetDBField_Int(nIndex++);
 		dle.nEvtErrCode				= GetDBField_Int(nIndex++);
+		dle.nSkipTarget				= GetDBField_Int(nIndex++);
 
 		dle.nNotifyType				= GetDBField_Int(nIndex++);
 		dle.nNotifyID				= GetDBField_Int(nIndex++);
+
+		dle.nHostID					= GetDBField_Int(nIndex++);
+		dle.nUserID					= GetDBField_Int(nIndex++);
+		dle.nRegSvrID				= GetDBField_Int(nIndex++);
+		dle.nSyncSvrMode			= GetDBField_Int(nIndex++);
+		dle.nSyncSvrStep			= GetDBField_Int(nIndex++);
 
 		dle.nSubjectType			= GetDBField_Int(nIndex++);
 		dle.nSubjectID				= GetDBField_Int(nIndex++);
@@ -89,6 +97,9 @@ INT32			CDBMgrLogEvent::LoadDB(TListDBLogEvent& tDBLogEventList)
 
 		dle.nOperationType			= GetDBField_Int(nIndex++);
 		dle.strEventDescr			= GetDBField_String(nIndex++);
+		{
+			StrToMapID_Str(dle.strEventDescr, dle.tDescIDStrMap);
+		}
 
         tDBLogEventList.push_back(dle);
         if(m_nLoadMaxID < UINT32(dle.nID))
@@ -103,21 +114,24 @@ INT32			CDBMgrLogEvent::LoadDB(TListDBLogEvent& tDBLogEventList)
 
 INT32			CDBMgrLogEvent::InsertLogEvent(DB_LOG_EVENT& dle)
 {
-	m_strQuery = SPrintf("INSERT INTO log_event(used_flag, reg_date, evt_time, evt_ecode, "
+	m_strQuery = SPrintf("INSERT INTO log_event(used_flag, reg_date, evt_time, evt_ecode, skip_target, "
 									"notify_type, notify_id, "
+									"host_id, user_id, reg_svr_id, sync_svr_mode, sync_svr_step, "
 									"subject_type, subject_id, subject_info, "
 									"target_type, target_id, target_info, "
 									"object_type, object_code, object_id, object_info, "
 									"operation_type, evt_descr)"
     								"VALUES"
-									"(%u, %u, %u, %u, "
+									"(%u, %u, %u, %u, %u, "
 									"%u, %u, "
+									"%u, %u, %u, %u, %u, "
 									"%u, %u, '%s', "
 									"%u, %u, '%s', "
 									"%u, %u, %u, '%s', "
 									"%u, '%s');",
-									dle.nUsedFlag, dle.nRegDate, dle.nEvtTime, dle.nEvtErrCode,
+									dle.nUsedFlag, dle.nRegDate, dle.nEvtTime, dle.nEvtErrCode, dle.nSkipTarget,
 									dle.nNotifyType, dle.nNotifyID, 
+									dle.nHostID, dle.nUserID, dle.nRegSvrID, dle.nSyncSvrMode, dle.nSyncSvrStep,
 									dle.nSubjectType, dle.nSubjectID, dle.strSubjectInfo.c_str(), 
 									dle.nTargetType, dle.nTargetID, dle.strTargetInfo.c_str(), 
 									dle.nObjectType, dle.nObjectCode, dle.nObjectID, dle.strObjectInfo.c_str(), 
@@ -134,7 +148,26 @@ INT32			CDBMgrLogEvent::InsertLogEvent(DB_LOG_EVENT& dle)
 
 INT32			CDBMgrLogEvent::UpdateLogEvent(DB_LOG_EVENT& dle)
 {	
-    return 0;
+	m_strQuery = SPrintf("UPDATE log_event SET reg_date=%u, evt_time=%u, evt_ecode=%u, skip_target=%u,"
+						"notify_type=%u, notify_id=%u, "
+						"host_id=%u, user_id=%u, reg_svr_id=%u, sync_svr_mode=%u, sync_svr_step=%u, "
+						"subject_type=%u, subject_id=%u, subject_info='%s', "
+						"target_type=%u, target_id=%u, target_info='%s', "
+						"object_type=%u, object_code=%u, object_id=%u, object_info='%s', "
+						"operation_type=%u, evt_descr='%s' "
+						"WHERE id=%u;",
+						dle.nRegDate, dle.nEvtTime, dle.nEvtErrCode, dle.nSkipTarget,
+						dle.nNotifyType, dle.nNotifyID, 
+						dle.nHostID, dle.nUserID, dle.nRegSvrID, dle.nSyncSvrMode, dle.nSyncSvrStep,
+						dle.nSubjectType, dle.nSubjectID, dle.strSubjectInfo.c_str(), 
+						dle.nTargetType, dle.nTargetID, dle.strTargetInfo.c_str(), 
+						dle.nObjectType, dle.nObjectCode, dle.nObjectID, dle.strObjectInfo.c_str(), 
+						dle.nOperationType, dle.strEventDescr.c_str(),
+						dle.nID);
+
+	if(DBOP_Check(ExecuteQuery(m_strQuery)))
+    		return ERR_DBMS_UPDATE_FAIL;
+	return 0;
 }
 //---------------------------------------------------------------------------
 
@@ -185,8 +218,86 @@ INT32	CDBMgrLogEvent::DeleteExecute(UINT32 nID)
 }
 //---------------------------------------------------------------------------
 
+INT32	CDBMgrLogEvent::LoadDB(UINT32 nLogMode, UINT32 nLogNum, TListDBLogEvent& tDBLogEventList)
+{
+	UINT32 nReadCnt = 0;
+	DB_LOG_EVENT dle;
 
+	INT32 nIndex = 0;
+	INT32 nContinue = 0;
 
+	m_strQuery = SPrintf("SELECT id, reg_date, evt_time, evt_ecode, skip_target, "
+							"notify_type, notify_id, "
+							"host_id, user_id, reg_svr_id, sync_svr_mode, sync_svr_step, "
+							"subject_type, subject_id, subject_info, "
+							"target_type, target_id, target_info, "
+							"object_type, object_code, object_id, object_info, "
+							"operation_type, evt_descr "
+							"FROM log_event WHERE used_flag=1;");
+	if(DBOP_Check(ExecuteQuery(m_strQuery)))
+    		return ERR_DBMS_SELECT_FAIL;
 
+	do
+	{
+		nContinue	= 0;
+		nIndex		= 0;
 
+		dle.nID						= GetDBField_Int(nIndex++);
+		dle.nRegDate				= GetDBField_Int(nIndex++);
 
+		switch(nLogMode)
+		{
+		case SS_ENV_LOG_LOAD_MODE_TYPE_DAY:	
+			{
+				if(nLogNum && dle.nRegDate < nLogNum)	nContinue = 1;
+				break;
+			}
+		case SS_ENV_LOG_LOAD_MODE_TYPE_COUNT:
+			{
+				if(nLogNum && nReadCnt > nLogNum)		nContinue = 1;
+				break;
+			}
+		}
+
+		if(nContinue)	continue;
+
+		dle.nEvtTime				= GetDBField_Int(nIndex++);
+		dle.nEvtErrCode				= GetDBField_Int(nIndex++);
+		dle.nSkipTarget				= GetDBField_Int(nIndex++);
+
+		dle.nNotifyType				= GetDBField_Int(nIndex++);
+		dle.nNotifyID				= GetDBField_Int(nIndex++);
+
+		dle.nHostID					= GetDBField_Int(nIndex++);
+		dle.nUserID					= GetDBField_Int(nIndex++);
+		dle.nRegSvrID				= GetDBField_Int(nIndex++);
+		dle.nSyncSvrMode			= GetDBField_Int(nIndex++);
+		dle.nSyncSvrStep			= GetDBField_Int(nIndex++);
+
+		dle.nSubjectType			= GetDBField_Int(nIndex++);
+		dle.nSubjectID				= GetDBField_Int(nIndex++);
+		dle.strSubjectInfo			= GetDBField_String(nIndex++);
+
+		dle.nTargetType				= GetDBField_Int(nIndex++);
+		dle.nTargetID				= GetDBField_Int(nIndex++);
+		dle.strTargetInfo			= GetDBField_String(nIndex++);
+
+		dle.nObjectType				= GetDBField_Int(nIndex++);
+		dle.nObjectCode				= GetDBField_Int(nIndex++);
+		dle.nObjectID				= GetDBField_Int(nIndex++);
+		dle.strObjectInfo			= GetDBField_String(nIndex++);
+
+		dle.nOperationType			= GetDBField_Int(nIndex++);
+		dle.strEventDescr			= GetDBField_String(nIndex++);
+		{
+			StrToMapID_Str(dle.strEventDescr, dle.tDescIDStrMap);
+		}
+
+		tDBLogEventList.push_back(dle);
+		if(m_nLoadMaxID < UINT32(dle.nID))	m_nLoadMaxID = dle.nID;
+		nReadCnt++;
+	}while(Next());
+	m_nLoadNumber = (UINT32)tDBLogEventList.size();
+	WriteLogN("load database : [%s][%u]", m_strDBTName.c_str(), m_nLoadNumber);
+	return 0;
+}

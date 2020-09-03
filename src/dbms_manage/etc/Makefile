@@ -2,7 +2,7 @@ include ../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = DBMgrErrorCode.cpp DBMgrLinkLicense.cpp DBMgrLocalEnvAuth.cpp DBMgrLocalEnvLog.cpp DBMgrOsType.cpp DBMgrSchemaInfo.cpp
+CPPFILES = DBMgrDocDeleteInfo.cpp DBMgrErrorCode.cpp DBMgrLinkLicense.cpp DBMgrLocalEnvAuth.cpp DBMgrLocalEnvLog.cpp DBMgrOsType.cpp DBMgrSchemaInfo.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 
@@ -12,4 +12,4 @@ all: $(OBJ)
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 clean:
-	rm -f ./*.o
+	rm -f $(OBJ)

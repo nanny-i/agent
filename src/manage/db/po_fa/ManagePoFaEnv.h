@@ -39,7 +39,8 @@ public:
 	INT32					ApplyPoFaEnv(DB_PO_FA_ENV&	dpfe);
 
 public:
-	String					GetName(UINT32 nID);    
+	String					GetName(UINT32 nID);
+   	INT32					ChkMaxWorkTime(UINT32& nWorkTime);    
 	INT32					GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList);
 
 public:

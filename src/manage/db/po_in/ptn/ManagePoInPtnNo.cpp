@@ -91,9 +91,9 @@ INT32					CManagePoInPtnNo::InitHash(UINT32 nID)
 
 	{
 		strOrgValue = SPrintf("%s,"
-							"%u,", 
+							"%u,%u,", 
 							GetHdrHashInfo(pdata).c_str(),
-							pdata->nMsgType);
+							pdata->nMsgType, pdata->nReqSkipOpt);
 
 		{
 			TMapIDItor begin, end;
@@ -244,6 +244,7 @@ INT32					CManagePoInPtnNo::SetPkt(PDB_PO_IN_PTN_NO pdata, MemToken& SendToken)
 	SendToken.TokenAdd_DPH(pdata->tDPH);
 
 	SendToken.TokenAdd_32(pdata->nMsgType);
+	SendToken.TokenAdd_32(pdata->nReqSkipOpt);
 
 	SendToken.TokenSet_Block();
     return 0;
@@ -255,6 +256,7 @@ INT32					CManagePoInPtnNo::GetPkt(MemToken& RecvToken, DB_PO_IN_PTN_NO& data)
 	if(!RecvToken.TokenDel_DPH(data.tDPH))			goto INVALID_PKT;
 
 	if(!RecvToken.TokenDel_32(data.nMsgType))		goto INVALID_PKT;
+	if(!RecvToken.TokenDel_32(data.nReqSkipOpt))	goto INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

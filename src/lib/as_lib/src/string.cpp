@@ -211,7 +211,36 @@ String _strlwr(const char *str)
 	return strRet;
 }
 
+String _strupr(const char *str)
+{
+	int i=0;
+	int len=0;
+	String strRet = "";
+	char acTempData[CHAR_MAX_SIZE] = {0,};
+	if(str == NULL)
+	{
+		return strRet;
+	}
+	len=strlen(str);
+	if(len < 1)
+	{
+		return strRet;
+	}
+	else if(len > CHAR_MAX_SIZE-1)
+	{
+		len = CHAR_MAX_SIZE -1;
+	}
 
+	strncpy(acTempData, str, len);
+	acTempData[len] = 0;
+
+	for(i=0;i<len;i++)
+	{
+		acTempData[i]=(char)_toupper(acTempData[i]);
+	}
+	strRet = String(acTempData);
+	return strRet;
+}
 //-------------------------------------------------------------------------
 
 LPTSTR	FormatString(LPTSTR lpBuf, LPTSTR fmt,...)
@@ -336,6 +365,11 @@ String ConvertIP(UINT32 nIP)
 
 UINT32	ConvertHost(LPCTSTR lpAddress)
 {
+	if(lpAddress == NULL || lpAddress[0] == 0)
+		return (UINT32)INADDR_NONE;
+	if(strchr(lpAddress, '.') == NULL)
+		return (UINT32)INADDR_NONE;
+
 	return inet_addr(lpAddress);
 }
 //-------------------------------------------------------------------------
@@ -468,4 +502,95 @@ String		PathWinToUnix(String strValue)
 	return strValue;
 }
 
+INT32 ConvertCharsetToEucKr(char *pSrcCharSet, char *pDstCharSet, char *pSrcData, int nSrcLen, char *pDstData, int nDstLen)
+{
+	iconv_t it;
+	INT32 nRetVal = 0;
+	size_t nSrcStrLen = 0;
+	size_t nDstStrLen = 0;
+	if(pSrcCharSet == NULL || pDstCharSet == NULL || pSrcData == NULL || nSrcLen < 1 || pDstData == NULL || nDstLen < 1)
+		return -1;
 
+	it = iconv_open(pDstCharSet, pSrcCharSet);
+	if (it == (iconv_t)(-1))
+	{
+		return -2;
+	}
+
+	nSrcStrLen = (size_t)nSrcLen;
+	nDstStrLen = (size_t)nDstLen;
+
+	size_t cc = iconv(it, &pSrcData, &nSrcStrLen, &pDstData, &nDstStrLen);
+	if (cc == (size_t)(-1))
+	{
+		nRetVal = -3;
+	}
+	iconv_close(it);
+	return nRetVal;
+}
+
+INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String &strSrcData, String &strDstData)
+{
+	iconv_t it;
+	INT32 nRetVal = 0;
+	char *pSrcData = NULL;
+	char *pDstData = NULL;
+	char *pSrc = NULL;
+	char *pDst = NULL;
+
+	size_t nSrcStrLen = (size_t)strSrcData.length();
+	size_t nDstStrLen = nSrcStrLen+1;
+
+	if(pSrcCharSet == NULL || pDstCharSet == NULL || nSrcStrLen < 1)
+		return -1;
+
+	it = iconv_open(pDstCharSet, pSrcCharSet);
+	if (it == (iconv_t)(-1))
+	{
+		return -2;
+	}
+
+	do{
+		pSrcData = (char *)malloc(nSrcStrLen + 2);
+		if(pSrcData == NULL)
+		{
+			iconv_close(it);
+			nRetVal = -3;
+			break;
+		}
+		memset(pSrcData, 0, nSrcStrLen + 2);
+		strncpy(pSrcData, strSrcData.c_str(), nSrcStrLen);
+		pDstData = (char *)malloc(nDstStrLen + 1);
+		if(pDstData == NULL)
+		{
+			iconv_close(it);
+			nRetVal = -4;
+			break;
+		}
+		memset(pDstData, 0, nDstStrLen + 1);
+
+		pSrc = pSrcData;
+		pDst = pDstData;
+
+		if(iconv(it, &pSrc, &nSrcStrLen, &pDst, &nDstStrLen) == (size_t)(-1))
+		{
+			iconv_close(it);
+			nRetVal = -5;
+			break;
+		}
+		iconv_close(it);
+
+		if(pDstData[0] == 0)
+		{
+			nRetVal = -6;
+			break;
+		}
+		strDstData = String(pDstData);
+		nRetVal = 0;
+	}while(FALSE);
+
+	safe_free(pSrcData);
+	safe_free(pDstData);
+
+	return nRetVal;
+}

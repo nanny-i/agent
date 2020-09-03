@@ -236,7 +236,7 @@ void		CLogicMgrSiteFile::SetSiteFile(DB_SITE_FILE& dsf)
 	{
 		WriteLogN("[%s] remain site file to file : fp[%s]:fn[%s]", 
 					m_strLogicName.c_str(),
-					dsf.strFilePath, dsf.strFileName);
+					dsf.strFilePath.c_str(), dsf.strFileName.c_str());
 	}
 		
 	INT32 nOldItem = dsf.nID;
@@ -260,7 +260,7 @@ void		CLogicMgrSiteFile::SetSiteFile(DB_SITE_FILE& dsf)
 				if(pdata && (pdata->nNewFileSendType & SS_PO_FE_PTN_OP_NEW_FILE_SEND_TYPE_INFO) && 
 							((dsf.nSyncSvrStep & SS_PO_FE_PTN_OP_NEW_FILE_SEND_TYPE_INFO)))
 				{
-					SendData(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
+					SendData_Mgr(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
 					break;
 				}
 			}
@@ -271,7 +271,7 @@ void		CLogicMgrSiteFile::SetSiteFile(DB_SITE_FILE& dsf)
 					(pdata->nRTFGMode & SS_PO_IN_PTN_OP_NEW_FILE_SEND_TYPE_INFO) && 
 					((dsf.nSyncSvrStep & SS_PO_FE_PTN_OP_NEW_FILE_SEND_TYPE_INFO)))
 				{
-					SendData(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
+					SendData_Mgr(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
 					break;
 				}
 			}
@@ -315,7 +315,7 @@ void		CLogicMgrSiteFile::SendPkt_Sync(INT32 nOnceMaxNum)
 			nSendNum += 1;
 			nOnceNum -= 1;
 		}
-		SendData(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
+		SendData_Mgr(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
 		SendToken.Clear();		
 	}
 	return;
@@ -346,7 +346,7 @@ void		CLogicMgrSiteFile::SendPkt_ReSend(INT32 nOnceMaxNum)
 			nSendNum += 1;
 			nOnceNum -= 1;
 		}
-		SendData(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
+		SendData_Mgr(G_TYPE_SITE_FILE, G_CODE_COMMON_SYNC, SendToken);
 		SendToken.Clear();		
 	}
 	return;

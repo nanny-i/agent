@@ -61,6 +61,7 @@ private:
 private:
 	INT32			StopThread_Common(CThreadBase* tThreadObject, UINT32 nWaitTime = 5/*sec*/);
 	INT32			SyncDatabase();
+	VOID			DelFileAfterBoot();
 
 private:
 	INT32			PreCreateSubClass();

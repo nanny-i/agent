@@ -27,19 +27,22 @@
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-void	CLogicBase::SendData(PPKT_DATA pkt_data, MemToken& SendToken)
+INT32	CLogicBase::SendData_Mgr(PPKT_DATA pkt_data, MemToken& SendToken)
 {
-	SendData(pkt_data->hdr.type, pkt_data->hdr.code, SendToken);
-    return;
+	return SendData_Mgr(pkt_data->hdr.type, pkt_data->hdr.code, SendToken);
 }
 //---------------------------------------------------------------------------
 
-void	CLogicBase::SendData(UINT16 nType, UINT16 nCode, MemToken& SendToken)
+INT32	CLogicBase::SendData_Mgr(UINT16 nType, UINT16 nCode, MemToken& SendToken)
 {
-	t_MgrCltUtil->Send_CLD(nType, nCode, SendToken.GetLength(), SendToken.GetData());
-
-    return;
+	return t_MgrCltUtil->Send_CLD(nType, nCode, SendToken.GetLength(), SendToken.GetData());
 }
+
+INT32	CLogicBase::IsInitialize_Mgr()
+{
+	return t_MgrCltUtil->IsInitialize();
+}
+
 //---------------------------------------------------------------------------
 
 void	CLogicBase::EditSKey_Mgr(UINT32 nSessionKey)
@@ -126,7 +129,7 @@ void	CLogicBase::AnalyzePkt_FromMgr(PPKT_DATA pkt_data)
 				}
 				case AZPKT_CB_RTN_SEND_ACK:
 				{
-					SendData(m_nPktType, m_nPktCode, SendToken);
+					SendData_Mgr(m_nPktType, m_nPktCode, SendToken);
 					SendToken.Clear();
 					break;
 				}
@@ -244,7 +247,7 @@ void	CLogicBase::AnalyzePkt_FromMgr_Edit()
 		}
 		case AZPKT_CB_RTN_SEND_ACK:
 		{
-			SendData(m_nPktType, m_nPktCode, SendToken); 
+			SendData_Mgr(m_nPktType, m_nPktCode, SendToken); 
 			SendToken.Clear();
 			break;
 		}
@@ -283,7 +286,7 @@ void	CLogicBase::AnalyzePkt_FromMgr_Edit()
 		{
 			SendToken.TokenAdd_32(m_tDPH->nID);
 			SendToken.TokenAdd_32(m_tDPH->nSeqNo);
-			SendData(m_nPktType, m_nPktCode, SendToken);
+			SendData_Mgr(m_nPktType, m_nPktCode, SendToken);
 			SendToken.Clear();
 		}
 	}	
@@ -303,8 +306,8 @@ void	CLogicBase::AnalyzePkt_FromMgr_Edit()
 
 	if(m_tDPH)
 	{
-		InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, m_tDPH->nID, m_tDPH->strName, m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLE_OBJ(m_tDPH->nID, m_tDPH->strName);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	{

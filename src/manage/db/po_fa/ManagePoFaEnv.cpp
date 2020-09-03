@@ -90,8 +90,10 @@ INT32					CManagePoFaEnv::InitHash(UINT32 nID)
 	}
 
 	{
-		strOrgValue = SPrintf("%s,", 
-							GetHdrHashInfo(pdpfe).c_str());
+		strOrgValue = SPrintf("%s,"
+							"%d,", 
+							GetHdrHashInfo(pdpfe),
+							pdpfe->nSysOffMaxWorkTime);
 
 		{
 			TMapIDItor begin, end;
@@ -177,6 +179,22 @@ String					CManagePoFaEnv::GetName(UINT32 nID)
     return pdpfe->tDPH.strName;
 }
 //---------------------------------------------------------------------------
+
+
+
+INT32					CManagePoFaEnv::ChkMaxWorkTime(UINT32& nWorkTime)
+{
+	PDB_PO_FA_ENV pCurPolicy = (PDB_PO_FA_ENV)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FA_ENV);
+	if(!pCurPolicy)
+		return 0;
+
+	UINT32 nChkTime = (GetCurrentDateTimeInt() - t_EnvInfoOp->m_nSysOffTime) / TIMER_INTERVAL_TIME_MIN;
+	nWorkTime = nChkTime;
+	if(nChkTime < pCurPolicy->nSysOffMaxWorkTime)
+		return 1;
+
+	return 0;
+}
 
 INT32					CManagePoFaEnv::GetHostSysTypePkgListID(TMapID tSubIDMap, TListID& tPkgIDList)
 {
@@ -286,6 +304,8 @@ INT32					CManagePoFaEnv::SetPkt(PDB_PO_FA_ENV pdpfe, MemToken& SendToken)
 {
 	SendToken.TokenAdd_DPH(pdpfe->tDPH);
 
+	SendToken.TokenAdd_32(pdpfe->nSysOffMaxWorkTime);
+
 	SendToken.TokenSet_Block();
     return 0;
 }
@@ -294,6 +314,8 @@ INT32					CManagePoFaEnv::SetPkt(PDB_PO_FA_ENV pdpfe, MemToken& SendToken)
 INT32					CManagePoFaEnv::GetPkt(MemToken& RecvToken, DB_PO_FA_ENV& dpfe)
 {
 	if (!RecvToken.TokenDel_DPH(dpfe.tDPH))				goto	INVALID_PKT;
+
+	if (!RecvToken.TokenDel_32(dpfe.nSysOffMaxWorkTime))	goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

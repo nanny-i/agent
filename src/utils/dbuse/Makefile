@@ -6,10 +6,9 @@ CPPFILES = dbuse.cpp
 OBJ = $(CPPFILES:.cpp=.o)
 
 all:
-	rm -f $(OBJ)
-	rm -f dbuse
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 	make build
+
 clean:
 	rm -f $(OBJ)
 	rm -f dbuse

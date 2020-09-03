@@ -92,7 +92,7 @@ INT32			CDBMgrPoInPtnOpUnit::InsertPoInPtnOpUnit(DB_PO_IN_PTN_OP_UNIT& data)
 						", sch_time, last_scan_time"
 						", scan_path, file_gather_type"
 						") VALUES (%s"
-						", '%I64u', %u"
+						", '%llu', %u"
 						", '%s', %u"
 						");",						
 						GetPoHDRQuery_InsertValue(tDPH).c_str(), 	
@@ -113,7 +113,7 @@ INT32			CDBMgrPoInPtnOpUnit::UpdatePoInPtnOpUnit(DB_PO_IN_PTN_OP_UNIT& data)
 	DB_PO_HEADER& tDPH = data.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_in_ptn_op_unit SET %s"
-						", sch_time='%I64u', last_scan_time=%u"
+						", sch_time='%llu', last_scan_time=%u"
 						", scan_path='%s', file_gather_type=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(), 	

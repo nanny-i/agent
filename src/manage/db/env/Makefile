@@ -2,7 +2,7 @@ include ../../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = ManageEnvLicense.cpp ManageEnvLog.cpp ManageEnvLogUnit.cpp ManageEnvNotifyInfo.cpp ManageEnvPolicy.cpp ManageEnvSelfProtectAgt.cpp ManageEnvSOrgLink.cpp ManageEnvTrustSubject.cpp
+CPPFILES = ManageEnvLicense.cpp ManageEnvLocal.cpp ManageEnvLog.cpp ManageEnvLogUnit.cpp ManageEnvNotifyInfo.cpp ManageEnvPolicy.cpp ManageEnvSelfProtectAgt.cpp ManageEnvSOrgLink.cpp ManageEnvSocket.cpp ManageEnvTrustSubject.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 

@@ -38,6 +38,8 @@ public:
 	INT32					ChgUIDToHID(TListID& tUIDList, TMapID& tHIDMap);
 	INT32					ChgUIDToHID(TListID& tUIDList, TListID& tHIDList);
 
+	INT32					GetUserID(UINT32 nHID);
+
 public:
 	INT32		GetPktHost(MemToken& RecvToken, DB_HOST& dh);
 	INT32		SetPktHost(MemToken& SendToken);

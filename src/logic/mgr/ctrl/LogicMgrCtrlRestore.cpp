@@ -77,7 +77,7 @@ INT32		CLogicMgrCtrlRestore::AnalyzePkt_FromMgr_Add_Ext()
 	SendToken.TokenAdd_32(m_nHostID);
 	SendToken.TokenAdd_32(0);
 
-	SendData(G_TYPE_CTL_RESTORE, G_CODE_COMMON_INFO, SendToken);
+	SendData_Mgr(G_TYPE_CTL_RESTORE, G_CODE_COMMON_INFO, SendToken);
 	SendToken.Clear();
 
 	return AZPKT_CB_RTN_SUCCESS;
@@ -97,7 +97,7 @@ INT32		CLogicMgrCtrlRestore::AnalyzePkt_FromMgr_Del_Ext()
 	SendToken.TokenAdd_32(m_nHostID);
 	SendToken.TokenAdd_32(nSequenceNumber);
 
-	SendData(G_TYPE_CTL_RESTORE, m_nPktCode, SendToken);
+	SendData_Mgr(G_TYPE_CTL_RESTORE, m_nPktCode, SendToken);
 	SendToken.Clear();
 
 	return AZPKT_CB_RTN_SUCCESS;
@@ -127,7 +127,7 @@ INT32		CLogicMgrCtrlRestore::AnalyzePkt_FromMgr_Ext_GetRestoreList()
 
 	SendToken.TokenAdd_32(0);
 
-	SendData(G_TYPE_CTL_RESTORE, m_nPktCode, SendToken);
+	SendData_Mgr(G_TYPE_CTL_RESTORE, m_nPktCode, SendToken);
 	SendToken.Clear();
 
 	return AZPKT_CB_RTN_SUCCESS;

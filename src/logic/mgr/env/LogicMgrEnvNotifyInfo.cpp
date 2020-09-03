@@ -94,7 +94,7 @@ INT32		CLogicMgrEnvNotifyInfo::AnalyzePkt_FromMgr_Edit_Ext()
 		{
 			if(t_ManageEnvNotifyInfo->ApplyEnvNotifyInfo(*begin))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				continue;
 			}
@@ -145,13 +145,16 @@ INT32		CLogicMgrEnvNotifyInfo::IsValidSchduleNotify(UINT32 nLastChkTime, UINT64 
 			WriteLogE("check valid schdule notify fail : not find item is null [env_notify_info ]");
 			continue;
 		}
+		
+		if(pNotify->tDPH.nUsedMode == STATUS_USED_MODE_OFF)
+			continue;
 
 		UINT32 nCurTime	 = GetCurrentDateTimeInt();
 		UINT32 nSchTime  = GetSchTimeByType(meni.nSchType, nSchInfo, nCurTime, nLastChkTime);
 		UINT32 nStTime   =  nSchTime - (pNotify->nNotifyBeforeDay * TIMER_INTERVAL_TIME_DAY);
 		UINT32 nNotifyTime = t_ManageEnvNotifyInfo->GetEnvNotifyInfoNotiTime(meni.nPolType, meni.tDPH.nID, pNotify->tDPH.nID);
 
-		if (pNotify->nPolicyCode == SS_PO_FA_NOTIFY_MSG_TYPE_SCHDULE_NOTIFY && 
+		if (pNotify->nPolicyCode == SS_PO_FA_NOTIFY_MSG_TYPE_SCH_START && 
 			!t_ManageEnvNotifyInfo->IsExcludeNotifySchdule(meni.nPolType, meni.tDPH.nID) &&
 			(nStTime < nCurTime) && difftime(nCurTime, nNotifyTime) >= TIMER_INTERVAL_TIME_DAY)
 		{
@@ -173,7 +176,7 @@ INT32		CLogicMgrEnvNotifyInfo::GetSchTimeByType(UINT32 nType, UINT64 nSchInfo, U
 	tIS.all = nSchInfo;
 
 	UINT32 nCurYearMonDay   = (nCurTime / TIMER_INTERVAL_TIME_DAY) * TIMER_INTERVAL_TIME_DAY;
-	UINT32 nCurYearMon      = nCurYearMonDay - (GetDayOfDay(nCurTime) - 1) * TIMER_INTERVAL_TIME_DAY;
+	UINT32 nCurYearMon      = nCurYearMonDay - (GetDayOfDay(nCurTime, 1) - 1) * TIMER_INTERVAL_TIME_DAY;
 	UINT32 nCurYearMonDayHour = (nCurTime / TIMER_INTERVAL_TIME_HOUR) * TIMER_INTERVAL_TIME_HOUR;
 
 	INT32 nRtn = 0;
@@ -213,7 +216,7 @@ INT32		CLogicMgrEnvNotifyInfo::GetSchTimeByType(UINT32 nType, UINT64 nSchInfo, U
 		}
 	case SCHEDULE_PERIOD_TYPE_WEEK:
 		{
-			UINT32 nDiffDay = GetDayDiffWeek(GetDayOfWeek(nCurTime), tIS.U8.value);
+			UINT32 nDiffDay = GetDayDiffWeek(GetDayOfWeek(nCurTime, 1), tIS.U8.value);
 			UINT32 nCurSchTime = nCurYearMonDay + tIS.U8.hour * TIMER_INTERVAL_TIME_HOUR + tIS.U8.min * TIMER_INTERVAL_TIME_MIN + nDiffDay * TIMER_INTERVAL_TIME_DAY;
 
 			if(nCurSchTime >= nCurTime && (nCurSchTime - nLastChkTime) >= (TIMER_INTERVAL_TIME_DAY))

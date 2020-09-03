@@ -30,7 +30,7 @@ private:
 	INT32		AnalyzePkt_FromMgr_Edit_Ext();
 
 public:
-	void		SendPkt_HostHw();
+	void		SendPkt_HostHw(BOOL bCheck = TRUE);
 
 public:
 	CLogicMgrHostHw();

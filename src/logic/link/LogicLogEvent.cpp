@@ -32,17 +32,12 @@ CLogicLogEvent*		t_LogicLogEvent = NULL;
 
 CLogicLogEvent::CLogicLogEvent()
 {
-	t_ManageLogEvent	= new CManageLogEvent();
-
-    t_ManageLogEvent->LoadDBMS();
-
 	m_strLogicName = "logic log event";
 }
 //---------------------------------------------------------------------------
 
 CLogicLogEvent::~CLogicLogEvent()
-{
-	SAFE_DELETE(t_ManageLogEvent);
+{	
 }
 //---------------------------------------------------------------------------
 
@@ -50,7 +45,8 @@ void		CLogicLogEvent::AnalyzePkt_LogEvent(PPKT_DATA pkt_data)
 {
 	InitBaseMember(pkt_data);
 	switch(m_nPktCode)
-    {
+    {		
+		case G_CODE_COMMON_SYNC:		AnalyzePkt_LogEvent_Ext_Sync();					break;
         default:
         {
         	WriteLogE("[%s] not define pkt code from console : [%d][%d]", m_strLogicName.c_str(), m_nPktType, m_nPktCode);
@@ -62,58 +58,29 @@ void		CLogicLogEvent::AnalyzePkt_LogEvent(PPKT_DATA pkt_data)
 }
 //---------------------------------------------------------------------------
 
-void		CLogicLogEvent::InitDLEALL(UINT32 nOpType, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc)
+void		CLogicLogEvent::AnalyzePkt_LogEvent_Ext_Sync()
 {
-	CLogicBase::InitDLEALL(nOpType, nSType, nSID, nTType, nTID, nOType, nOCode, nOID, strOInfo, strDesc);
+	TListDBLogEvent	tDBLogEventList;
+
+	if(!RecvToken.TokenDel_32(m_nRecvNum))					goto INVALID_PKT;
+	while(m_nRecvNum--)
+	{
+		DB_LOG_EVENT	data;
+		if(t_ManageLogEvent->GetPkt(RecvToken, data))		goto INVALID_PKT;
+
+		tDBLogEventList.push_back(data);
+	}
+
+	t_LogicMgrLogEvent->SetLogEvent(tDBLogEventList);
+	goto OP_END;
+
+INVALID_PKT:	
+	WriteLogE("[%s] recv invalid pkt from mgr : [%s][%x]:[%x]", m_strLogicName.c_str(), Int64ToHex(m_nPktType).c_str(), m_nPktCode, m_nDbgPos);
+	goto OP_END;
+
+OP_END:
 	return;
 }
-//---------------------------------------------------------------------------
-
-void		CLogicLogEvent::SetLogEvent()
-{
-	return SetLogEvent(m_tDLE);
-}
-//---------------------------------------------------------------------------
-
-void		CLogicLogEvent::SetLogEvent(TListDBLogEvent& tDELNList)
-{
-	TListDBLogEventItor begin, end;
-	begin = tDELNList.begin();	end = tDELNList.end();
-	for(begin; begin != end; begin++)
-	{
-		SetLogEvent(*begin);
-	}
-	return;
-}
-//---------------------------------------------------------------------------
-
-void		CLogicLogEvent::SetLogEvent(DB_LOG_EVENT& dle)
-{
-	{
-		WriteLogN("[logic log event] remain evt log to file : op[%d]:s[%d:%d][%s]:t[%d:%d][%s]:o[%d:%d][%d:%s]:[%s]", 
-																			dle.nOperationType, 
-																			dle.nSubjectType, dle.nSubjectID, dle.strSubjectInfo.c_str(), 
-																			dle.nTargetType, dle.nTargetID, dle.strTargetInfo.c_str(), 
-																			dle.nObjectType, dle.nObjectCode, dle.nObjectID, dle.strObjectInfo.c_str(),
-																			dle.strEventDescr.c_str());
-	}
-
-
-	
-	{
-		t_ManageLogEvent->AddLogEvent(dle);
-	}
-
-	{	
-		SendToken.Set(1024);
-		SendToken.TokenAdd_32(ERR_SUCCESS);
-		t_ManageLogEvent->SetPkt(&dle, SendToken);
-		SendData_Link(G_TYPE_LOG_EVENT, G_CODE_COMMON_ADD, SendToken);
-		SendToken.Clear();
-	}
-	return;
-}
-//---------------------------------------------------------------------------
 
 
 

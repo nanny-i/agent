@@ -61,7 +61,7 @@ INT32		CLogicMgrPoSvrInfoUdt::AnalyzePkt_FromMgr_Ext()
 
 INT32		CLogicMgrPoSvrInfoUdt::AnalyzePkt_FromMgr_Edit_Ext()
 {
-	//PDB_PO_SVR_INFO_UDT pdpsiu = NULL;
+	PDB_PO_SVR_INFO_UDT pdpsiu = NULL;
 	DB_PO_SVR_INFO_UDT dpsiu;
 
 	m_tDPH = &(dpsiu.tDPH);
@@ -69,11 +69,11 @@ INT32		CLogicMgrPoSvrInfoUdt::AnalyzePkt_FromMgr_Edit_Ext()
 	if( t_ManagePoSvrInfoUdt->GetPkt(RecvToken, dpsiu))	
 		return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);	
 
-	//pdpsiu = (PDB_PO_SVR_INFO_UDT)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);	
+//	pdpsiu = (PDB_PO_SVR_INFO_UDT)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);	
 	{
 		if(SetER(t_ManagePoSvrInfoUdt->ApplyPoSvrInfoUdt(dpsiu)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}

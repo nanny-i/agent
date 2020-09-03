@@ -36,6 +36,7 @@ public:
 	void		SendAuthLogin();
 	void		SendMgrInitData();
 	void		SendMgrInitData_Polcy();
+	void		SendMgrInitData_Sync();
 
 public:
 	CLogicMgrAuth();

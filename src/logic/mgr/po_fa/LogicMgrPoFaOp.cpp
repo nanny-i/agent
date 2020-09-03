@@ -240,7 +240,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpSubUnit->ApplyPoFaOpSubUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub subject unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -254,7 +254,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpObjUnit->ApplyPoFaOpObjUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub object unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -268,7 +268,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpSchUnit->ApplyPoFaOpSchUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub schedule unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -284,7 +284,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpUnitSubPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub subject pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -299,7 +299,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpUnitObjPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub object pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -314,7 +314,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpUnitSchPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub schedule pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -329,7 +329,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpUnitRulPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub rule pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -347,7 +347,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpUnit->ApplyPoFaOpUnit(*begin))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -361,7 +361,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoFaOpPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -372,7 +372,7 @@ INT32		CLogicMgrPoFaOp::AnalyzePkt_FromMgr_Edit_Ext()
 
 			if(SetER(t_ManagePoFaOp->ApplyPoFaOp(dpfo)))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 			}
@@ -493,23 +493,22 @@ INT32		CLogicMgrPoFaOp::ApplyPolicy_Sch()
 
 	WriteLogN("start(check) fa op schedule : [id:%d][%d.%d.%d.%d][%u][del_af_day:%d:%d]", pdb_po->tDPH.nID, 
  				tIS.U8.type, tIS.U8.value, tIS.U8.hour, tIS.U8.min, nLastChkTime, pdb_po->nChkFDTType, pdb_po->nChkFDTValue);
+	t_ManageDocDeleteInfo->UpdateDocScanTime();
 
 	pdb_po->nScanTime = nLastChkTime;
 	if(pdb_po->tDPH.nID)	t_ManagePoFaOp->EditPoFaOp(*pdb_po);
 
 	UINT32 nDelDocCnt = 0, nDelBkCnt = 0;
-	nDelDocCnt = t_LogicMgrLogDoc->ChkBackupOp(pdb_po->nDelMethod, pdb_po->nDelCount, pdb_po->nLimitSize, pdb_po->nLimitCnt, pdb_po->nChkFDTType, pdb_po->nChkFDTValue);
-	nDelBkCnt  = t_LogicMgrLogDoc->ChkDelBackupOp();
-	t_DocBackupUtil->RemoveBackupFilesByNonExistLog();
+	nDelDocCnt = t_LogicMgrLogDoc->ChkBackupOp(pdb_po->nDelMethod, pdb_po->nDelCount, pdb_po->nLimitSize, pdb_po->nLimitCnt, pdb_po->nChkFDTType, pdb_po->nChkFDTValue, t_EnvInfoOp->GetStopOpBySysOff());
+	nDelBkCnt  = t_LogicMgrLogDoc->ChkDelBackupOp(t_EnvInfoOp->GetStopOpBySysOff());
+	t_DocBackupUtil->RemoveBackupFilesByNonExistLog(t_EnvInfoOp->GetStopOpBySysOff());
 
 	{
-		InitDLST_PoOp(pdb_po->tDPH.nID, pdb_po->tDPH.strName, EVENT_OPERATION_TYPE_START);
-		AppendDLStDesc(SS_LOG_STATUS_DESC_KEY_PO_START_TIME, nLastChkTime);
-		AppendDLStDesc(SS_LOG_STATUS_DESC_KEY_DOC_DEL_CNT, nDelDocCnt);
-		AppendDLStDesc(SS_LOG_STATUS_DESC_KEY_BK_DEL_CNT, nDelBkCnt);
-
-		HISYNCSTEPUP(m_tDLST.nSyncSvrStep);
-		t_LogicMgrLogStatus->SetLogStatus(m_tDLST);
+		InitDLEH_Sync(pdb_po->tDPH.nID, pdb_po->tDPH.strName, EVENT_OPERATION_TYPE_SCHEDULE);
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_START_TIME, nLastChkTime);
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_DOC_DEL_CNT, nDelDocCnt);
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_BK_DEL_CNT, nDelBkCnt);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	return 0;

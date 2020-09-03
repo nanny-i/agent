@@ -33,6 +33,14 @@
 #include	"com_struct_mem_sys_drive.h"
 #include	"com_struct_mem_find_order_info.h"
 #include	"com_struct_mem_evt_mon.h"
+#include	"com_struct_mem_devo_info.h"
+#include	"com_struct_mem_work_execute.h"
+#include	"com_struct_mem_link_env.h"
+#include	"com_struct_mem_patch_file.h"
+#include	"com_struct_mem_vuln_rst.h"
+#include	"com_struct_mem_chk_exist_interval.h"
+
+#include	"com_struct_mem_db_mgr_member.h"
 
 //------------------------------------------------------------------------------
 

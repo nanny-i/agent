@@ -40,7 +40,7 @@ INT32		CMainDlg::StopThread_Common(CThreadBase* tThreadObject, UINT32 nWaitTime)
 
 	while(m_SemExt.WaitForSingleObject(100) == WAIT_TIMEOUT)
 	{
-		if(tThreadObject->IsRunThread() == 0)
+		if(tThreadObject->GetContinue() == 0)
 			break;
 		if(!nLWaitTime)
 		--nLWaitTime;
@@ -54,3 +54,10 @@ INT32		CMainDlg::StopThread_Common(CThreadBase* tThreadObject, UINT32 nWaitTime)
 	return 0;
 }
 //--------------------------------------------------------------------
+
+VOID CMainDlg::DelFileAfterBoot()
+{
+	if(t_LogicMgrPoFaDelFileAfterBoot)
+		t_LogicMgrPoFaDelFileAfterBoot->DelFileAfterBoot();
+
+}

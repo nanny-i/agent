@@ -37,9 +37,23 @@ CManageLogDocDScan::~CManageLogDocDScan(void)
 
 INT32		CManageLogDocDScan::LoadDBMS()
 {
+	UINT32 nLogMode = 0, nLogNum = 0;
+	{
+		PDB_ENV_LOG pdel = t_ManageEnvLog->FindItem(DEFAULT_ID);
+		if(pdel)
+		{
+			nLogMode = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadModeMap, SS_ENV_LOG_INDEX_DOC_DSCAN);
+			nLogNum = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadNumMap, SS_ENV_LOG_INDEX_DOC_DSCAN);
+			if(nLogMode == SS_ENV_LOG_LOAD_MODE_TYPE_DAY && nLogNum)
+			{
+				nLogNum = ((GetCurrentDateTimeInt() / 86400) - nLogNum) * 86400;
+			}
+		}
+	}
+
 	TListDBLogDocDScan		tDBLogDocDScanList;
 	TListDBLogDocDScanItor begin, end;
-	if(SetER(t_DBMgrLogDocDScan->LoadExecute(&tDBLogDocDScanList)))
+	if(SetER(t_DBMgrLogDocDScan->LoadDB(nLogMode, nLogNum, tDBLogDocDScanList)))
 	{
 		return g_nErrRtn;
 	}
@@ -92,12 +106,19 @@ INT32		CManageLogDocDScan::ClearItem()
 
 INT32		CManageLogDocDScan::SetPkt(PDB_LOG_DOC_DSCAN pdldd, MemToken& SendToken)
 {
+	String strEucData;
 	SendToken.TokenAdd_32(pdldd->nID);
 	SendToken.TokenAdd_32(pdldd->nUsedFlag);
 	SendToken.TokenAdd_32(pdldd->nRegDate);
 	SendToken.TokenAdd_32(pdldd->nExtOption);
 
-	SendToken.TokenAdd_String(pdldd->strScanPath);
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdldd->strScanPath, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdldd->strScanPath);
+
 	SendToken.TokenAdd_String(pdldd->strScanPtn);
 
 	SendToken.TokenAdd_32(pdldd->nFindNum);
@@ -111,12 +132,18 @@ INT32		CManageLogDocDScan::SetPkt(PDB_LOG_DOC_DSCAN pdldd, MemToken& SendToken)
 
 INT32		CManageLogDocDScan::GetPkt(MemToken& RecvToken, DB_LOG_DOC_DSCAN& dldd)
 {
+	String strUtcData;
 	if(!RecvToken.TokenDel_32(dldd.nID))							goto	INVALID_PKT;
 	if(!RecvToken.TokenDel_32(dldd.nUsedFlag))						goto	INVALID_PKT;
 	if(!RecvToken.TokenDel_32(dldd.nRegDate))						goto	INVALID_PKT;
 	if(!RecvToken.TokenDel_32(dldd.nExtOption))						goto	INVALID_PKT;
 
 	if(RecvToken.TokenDel_String(dldd.strScanPath) < 0)				goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dldd.strScanPath, strUtcData) == 0)
+	{
+		dldd.strScanPath = strUtcData;
+	}
+
 	if(RecvToken.TokenDel_String(dldd.strScanPtn) < 0)				goto	INVALID_PKT;
 
 	if(!RecvToken.TokenDel_32(dldd.nFindNum))						goto	INVALID_PKT;

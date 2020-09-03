@@ -49,24 +49,48 @@ typedef struct _db_policy
 		nPFeNotifyID			= 0;
 		nPFeSinglePtnID			= 0;
 		nPFePtnLoID				= 0;
+
 		nPFaNotifyID			= 0;
 		nPSchID					= 0;
+
 		nPInPtnOpID				= 0;
 		nPInPtnBLID				= 0;
 		nPInPtnWLID				= 0;
 		nPInPtnExID				= 0;
 		nPInPtnSPID				= 0;
 		nPInPtnNoID				= 0;	
-		nPInAcDocID				= 0;
-		nPInAcSfID				= 0;
-		nPInAcFileID			= 0;			
+
+		nReservedA				= 0;
+		nReservedB				= 0;
+		nReservedC				= 0;			
+
 		nPInVulnOpID			= 0;
 		nPInVulnScanID			= 0;
+
 		nPHostNotifyID			= 0;
+
 		nPInDevOOpID			= 0;
 		nPInDevOBLID			= 0;
 		nPInDevOWLID			= 0;
 		nPInDevOExID			= 0;
+		nPInDevONotifyID		= 0;
+
+		nPPmOpID				= 0;
+		nPPmDmID				= 0;
+		nPPmScanID				= 0;
+		nPPmExID				= 0;
+		nPPmNoID				= 0;
+
+		nPInVulnAxID			= 0;
+		nPInVulnEditAppID		= 0;
+		nPInVulnQnaID			= 0;
+		nPInVulnSecuUsbID		= 0;
+		nPInVulnSwID			= 0;
+		nPInVulnPatchExceptionID= 0;
+
+		nPInRsOpID				= 0;
+		nPInRsNoID				= 0;
+		nPInRsBkID				= 0;
 	}
 
 	UINT32		nPUpdateID;
@@ -94,8 +118,8 @@ typedef struct _db_policy
 	UINT32		nPFeNotifyID;
 	UINT32		nPFeSinglePtnID;
 	UINT32		nPFePtnLoID;
-	UINT32		nPFaNotifyID;
 
+	UINT32		nPFaNotifyID;
 	UINT32		nPSchID;
 
 	UINT32		nPInPtnOpID;
@@ -103,17 +127,39 @@ typedef struct _db_policy
 	UINT32		nPInPtnWLID;
 	UINT32		nPInPtnExID;
 	UINT32		nPInPtnSPID;
-	UINT32		nPInPtnNoID;	
-	UINT32		nPInAcDocID;
-	UINT32		nPInAcSfID;
-	UINT32		nPInAcFileID;
+	UINT32		nPInPtnNoID;
+
+	UINT32		nReservedA;
+	UINT32		nReservedB;
+	UINT32		nReservedC;
+
 	UINT32		nPInVulnOpID;
 	UINT32		nPInVulnScanID;
+
 	UINT32		nPHostNotifyID;
+
 	UINT32		nPInDevOOpID;
 	UINT32		nPInDevOBLID;
 	UINT32		nPInDevOWLID;
 	UINT32		nPInDevOExID;
+	UINT32		nPInDevONotifyID;
+
+	UINT32		nPPmOpID;
+	UINT32		nPPmDmID;
+	UINT32		nPPmScanID;
+	UINT32		nPPmExID;
+	UINT32		nPPmNoID;
+
+	UINT32		nPInVulnAxID;
+	UINT32		nPInVulnEditAppID;
+	UINT32		nPInVulnQnaID;
+	UINT32		nPInVulnSecuUsbID;
+	UINT32		nPInVulnSwID;
+	UINT32		nPInVulnPatchExceptionID;
+
+	UINT32		nPInRsOpID;
+	UINT32		nPInRsNoID;
+	UINT32		nPInRsBkID;
 }DB_POLICY, *PDB_POLICY;
 
 #endif //DB_POLICY_H_4D39CDDB_E289_4d56_9F98_FE42776F4467

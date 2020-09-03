@@ -32,6 +32,7 @@ typedef struct _db_po_host_run
 		nBootChkType	= 0;
 		nIntegrityMode	= 0;
 		nCrossAuthMode	= 0;
+		nOncePktNum		= 0;
 	}
 
 	DB_PO_HEADER		tDPH;
@@ -44,6 +45,7 @@ typedef struct _db_po_host_run
 	UINT32				nBootChkType;
 	UINT32				nIntegrityMode;
 	UINT32				nCrossAuthMode;
+	UINT32				nOncePktNum;
 
 }DB_PO_HOST_RUN, *PDB_PO_HOST_RUN;
 

@@ -111,7 +111,7 @@ INT32		CLogicMgrPoFeSinglePtn::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoFeSinglePtnUnit->ApplyPoFeSinglePtnUnit(*begin))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}				
@@ -120,7 +120,7 @@ INT32		CLogicMgrPoFeSinglePtn::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoFeSinglePtn->ApplyPoFeSinglePtn(dpfsp)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}

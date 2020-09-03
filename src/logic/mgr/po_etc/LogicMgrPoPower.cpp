@@ -47,6 +47,8 @@ CLogicMgrPoPower::CLogicMgrPoPower()
 	m_nPolicyType		= SS_POLICY_TYPE_POWER;
 	m_nEvtObjType		= EVENT_OBJECT_TYPE_POLICY;
 	m_nEvtObjCode		= EVENT_OBJECT_CODE_POLICY_POWER;
+
+	m_dwWriteLogCount	= 0;
 }
 //---------------------------------------------------------------------------
 CLogicMgrPoPower::~CLogicMgrPoPower()
@@ -106,7 +108,7 @@ INT32		CLogicMgrPoPower::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoPowerUnit->ApplyPoPowerUnit(*begin))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -120,7 +122,7 @@ INT32		CLogicMgrPoPower::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoPowerPkg->FindItem(begin->tDPH.nID))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -132,7 +134,7 @@ INT32		CLogicMgrPoPower::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoPower->ApplyPoPower(dpp)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -233,7 +235,7 @@ INT32		CLogicMgrPoPower::ApplyPowerUnit(DB_PO_POWER_UNIT* pUnit)
 	int nHourMin	= (nHour * 100) + nMin;
 	WriteLogN("[%s] start apply powor policy: [%d][%.2d][%d][%.2d:%.2d][%.4d]", m_strLogicName.c_str(), pUnit->tDPH.nID, nDay, nWeek, nHour, nMin, nHourMin);
 
-
+	INT32 nExitWindow = 0;
 	String strCtrlType;
 	CPowerUtil pu;
 	switch(pUnit->nCtlMode)
@@ -311,11 +313,22 @@ INT32		CLogicMgrPoPower::ApplyPowerUnit(DB_PO_POWER_UNIT* pUnit)
 		}
 	}
 
+	if (nExitWindow != 0 && m_dwWriteLogCount > 0)
 	{
-		InitDLST_PoOp(pUnit->tDPH.nID, pUnit->tDPH.strName, EVENT_OPERATION_TYPE_START);
-		AppendDLStDesc(SS_LOG_STATUS_DESC_KEY_PO_START_TIME, GetCurrentDateTimeInt());
-		HISYNCSTEPUP(m_tDLST.nSyncSvrStep);
-		t_LogicMgrLogStatus->SetLogStatus(m_tDLST);
+		m_dwWriteLogCount++;
+		WriteLogN("[%s] end power call count = %d : [%s]", m_strLogicName.c_str(), m_dwWriteLogCount, strCtrlType.c_str());
+		return 0;
+	}
+
+	{
+		if (nExitWindow != 0 && m_dwWriteLogCount <= 0)
+			m_dwWriteLogCount = 1;	// Because ExitWindowsEx Executes Asynchronously
+
+		InitDLEH_Sync(pUnit->tDPH.nID, pUnit->tDPH.strName, EVENT_OPERATION_TYPE_SCHEDULE);		
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_START_TIME, GetCurrentDateTimeInt());		
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_TYPE, strCtrlType);
+
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	WriteLogN("[%s] end apply power policy : [%s]", m_strLogicName.c_str(), strCtrlType.c_str());

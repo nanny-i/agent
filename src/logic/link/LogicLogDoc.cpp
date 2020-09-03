@@ -46,6 +46,7 @@ void		CLogicLogDoc::AnalyzePkt_LogDoc(PPKT_DATA pkt_data)
 	InitBaseMember(pkt_data);
 	switch(m_nPktCode)
     {
+		case G_CODE_COMMON_UPDATE:									break;
 		default:
         {
         	WriteLogE("[%s] not define pkt code from console : [%d][%d]", m_strLogicName.c_str(), m_nPktType, m_nPktCode);

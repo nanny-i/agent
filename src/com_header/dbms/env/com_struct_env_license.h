@@ -30,6 +30,7 @@ typedef struct _db_env_license
 
 	String				strLicenseKey;
 	TMapID64			tRightPackageMap;
+	TMapID64			tRightClassMap;
 	TMapID64			tRightPolicyMap;
 	TMapID64			tRightControlMap;
 

@@ -154,6 +154,10 @@ void		CLogicMgrLogSecu::SetLogSecu(DB_LOG_SECU& dls)
 	}
 
 	{
+		dls.nUserID = t_ManageHost->GetUserID(t_ManageHost->FirstID());
+	}
+
+	{
 		PDB_ENV_LOG_UNIT pDELEU = t_ManageEnvLogUnit->FindRecordLogSecuUnit(&dls);
 		if(pDELEU && pDELEU->tDPH.nUsedMode == STATUS_USED_MODE_ON)
 		{
@@ -172,13 +176,52 @@ void		CLogicMgrLogSecu::SetLogSecu(DB_LOG_SECU& dls)
 		t_ManageLogSecu->SetPkt(&dls, SendToken);
 		if(!(dls.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))
 		{
-			SendData(G_TYPE_LOG_SECU, G_CODE_COMMON_SYNC, SendToken);
+			SendData_Mgr(G_TYPE_LOG_SECU, G_CODE_COMMON_SYNC, SendToken);
 		}
 		if(!(dls.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_AGENT))		
 		{
 			SendData_Link(G_TYPE_LOG_SECU, G_CODE_COMMON_SYNC, SendToken);
 		}
 		SendToken.Clear();
+	}
+	return;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+void		CLogicMgrLogSecu::SendPkt_Sync(INT32 nOnceMaxNum)
+{
+	TListPVOID tSendList;
+	{
+		t_ManageLogSecu->SetPktSync(tSendList);
+
+		if(tSendList.empty())	return;
+	}
+
+	INT32 nOnceNum = nOnceMaxNum;
+	INT32 nSendNum = 0;
+
+	TListPVOIDItor begin, end;
+	begin = tSendList.begin();	end = tSendList.end();
+
+	while(nSendNum < tSendList.size())
+	{
+		nOnceNum = (((tSendList.size() - nSendNum) > nOnceMaxNum && nOnceMaxNum > 0) ? nOnceMaxNum : (tSendList.size() - nSendNum));
+
+		SendToken.Clear();
+		SendToken.TokenAdd_32(nOnceNum);
+		for(begin; begin != end && nOnceNum; begin++)
+		{
+			t_ManageLogSecu->SetPkt((PDB_LOG_SECU)(*begin), SendToken);
+
+			nSendNum += 1;
+			nOnceNum -= 1;
+		}
+		SendData_Mgr(G_TYPE_LOG_SECU, G_CODE_COMMON_SYNC, SendToken);
+		SendToken.Clear();		
 	}
 	return;
 }

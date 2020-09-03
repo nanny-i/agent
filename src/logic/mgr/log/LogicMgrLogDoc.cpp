@@ -200,7 +200,7 @@ INT32		CLogicMgrLogDoc::AnalyzePkt_FromMgr_Ext_RollBack()
 			PDB_LOG_DOC pdld = t_ManageLogDoc->FindKeyItem(*begin);
 			if(!pdld)
 			{
-				SetDLEA_EC(ERR_INFO_NOT_DELETE_BECAUSE_NOT_FIND, 0);
+				SetDLEH_EC(ERR_INFO_NOT_DELETE_BECAUSE_NOT_FIND, 0);
 				WriteLogE("[%s] not find host information for delete [id:%d]", m_strLogicName.c_str(), *begin);
 				continue;
 			}
@@ -209,8 +209,8 @@ INT32		CLogicMgrLogDoc::AnalyzePkt_FromMgr_Ext_RollBack()
 			if(pdld->nBackupTime == 0)		continue;
 
 			{
-				InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, pdld->nID, pdld->strObjectName, m_strName);
-				t_LogicLogEvent->SetLogEvent(m_tDLE);
+				InitDLE_OBJ(pdld->nID, pdld->strObjectName, SS_LOG_EVENT_HOST_SYNC_MODE_ALL);
+				t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 			}
 
 			if(SetER(t_DocBackupUtil->RecoveryFile(pdld)))
@@ -238,17 +238,17 @@ INT32		CLogicMgrLogDoc::AnalyzePkt_FromMgr_Ext_RollBack_Each_Host()
 	if(!RecvToken.TokenDel_32(nStDate))					return AZPKT_CB_RTN_PKT_INVALID;
 	if(!RecvToken.TokenDel_32(nEdDate))					return AZPKT_CB_RTN_PKT_INVALID;
 
-	t_ManageLogDoc->GetKeyIDList(m_tRecvIDList);
+	t_ManageLogDoc->GetItemIDList(m_tRecvIDList);
 
 	{
 		TListIDItor begin, end;
 		begin = m_tRecvIDList.begin();	end = m_tRecvIDList.end();
 		for(begin; begin != end; begin++)
 		{
-			PDB_LOG_DOC pdld = t_ManageLogDoc->FindKeyItem(*begin);
+			PDB_LOG_DOC pdld = t_ManageLogDoc->FindItem(*begin);
 			if(!pdld)
 			{
-				SetDLEA_EC(ERR_INFO_NOT_DELETE_BECAUSE_NOT_FIND, 0);
+				SetDLEH_EC(ERR_INFO_NOT_DELETE_BECAUSE_NOT_FIND, 0);
 				WriteLogE("[%s] not find host information for delete [id:%d]", m_strLogicName.c_str(), *begin);
 				continue;
 			}
@@ -269,8 +269,8 @@ INT32		CLogicMgrLogDoc::AnalyzePkt_FromMgr_Ext_RollBack_Each_Host()
 
 		{
 			String strObjectInfo = "[doc recovery each host]";
-			InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, 0, strObjectInfo, m_strName);
-			t_LogicLogEvent->SetLogEvent(m_tDLE);
+			InitDLE_OBJ(0, strObjectInfo, SS_LOG_EVENT_HOST_SYNC_MODE_ALL);
+			t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 		}
 	}
 
@@ -311,8 +311,11 @@ INT32		CLogicMgrLogDoc::DeleteLogDoc(DB_LOG_DOC& dld)
 	{
 		PDB_PO_FA_CLEAR_UNIT pdb_unit = t_ManagePoFaClearUnit->FindItem(dld.nPolicyType - ASI_EPS_APP_POLICY_GROUP_ID_FA_CLEAR);
 		// 20200728 edit jhjung
-	//	if(pdb_unit)
 		if(pdb_unit && (t_EnvInfo->m_nHostSysType & pdb_unit->tDPH.nNotifyInfoID))
+			WriteLogN("m_nHostSysType %u nNotifyInfoID %u ", t_EnvInfo->m_nHostSysType, pdb_unit->tDPH.nNotifyInfoID);
+		else
+			WriteLogN("m_nHostSysType %u nNotifyInfoID null ", t_EnvInfo->m_nHostSysType);
+		if(pdb_unit)
 		{
 			nDelCnt			= pdb_unit->nDelCount;
 			nLimitSize		= pdb_unit->nLimitSize;
@@ -335,6 +338,7 @@ INT32		CLogicMgrLogDoc::DeleteLogDoc(DB_LOG_DOC& dld)
 
 void		CLogicMgrLogDoc::SetLogDoc(DB_LOG_DOC& dld)
 {
+	INT32 nRetVal = 0;
 	if(!ISSYNCSTEP(dld.nSyncSvrStep)) 
 	{
 		if(dld.strObjectPath.find("%") == string::npos && dld.strObjectName.find("%") == string::npos &&
@@ -351,6 +355,10 @@ void		CLogicMgrLogDoc::SetLogDoc(DB_LOG_DOC& dld)
 	}
 
 	{
+		dld.nUserID = t_ManageHost->GetUserID(t_ManageHost->FirstID());
+	}
+
+	{
 		PDB_ENV_LOG_UNIT pDELEU = t_ManageEnvLogUnit->FindRecordLogDocUnit(&dld);
 		if(pDELEU && pDELEU->tDPH.nUsedMode == STATUS_USED_MODE_ON)
 		{
@@ -358,7 +366,7 @@ void		CLogicMgrLogDoc::SetLogDoc(DB_LOG_DOC& dld)
 		}
 	}
 
-	if(t_ManageLogDoc->FindItem(dld.nID))
+	if(dld.nID != 0 && t_ManageLogDoc->FindItem(dld.nID))
 	{
 		t_ManageLogDoc->EditLogDoc(dld);
 	}
@@ -373,7 +381,11 @@ void		CLogicMgrLogDoc::SetLogDoc(DB_LOG_DOC& dld)
 		t_ManageLogDoc->SetPkt(&dld, SendToken);
 		if(!ISSYNCSTEP(dld.nSyncSvrStep) && !(dld.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))
 		{
-			SendData(G_TYPE_LOG_DOC, G_CODE_COMMON_SYNC, SendToken);
+			nRetVal = SendData_Mgr(G_TYPE_LOG_DOC, G_CODE_COMMON_SYNC, SendToken);
+			if(nRetVal == 0)
+				WriteLogN("[%s] send data log doc (%s)", m_strLogicName.c_str(), dld.strObjectPath.c_str());
+			else
+				WriteLogE("[%s] fail to send data log doc (%s) (%d)", m_strLogicName.c_str(), dld.strObjectPath.c_str(), nRetVal);
 		}
 		SendToken.Clear();
 		
@@ -396,13 +408,16 @@ void		CLogicMgrLogDoc::SetLogDoc_Mgr(DB_LOG_DOC& dld)
 		dld.nFileCrTime = pdld->nFileCrTime;
 		dld.nFileMdTime = pdld->nFileMdTime;
 		dld.nFileAcTime = pdld->nFileAcTime;
+		dld.strObjectPath = pdld->strObjectPath;
+		dld.strObjectName = pdld->strObjectName;
+		dld.strBkFileName = pdld->strBkFileName;
 	}
 
 	SetLogDoc(dld);
 }
 //---------------------------------------------------------------------------
 
-INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nLimitSize, UINT32 nLimitDelCnt, UINT32 nChkFDTType, UINT32 nDelAfterDay)
+INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nLimitSize, UINT32 nLimitDelCnt, UINT32 nChkFDTType, UINT32 nDelAfterDay, UINT32& nContinue)
 {
 	PDB_PO_FA_BK pdpfb = (PDB_PO_FA_BK)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FA_BK);
 	if(!pdpfb)	
@@ -420,7 +435,7 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 	t_ManageLogDoc->GetItemIDList(tIDList);
 	TListIDItor begin, end;
 	begin = tIDList.begin();	end = tIDList.end();
-	for(begin; begin != end; begin++)
+	for(begin; begin != end && !nContinue; begin++)
 	{
 		PDB_LOG_DOC pdld = t_ManageLogDoc->FindItem(*begin);
 		if(!pdld)	continue;
@@ -455,6 +470,8 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 
 		nDelDocCount++;
 	}
+	t_ManageDocDeleteInfo->UpdateDocDeleteInfo();
+	t_LogicDocDeleteInfo->SendPkt_DocDeleteInfo_Edit();
 
 	{
 		MEM_FIND_ORDER_INFO tMFOI;
@@ -470,7 +487,7 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 }
 //---------------------------------------------------------------------------
 
-INT32		CLogicMgrLogDoc::ChkDelBackupOp()
+INT32		CLogicMgrLogDoc::ChkDelBackupOp(UINT32& nContinue)
 {
 	INT32 nRmCount = 0;
 	TListID tIDList;
@@ -478,7 +495,7 @@ INT32		CLogicMgrLogDoc::ChkDelBackupOp()
 	t_ManageLogDoc->GetItemIDList(tIDList);
 	TListIDRItor begin, end;
 	begin = tIDList.rbegin();	end = tIDList.rend();
-	for(begin; begin != end; begin++)
+	for(begin; begin != end && !nContinue; begin++)
 	{
 		PDB_LOG_DOC pdld = t_ManageLogDoc->FindItem(*begin);
 		if(!pdld)	continue;
@@ -502,6 +519,45 @@ INT32		CLogicMgrLogDoc::ChkDelBackupOp()
 	WriteLogN("[%s] doc remove backup operation end [rm_count:%d]", m_strLogicName.c_str(), nRmCount);
 
 	return nRmCount;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+void		CLogicMgrLogDoc::SendPkt_Sync(INT32 nOnceMaxNum)
+{
+	TListPVOID tSendList;
+	{
+		t_ManageLogDoc->SetPktSync(tSendList);
+
+		if(tSendList.empty())	return;
+	}
+
+	INT32 nOnceNum = nOnceMaxNum;
+	INT32 nSendNum = 0;
+
+	TListPVOIDItor begin, end;
+	begin = tSendList.begin();	end = tSendList.end();
+
+	while(nSendNum < tSendList.size())
+	{
+		nOnceNum = (((tSendList.size() - nSendNum) > nOnceMaxNum && nOnceMaxNum > 0) ? nOnceMaxNum : (tSendList.size() - nSendNum));
+
+		SendToken.Clear();
+		SendToken.TokenAdd_32(nOnceNum);
+		for(begin; begin != end && nOnceNum; begin++)
+		{
+			t_ManageLogDoc->SetPkt((PDB_LOG_DOC)(*begin), SendToken);
+
+			nSendNum += 1;
+			nOnceNum -= 1;
+		}
+		SendData_Mgr(G_TYPE_LOG_DOC, G_CODE_COMMON_SYNC, SendToken);
+		SendToken.Clear();		
+	}
+	return;
 }
 //---------------------------------------------------------------------------
 

@@ -40,6 +40,7 @@ typedef struct _db_log_doc
 		nNotifyID			= 0;
 
 		nHostID				= 0;
+		nUserID				= 0;
 		nPolicyType			= 0;
 		nOpType 			= 0;
 		nRegSvrID			= 0;
@@ -72,6 +73,7 @@ typedef struct _db_log_doc
 	UINT32		nNotifyID;
 
 	UINT32		nHostID;
+	UINT32		nUserID;
 	UINT32		nPolicyType;
 	UINT32		nOpType;
 	UINT32		nRegSvrID;
@@ -85,9 +87,8 @@ typedef struct _db_log_doc
 	String		strSubjectName;
 	String		strObjectPath;
 	String		strObjectName;
-	StringW	strObjectPathW;
+	StringW		strObjectPathW;
 	String		strBkFileName;
-
 	UINT32		nFileCrTime;
 	UINT32		nFileMdTime;
 	UINT32		nFileAcTime;

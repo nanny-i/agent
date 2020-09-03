@@ -54,7 +54,7 @@ INT32		CManagePoDeployFilePkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -69,7 +69,7 @@ INT32					CManagePoDeployFilePkg::InitPkg()
 		PDB_PO_DEPLOY_FILE pdpdf = t_ManagePoDeployFile->FindItem(begin->second.tDPH.nPolicyID);
 		if(!pdpdf)
 		{
-			WriteLogE("not find po_deploy_file_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+//			WriteLogE("not find po_deploy_file_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -106,7 +106,7 @@ INT32					CManagePoDeployFilePkg::AddPoDeployFilePkg(DB_PO_DEPLOY_FILE_PKG&	dpdf
     }
 
 	AddItem(dpdfp.tDPH.nID, dpdfp);
-	AddKeyIDList(&dpdfp);
+	AddKeyIDListPkg(&dpdfp);
 
     return 0;
 }
@@ -138,7 +138,7 @@ INT32					CManagePoDeployFilePkg::DelPoDeployFilePkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpdfp);
+	DelKeyIDListPkg(pdpdfp);
     DeleteItem(nID);
     return 0;
 }

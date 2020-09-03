@@ -24,6 +24,7 @@
 #include "com_struct.h"
 #include "LogicMgrPoFaClear.h"
 
+
 //---------------------------------------------------------------------------
 
 CLogicMgrPoFaClear*		t_LogicMgrPoFaClear = NULL;
@@ -97,7 +98,7 @@ INT32		CLogicMgrPoFaClear::AnalyzePkt_FromMgr_Edit_Ext()
 				tDT.all = dpfcu.nScanTime;
 				if(tDT.U8.min && t_EnvInfoOp->IsSysBootTime() == 0)
 				{
-					dpfcu.nScanTime = t_EnvInfo->m_nBootChkTime;
+					dpfcu.nScanTime = GetCurrentDateTimeInt() - t_EnvInfo->m_nBootChkTime;
 					WriteLogN("[%s] auto setting last scan time  : [%d][%u]", m_strLogicName.c_str(), dpfcu.tDPH.nID, dpfcu.nScanTime);
 				}
 			}
@@ -124,7 +125,7 @@ INT32		CLogicMgrPoFaClear::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoFaClearUnit->ApplyPoFaClearUnit(*begin))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -138,7 +139,7 @@ INT32		CLogicMgrPoFaClear::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoFaClearPkg->FindItem(begin->tDPH.nID))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -149,7 +150,7 @@ INT32		CLogicMgrPoFaClear::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoFaClear->ApplyPoFaClear(dpfc)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -274,18 +275,29 @@ INT32		CLogicMgrPoFaClear::OnTimer_Logic()
 		return 0;
 	}
 
-	dwID = pDbPo->tDPH.nID;
-	t_ManagePoFaClearPkg->GetKeyIDList(dwID, tIDList);
-	begin = tIDList.begin();	end = tIDList.end();
-	for(begin; begin != end; begin++)
 	{
-		tMFOI.nPoID = *begin;
-		tMFOI.nOpType = SS_LOG_DOC_OP_TYPE_SCHEDULE;
-		tMFOI.nNextOp = G_CODE_COMMON_DEL;
-		nRet = ApplyPolicy_Unit(*begin, tMFOI);
-		if(!nRet)
-			ApplyPolicy_SendLastChkTime(*begin);
-	}
+		UINT32 nRet = -1;
+
+		TListID tIDList;
+		t_ManagePoFaClearPkg->GetKeyIDList(pDbPo->tDPH.nID, tIDList);
+		TListIDItor begin, end;
+		begin = tIDList.begin();	end = tIDList.end();
+		for(begin; begin != end; begin++)
+		{
+			
+			MEM_FIND_ORDER_INFO tMFOI;
+			{
+				tMFOI.nPoID = *begin;
+				tMFOI.nOpType = SS_LOG_DOC_OP_TYPE_SCHEDULE;
+				tMFOI.nNextOp = G_CODE_COMMON_DEL;
+			}
+			
+			nRet = ApplyPolicy_Unit(*begin, tMFOI);
+
+			if(!nRet)
+				ApplyPolicy_SendLastChkTime(*begin);
+		}
+	}	
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -321,21 +333,17 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(UINT32 nUnitID, MEM_FIND_ORDER_INFO&
 INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIND_ORDER_INFO& tMFOI)
 {
 	CFileUtil tFileUtil;
-	U64_SCHEDULE tIS;
-	UINT32 nLastChkTime = 0;
+	CSystemInfo tSysInfo;
+	CProcUtil tProcUtil;	
 	INT32 nRetVal = 0;
-
-	if(pdpfcu == NULL)
 	{
-		return -1;
-	}
+		tFileUtil.SetEnvPathRegKey(STR_REG_DEFAULT_SVC_PATH_ENV_PATH);
+	}	
 
-	nLastChkTime = pdpfcu->nScanTime;
-
+	UINT32 nLastChkTime = pdpfcu->nScanTime;
+	U64_SCHEDULE tIS;
 	tIS.all = pdpfcu->nSchTime;
 	tIS.U8.type = pdpfcu->nSchType;
-
-	tFileUtil.SetEnvPathRegKey(STR_REG_DEFAULT_SVC_PATH_ENV_PATH);
 
 	if(tMFOI.nOpType == SS_LOG_DOC_OP_TYPE_SCHEDULE_DEMAND || tMFOI.nOpType == SS_LOG_DOC_OP_TYPE_SCAN)
 	{
@@ -358,18 +366,23 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 			if(!t_LogicMgrEnvNotifyInfo->IsValidSchduleNotify(nLastChkTime, tIS.all, menis))
 				t_LogicEnvNotifyInfo->SendPkt_Notify_Sch_info(menis);
 		}
-		if(IsValidSchedule(tIS.all, nLastChkTime) == 0)
+
+		nRetVal = IsValidSchedule(tIS.all, nLastChkTime);
+		if(nRetVal == 0)
 		{
 			return -1;
 		}
 		if(pdpfcu->nScanType == SS_PO_FA_CLEAR_SCAN_TYPE_DEMAND)
 		{
+/*
 			INT32 nReadOnly = 0;
 			PDB_PO_HOST_RUN pdphr = (PDB_PO_HOST_RUN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_HOST_RUN);
 			if(!pdphr || pdphr->nMgrShowType == SS_PO_HOST_RUN_MGR_SHOW_TYPE_NOT_USED)
 				nReadOnly = 1;
-
+*/
 			if(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_SCAN_TYPE_DEMAND_NON_FIND_AUTO)
+				WriteLogN("init fa clear request excute view .. from schedule : [uid:%d]", pdpfcu->tDPH.nID);
+
 			{
 				pdpfcu->nScanTime = nLastChkTime;
 				if(pdpfcu->tDPH.nID)
@@ -384,6 +397,7 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 	}
 
 	WriteLogN("start(check) fa clear schedule : [uid:%d][mfoi_optype:%d]", pdpfcu->tDPH.nID, tMFOI.nOpType);
+	t_ManageDocDeleteInfo->UpdateDocScanTime();
 	pdpfcu->nScanTime = nLastChkTime;
 	if(pdpfcu->tDPH.nID)
 		t_ManagePoFaClearUnit->EditPoFaClearUnit(*pdpfcu);
@@ -599,26 +613,48 @@ INT32		CLogicMgrPoFaClear::EndFindOrder(PMEM_FIND_ORDER_INFO pMFOI)
 {
 	INT32 nPolicyType = (pMFOI->nPoID ? pMFOI->nPoID : pMFOI->nID) + ASI_EPS_APP_POLICY_GROUP_ID_FA_CLEAR;
 
+	String strOpType = "unknown";
+	UINT32	nStartTime = GetCurrentDateTimeInt();
+	String strUnitName = "";
+
 	switch(pMFOI->nOpType)
 	{
-		case SS_LOG_DOC_OP_TYPE_SCHEDULE:
-			t_LogicPoFaClear->SendPkt_Del_Last(nPolicyType, pMFOI->nOpType, pMFOI->nNotiTotalFind);
+		case SS_LOG_DOC_OP_TYPE_SCHEDULE:			
+		{			
+			t_LogicPoFaClear->SendPkt_Del_Last(nPolicyType, pMFOI->nOpType, pMFOI->nNotiTotalFind);		
+			
+			nStartTime = t_ManagePoFaClearUnit->GetLastChkTime(pMFOI->nPoID);
+			strUnitName = t_ManagePoFaClearUnit->GetName(pMFOI->nPoID);
+			strOpType = "auto scan";
 			break;
+		}
 		case SS_LOG_DOC_OP_TYPE_SCHEDULE_DEMAND:
-			t_LogicPoFaClear->SendPkt_End(*pMFOI);
+		{
+			t_LogicPoFaClear->SendPkt_End(*pMFOI);		
+
+			nStartTime = t_ManagePoFaClearUnit->GetLastChkTime(pMFOI->nPoID);
+			strUnitName = t_ManagePoFaClearUnit->GetName(pMFOI->nPoID);
+			strOpType = "demand scan";
 			break;
-		case SS_LOG_DOC_OP_TYPE_SCAN:
-			t_LogicLogDocDScan->SendPkt_End(*pMFOI);
+		}
+		case SS_LOG_DOC_OP_TYPE_SCAN:		
+		{
+			t_LogicLogDocDScan->SendPkt_End(*pMFOI);	
+			
+			nStartTime = pMFOI->nEvtTime;
+			strUnitName = "Manual Scan";
+			strOpType = "manual scan";
 			break;
+		}
 	}
 
-	if(pMFOI->nOpType == SS_LOG_DOC_OP_TYPE_SCHEDULE)
+	if(SS_LOG_DOC_OP_TYPE_SCHEDULE <= pMFOI->nOpType && pMFOI->nOpType <= SS_LOG_DOC_OP_TYPE_SCAN)
 	{
-		InitDLST_PoOp(pMFOI->nPoID, t_ManagePoFaClearUnit->GetName(pMFOI->nPoID), EVENT_OPERATION_TYPE_START);
-		AppendDLStDesc(SS_LOG_STATUS_DESC_KEY_PO_START_TIME, t_ManagePoFaClearUnit->GetLastChkTime(pMFOI->nPoID));
-		AppendDLStDesc(SS_LOG_STATUS_DESC_KEY_DOC_DEL_CNT, pMFOI->nNotiTotalFind);
-		HISYNCSTEPUP(m_tDLST.nSyncSvrStep);
-		t_LogicMgrLogStatus->SetLogStatus(m_tDLST);
+		InitDLEH_Sync(pMFOI->nPoID, strUnitName, EVENT_OPERATION_TYPE_SCAN);
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_TYPE, strOpType);
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_START_TIME, nStartTime);
+		AppendDLEDesc(SS_LOG_EVENT_HOST_DESC_KEY_DOC_DEL_CNT, pMFOI->nNotiTotalFind);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	return 0;

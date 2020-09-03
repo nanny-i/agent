@@ -37,6 +37,6 @@ public:
     ~CDBMgrSchemaInfo();
 };
 
-//extern CDBMgrSchemaInfo*		t_DBMgrSchemaInfo;
+extern CDBMgrSchemaInfo*		t_DBMgrSchemaInfo;
 
 #endif

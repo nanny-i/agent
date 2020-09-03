@@ -206,25 +206,6 @@ INT32					CManageEnvLog::IsRecordLogEvt(PDB_LOG_EVENT pdle, DB_ENV_LOG_UNIT& del
 }
 //---------------------------------------------------------------------------
 
-INT32					CManageEnvLog::IsRecordLogStatus(PDB_LOG_STATUS pdlst, DB_ENV_LOG_UNIT& deleu)
-{
-	PDB_ENV_LOG pdele = GetDefaultItem();
-	if(!pdele)	return -1;
-
-	PDB_ENV_LOG_UNIT pdeleu = t_ManageEnvLogUnit->FindRecordLogStatusUnit(pdlst);
-	if(!pdeleu)
-	{
-		deleu.tDPH = pdele->tDPH;
-		deleu.nRecordMode = pdele->nRecordMode;
-	}
-	else
-	{
-		deleu = *pdeleu;
-	}
-	return (deleu.tDPH.nUsedMode ? 0 : 1);
-}
-//---------------------------------------------------------------------------
-
 INT32					CManageEnvLog::IsRecordLogDoc(PDB_LOG_DOC pdld, DB_ENV_LOG_UNIT& deleu)
 {
 	PDB_ENV_LOG pdele = GetDefaultItem();
@@ -269,6 +250,25 @@ INT32					CManageEnvLog::IsRecordLogDeployFile(PDB_LOG_DEPLOY_FILE pdldf, DB_ENV
 	if(!pdele)	return -1;
 
 	PDB_ENV_LOG_UNIT pdeleu = t_ManageEnvLogUnit->FindRecordLogDeployFileUnit(pdldf);
+	if(!pdeleu)
+	{
+		deleu.tDPH = pdele->tDPH;
+		deleu.nRecordMode = pdele->nRecordMode;
+	}
+	else
+	{
+		deleu = *pdeleu;
+	}
+	return (deleu.tDPH.nUsedMode ? 0 : 1);
+}
+//---------------------------------------------------------------------------
+
+INT32					CManageEnvLog::IsRecordLogPatch(PDB_LOG_PATCH pdlp, DB_ENV_LOG_UNIT& deleu)
+{
+	PDB_ENV_LOG pdele = GetDefaultItem();
+	if(!pdele)	return -1;
+
+	PDB_ENV_LOG_UNIT pdeleu = t_ManageEnvLogUnit->FindRecordLogPatchUnit(pdlp);
 	if(!pdeleu)
 	{
 		deleu.tDPH = pdele->tDPH;

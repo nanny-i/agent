@@ -40,6 +40,7 @@ typedef struct _db_log_deploy_file
 		nNotifyID			= 0;
 
 		nHostID				= 0;
+		nUserID				= 0;
 		nPolicyID			= 0;
 		nUnitID 			= 0;
 		nRegSvrID			= 0;
@@ -60,6 +61,7 @@ typedef struct _db_log_deploy_file
 	UINT32		nNotifyID;
 
 	UINT32		nHostID;
+	UINT32		nUserID;
 	UINT32		nPolicyID;
 	UINT32		nUnitID;
 	UINT32		nRegSvrID;

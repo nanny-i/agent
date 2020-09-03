@@ -12,7 +12,7 @@ set -e;										\
 endef
 
 
-SUBDIR := env etc log org po_etc po_fa po_fe po_in site
+SUBDIR := env etc log org po_etc po_fa po_fe po_in po_pms ptn site
 
 .PHONY: all
 

@@ -54,7 +54,7 @@ INT32		CManagePoSelfProtectPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -69,7 +69,7 @@ INT32					CManagePoSelfProtectPkg::InitPkg()
 		PDB_PO_SELF_PROTECT pdpsp = t_ManagePoSelfProtect->FindItem(begin->second.tDPH.nPolicyID);
 		if(!pdpsp)
 		{
-			WriteLogE("not find po_self_protect_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+//			WriteLogE("not find po_self_protect_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -105,7 +105,7 @@ INT32					CManagePoSelfProtectPkg::AddPoSelfProtectPkg(DB_PO_SELF_PROTECT_PKG&	d
     }
 
 	AddItem(dpspp.tDPH.nID, dpspp);
-	AddKeyIDList(&dpspp);
+	AddKeyIDListPkg(&dpspp);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoSelfProtectPkg::DelPoSelfProtectPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpspp);
+	DelKeyIDListPkg(pdpspp);
     DeleteItem(nID);
     return 0;
 }

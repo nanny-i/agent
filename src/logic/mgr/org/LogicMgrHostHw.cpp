@@ -129,7 +129,7 @@ INT32		CLogicMgrHostHw::AnalyzePkt_FromMgr_Edit_Ext()
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-void		CLogicMgrHostHw::SendPkt_HostHw()
+void		CLogicMgrHostHw::SendPkt_HostHw(BOOL bCheck)
 {
 	INT32 nSendPkt = 1;
 	DB_HOST_HW dhh;
@@ -177,32 +177,33 @@ void		CLogicMgrHostHw::SendPkt_HostHw()
 		goto SEND_PKT;
 	}
 
-	
 
-	do 
+	if(bCheck)
 	{
-		if( pdhh->strCPUName != dhh.strCPUName ||
-			pdhh->nHDDSize != dhh.nHDDSize ||
-			pdhh->nMemSize != dhh.nMemSize ||
-			pdhh->strBiosDate != dhh.strBiosDate)
+		do 
 		{
-			//WriteLogN("[%s] -> changed [%s][%d][%d][%s].", m_strLogicName.c_str(), pdhh->strCPUName, dhh.nHDDSize, dhh.nMemSize, dhh.strBiosDate);
-			break;
+			if( pdhh->strCPUName != dhh.strCPUName ||
+				pdhh->nHDDSize != dhh.nHDDSize ||
+				pdhh->nMemSize != dhh.nMemSize ||
+				pdhh->strBiosDate != dhh.strBiosDate)
+			{
+				//WriteLogN("[%s] -> changed [%s][%d][%d][%s].", m_strLogicName.c_str(), pdhh->strCPUName, dhh.nHDDSize, dhh.nMemSize, dhh.strBiosDate);
+				break;
+			}
+
+			nSendPkt = 0;
+		} while (FALSE);
+
+		if(!nSendPkt)	
+		{
+			//WriteLogN("[%s] -> [%s][%d][%d][%s].", m_strLogicName.c_str(), pdhh->strCPUName, dhh.nHDDSize, dhh.nMemSize, dhh.strBiosDate);
+			return;
 		}
-
-		nSendPkt = 0;
-	} while (FALSE);
-
-	if(!nSendPkt)	
-	{
-		//WriteLogN("[%s] -> [%s][%d][%d][%s].", m_strLogicName.c_str(), pdhh->strCPUName, dhh.nHDDSize, dhh.nMemSize, dhh.strBiosDate);
-		return;
 	}
-
 SEND_PKT:
 	SendToken.Clear();
 	t_ManageHostHw->SetPkt(&dhh, SendToken);
-	SendData(G_TYPE_HOST_HW, G_CODE_COMMON_EDIT, SendToken);
+	SendData_Mgr(G_TYPE_HOST_HW, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
 
 	return;

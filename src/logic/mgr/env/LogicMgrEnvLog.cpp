@@ -89,7 +89,7 @@ INT32		CLogicMgrEnvLog::AnalyzePkt_FromMgr_Edit_Ext()
 		{
 			if(t_ManageEnvLog->ApplyEnvLog(*begin))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply env information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				continue;
 			}

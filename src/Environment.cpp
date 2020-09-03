@@ -146,11 +146,8 @@ INT32       CEnvironment::LoadEnv_Local()
 	}
 	m_nHostRegTime = m_nValue;
 
-	if(t_RegUtil.RegReadInt(HKEY_LOCAL_MACHINE, "", "boot_chk_time", m_nValue))
-	{
-		m_nValue = 0;
-		t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "boot_chk_time", m_nValue);
-	}
+	m_nValue = uptime();
+	t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "boot_chk_time", m_nValue);
 	m_nBootChkTime = m_nValue;
 
 	if(t_RegUtil.RegReadInt(HKEY_LOCAL_MACHINE, "", "db_log_retention", m_nValue))
@@ -287,7 +284,6 @@ INT32		CEnvironment::SetReg_BootChkTime(UINT32 nTime)
 	t_RegUtil.SetRootPath(STR_REG_DEFAULT_SVC_LOCAL_PATH);
 
 	t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "boot_chk_time", nTime);
-	m_nBootChkTime = nTime;
 
 	t_RegUtil.SetRootPath(STR_REG_DEFAULT_SVC_PATH);
 	return 0;
@@ -316,12 +312,12 @@ INT32		CEnvironment::GetReg_LastOffInfo()
 }
 //---------------------------------------------------------------------------
 
-INT32		CEnvironment::SetReg_LastOffInfo(ASI_BOOT_TYPE eBootType)
+INT32		CEnvironment::SetReg_LastOffInfo(ASI_BOOT_TYPE eBootType, UINT32 nLastOffTime)
 {
 	t_RegUtil.SetRootPath(STR_REG_DEFAULT_SVC_LOCAL_PATH);
 
-	t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "last_off_type", INT32(eBootType));
-	t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "last_off_time", 0);
+	t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "last_off_type", UINT32(eBootType));
+	t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "last_off_time", nLastOffTime);
 
 	return 0;
 }
@@ -368,6 +364,25 @@ INT32		CEnvironment::SetReg_LgnSvrInfoListMode(UINT32 nMode)
 }
 //---------------------------------------------------------------------------
 
+INT32		CEnvironment::SetReg_ShutdownOption(UINT32 nMode)
+{
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CEnvironment::SetReg_AllowBlockingAppsAtShutdownByThread(UINT32 nMode)
+{
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CEnvironment::SetReg_AllowBlockingAppsAtShutdown(UINT32 nMode)
+{
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 INT32		CEnvironment::GetReg_LocalEnv_TSProtectMode()
 {
 	INT32 nRtn = 0;
@@ -463,3 +478,4 @@ INT32		CEnvironment::SetReg_TimeStamp(INT64 nTimeStamp)
 	return 0;
 }
 //---------------------------------------------------------------------------
+

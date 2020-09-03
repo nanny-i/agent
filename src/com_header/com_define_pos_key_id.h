@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2020-2025 ASHINi corp. 
- * 
- * This library is free software; you can redistribute it and/or 
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
- * version 2.1 of the License, or (at your option) any later version. 
- * 
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * Lesser General Public License for more details. 
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this library; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
- * 
- */
-
 
 #ifndef COM_DEFINE_POS_KEY_ID_H_938EF200_F60B_452A_BD30_A10E8507EDCC
 #define COM_DEFINE_POS_KEY_ID_H_938EF200_F60B_452A_BD30_A10E8507EDCC
@@ -38,9 +19,42 @@
 #define POS_KEY_ID_POSITION_PTN_FILE_PO_UID_MAP			0x00000002
 //--------------------------------------------------------------------
 
+#define POS_KEY_STR_POSITION_PTN_PATCH_GUID_MAP			0x00000001
+//--------------------------------------------------------------------
+
+#define POS_KEY_ID_POSITION_LOG_PATCH_SID_MAP			0x00000001
+#define POS_KEY_ID_POSITION_LOG_PATCH_PID_MAP			0x00000002
+//--------------------------------------------------------------------
+
+#define POS_KEY_STR_POSITION_LOG_RS_BK_DIR_MAP			0x00000001
+#define POS_KEY_STR_POSITION_LOG_RS_BK_DIR_FILE_MAP		0x00000002
+//--------------------------------------------------------------------
+
+#define POS_KEY_ID_POSITION_GROUP_CATEGORY_CID_MAP		0x00000001
+#define POS_KEY_ID_POSITION_GROUP_CATEGORY_GID_MAP		0x00000002
+#define POS_KEY_ID_POSITION_GROUP_CATEGORY_CGID_MAP		0x00000003
+//--------------------------------------------------------------------
+
 #define POS_KEY_ID_USER_UNICODE						1
 #define POS_KEY_ID_USER_ACCOUNT_ID					2
 
-#define POS_KEY_ID_PC_GROUP_CODE					3
+//--------------------------------------------------------------------
+
+#define POS_KEY_STR_POSITION_SITE_SW_KEY_MAP			0x00000001
+#define POS_KEY_STR_POSITION_SITE_SW_KEY_VER_MAP		0x00000002
+
+//--------------------------------------------------------------------
+
+enum
+{
+	POS_KEY_ID_MON_CHART_DATA_REALTIME		= 0,
+	POS_KEY_ID_MON_CHART_DATA_HOUR,
+	POS_KEY_ID_MON_CHART_DATA_DAY,
+	POS_KEY_ID_MON_CHART_DATA_WEEK,
+	POS_KEY_ID_MON_CHART_DATA_MONTH,
+	POS_KEY_ID_MON_CHART_DATA_FOREIGN_KEY,
+};
+
+
 //--------------------------------------------------------------------
 #endif	//COM_DEFINE_POS_KEY_ID_H_938EF200_F60B_452A_BD30_A10E8507EDCC

@@ -77,7 +77,7 @@ INT32					CManagePoSchUnit::GetHash(UINT32 nID, String& strOrgValue)
 
 		String strItemHash;
 		strItemHash = SPrintf("%s,"
-			"%I64u,%s,"
+			"%llu,%s,"
 			"%u,%u,", 
 			GetHdrHashInfo(pdphpsu).c_str(),
 			pdphpsu->nPackageType, strPolicyInfo.c_str(), 

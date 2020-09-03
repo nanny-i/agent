@@ -2,7 +2,7 @@ include ../../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = LogicMgrSiteFile.cpp LogicMgrSiteVuln.cpp LogicMgrSiteVulnLock.cpp LogicMgrSiteVulnRepair.cpp LogicMgrSiteVulnScan.cpp
+CPPFILES = LogicMgrSiteFile.cpp LogicMgrSiteVuln.cpp LogicMgrSiteVulnScan.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 

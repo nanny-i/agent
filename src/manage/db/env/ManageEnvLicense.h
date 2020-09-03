@@ -43,6 +43,11 @@ public:
 
 public:
 	UINT64					IsInvalidRight(UINT64 nPackage, UINT64 nPolicy, UINT64 nControl);
+	UINT64					IsValidRight(UINT64 nPackage, UINT64 nPolicy, UINT64 nControl);
+
+	UINT64					IsValidRight(PDB_ENV_LICENSE pdata, UINT64 nPackage, UINT64 nPolicy, UINT64 nControl);
+	UINT64					IsInvalidRight(PDB_ENV_LICENSE pdata, UINT64 nPackage, UINT64 nPolicy, UINT64 nControl);
+	
 
 public:
 	INT32					SetPkt(MemToken& SendToken);

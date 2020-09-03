@@ -110,7 +110,7 @@ INT32		CLogicMgrPoInVulnScan::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoInVulnScanUnit->ApplyPoInVulnScanUnit(*begin))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}				
@@ -124,7 +124,7 @@ INT32		CLogicMgrPoInVulnScan::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoInVulnScanPkg->FindItem(begin->tDPH.nID))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -135,7 +135,7 @@ INT32		CLogicMgrPoInVulnScan::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoInVulnScan->ApplyPoInVulnScan(data)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -155,6 +155,71 @@ INT32		CLogicMgrPoInVulnScan::AnalyzePkt_FromMgr_Edit_Ext()
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrPoInVulnScan::OnTimer_Logic()
+{	
+	PDB_PO_IN_VULN_OP pdata_op = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_OP);
+	if(!pdata_op)		return 0;	
+	if(pdata_op->tDPH.nUsedMode == STATUS_USED_MODE_OFF)	return 0;
+	
+	PDB_PO_IN_VULN_SCAN pdata_po = (PDB_PO_IN_VULN_SCAN)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(!pdata_po)	
+	{
+		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		return 0;
+	}
+
+	if(pdata_po->tDPH.nUsedMode == STATUS_USED_MODE_OFF)
+	{
+		return 0;
+	}
+
+	{
+		UINT32 nRet = -1;
+
+		TListID tIDList;
+		t_ManagePoInVulnScanPkg->GetKeyIDList(pdata_po->tDPH.nID, tIDList);
+		TListIDItor begin, end;
+		begin = tIDList.begin();	end = tIDList.end();
+		for(begin; begin != end; begin++)
+		{
+			PDB_PO_IN_VULN_SCAN_UNIT pdata_unit = t_ManagePoInVulnScanUnit->FindItem(*begin);
+			if(!pdata_unit || pdata_unit->tDPH.nUsedMode == STATUS_USED_MODE_OFF)		continue;
+
+			UINT32 nLastChkTime = pdata_unit->nLastScanTime;
+			U64_SCHEDULE tIS;
+			tIS.all = pdata_unit->nSchTime;
+			if(IsValidSchedule(tIS.all, nLastChkTime) == 0)
+			{
+				continue;
+			}			
+
+			SendData_Link_PoInVulnScan(pdata_unit->nScanType);		
+
+			pdata_unit->nLastScanTime = nLastChkTime;
+			if(SetER(t_ManagePoInVulnScanUnit->EditPoInVulnScanUnit(*pdata_unit)))
+			{
+				WriteLogE("[%s] edit po in vuln scan unit fail : [%d]", m_strLogicName.c_str(), pdata_unit->tDPH.nID);
+				return -1;
+			}
+		}
+	}	
+	return 1;
+}
+//---------------------------------------------------------------------------
+
+INT32    CLogicMgrPoInVulnScan::SendData_Link_PoInVulnScan(UINT32 nType)
+{		
+	WriteLogN("[%s] send link po in vuln scan unit type : [%d]", m_strLogicName.c_str(), nType);
+
+	SendToken.TokenAdd_32(nType);
+	SendData_Link(0, G_TYPE_PO_IN_VULN_SCAN, G_CODE_COMMON_SCAN, SendToken);
+	SendToken.Clear();
+	return AZPKT_CB_RTN_SUCCESS;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

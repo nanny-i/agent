@@ -35,6 +35,7 @@ typedef struct _db_id
 //------------------------------------------------------------------------------
 #include	"com_struct_po_header.h"
 #include	"com_struct_policy.h"
+#include	"com_struct_protect.h"
 #include	"com_struct_file_info.h"
 #include	"com_struct_ptn_file_info.h"
 
@@ -47,6 +48,8 @@ typedef struct _db_id
 #include	"com_struct_host_status_po.h"
 #include 	"com_struct_host_policy.h"
 #include	"com_struct_host_key.h"
+#include	"com_struct_host_patch.h"
+#include	"com_struct_host_vuln_rst.h"
 //------------------------------------------------------------------------------
 
 #include	"com_struct_user.h"
@@ -60,16 +63,17 @@ typedef struct _db_id
 #include	"com_struct_env_sorg_link.h"
 #include	"com_struct_env_trust_subject.h"
 #include	"com_struct_env_policy.h"
+#include	"com_struct_env_local.h"
+#include	"com_struct_env_socket.h"
 //------------------------------------------------------------------------------
 
 #include	"com_struct_error_code.h"
 #include	"com_struct_os_type.h"
+#include	"com_struct_doc_delete_info.h"
 
 #include	"com_struct_site_file.h"
 #include	"com_struct_site_vuln.h"
 #include	"com_struct_site_vuln_scan.h"
-#include	"com_struct_site_vuln_repair.h"
-#include	"com_struct_site_vuln_lock.h"
 //------------------------------------------------------------------------------
 
 #include	"com_struct_link_license.h"
@@ -81,6 +85,10 @@ typedef struct _db_id
 #include	"com_struct_log_secu.h"
 #include	"com_struct_log_doc_dscan.h"
 #include	"com_struct_log_doc_host.h"
+#include	"com_struct_log_patch.h"
+#include	"com_struct_log_device.h"
+#include	"com_struct_log_rs.h"
+#include	"com_struct_log_rs_bk.h"
 #include	"com_struct_log_status.h"
 //------------------------------------------------------------------------------
 
@@ -91,6 +99,7 @@ typedef struct _db_id
 #include	"com_struct_po_host_run.h"
 
 #include	"com_struct_po_sch.h"
+#include	"com_struct_po_host_notify.h"
 
 #include	"com_struct_po_power.h"
 #include	"com_struct_po_win_run.h"
@@ -104,6 +113,7 @@ typedef struct _db_id
 #include	"com_struct_po_fa_env.h"
 #include	"com_struct_po_fa_bk.h"
 #include	"com_struct_po_fa_notify.h"
+#include	"com_struct_po_fa_del_file_after_boot.h"
 
 #include	"com_struct_po_fe_ptn_op.h"
 #include	"com_struct_po_fe_ptn_lo.h"
@@ -127,18 +137,36 @@ typedef struct _db_id
 #include	"com_struct_po_in_ptn_sp_rule.h"
 #include	"com_struct_po_in_ptn_no.h"
 
-#include	"com_struct_po_in_ac_doc.h"
-#include	"com_struct_po_in_ac_sf.h"
-#include	"com_struct_po_in_ac_file.h"
-
+#include	"com_struct_po_in_vuln_ax.h"
+#include	"com_struct_po_in_vuln_edit_app.h"
 #include	"com_struct_po_in_vuln_op.h"
+#include	"com_struct_po_in_vuln_qna.h"
 #include	"com_struct_po_in_vuln_scan.h"
+#include	"com_struct_po_in_vuln_secu_usb.h"
+#include	"com_struct_po_in_vuln_sw.h"
+#include	"com_struct_po_in_vuln_patch_exception.h"
 
-#include 	"com_struct_po_in_reg_vuln.h"
-#include 	"com_struct_po_in_reg_svc.h"
-#include 	"com_struct_po_in_reg_sw.h"
-#include 	"com_struct_po_in_reg_sys.h"
+#include	"com_struct_po_in_rs_op.h"
+#include	"com_struct_po_in_rs_bk.h"
+#include	"com_struct_po_in_rs_no.h"
 
+#include	"com_struct_po_in_devo_op.h"
+#include	"com_struct_po_in_devo_bl.h"
+#include	"com_struct_po_in_devo_wl.h"
+#include	"com_struct_po_in_devo_ex.h"
+#include	"com_struct_po_in_devo_info.h"
+#include	"com_struct_po_in_devo_notify.h"
+#include	"com_struct_po_dv_default.h"
+//------------------------------------------------------------------------------
+
+#include	"com_struct_po_pm_op.h"
+#include	"com_struct_po_pm_dm.h"
+#include	"com_struct_po_pm_scan.h"
+#include	"com_struct_po_pm_ex.h"
+#include	"com_struct_po_pm_no.h"
+//------------------------------------------------------------------------------
+
+#include	"com_struct_ptn.h"
 //------------------------------------------------------------------------------
 
 

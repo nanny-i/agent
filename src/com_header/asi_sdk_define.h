@@ -49,6 +49,17 @@
 #define HIUINT32(l)    		((UINT16) (((UINT32) (l) >> 16) & 0xFFFFFFFF))
 #define LOUINT32(I)   	 	((UINT16)(I))
 
+#define MAKEUINT8(l, h) 	((UINT8) (((UINT8) (l)) | ((UINT8) ((h))) << 4)) 
+#define HIUINT8(n)    		((UINT8) (((UINT8) (n) >> 4) & 0xFF))
+#define LOUINT8(n)   	 	((UINT8)((n) << 4) >> 4)
+
+#define MAKETYPEID32(l, h)	((UINT32) (((UINT32) (l << 24)) | ((UINT32)(h))))
+#define LOTYPEID32(n)   	((UINT8)((n >> 24)))
+#define HITYPEID32(n)    	((UINT32) (((UINT32) (n)) & 0x00FFFFFF))
+
+#define MAKETYPEID64(l, h)	((UINT64) (((UINT64) (l << 56)) | ((UINT64)(h))))
+#define LOTYPEID64(n)   	((UINT8)((n >> 56)))
+#define HITYPEID64(n)    	((UINT64) (((UINT64) (n)) & 0x00FFFFFFFFFFFFFF))
 
 #define HISYNCSTEP(a)		((UINT16)(((UINT32) (a) >> 16) & 0xFFFF))
 #define LOSYNCSTEP(b)		((UINT16)(b))

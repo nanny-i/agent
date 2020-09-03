@@ -54,7 +54,7 @@ INT32		CManagePoFaEnvPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -105,7 +105,7 @@ INT32					CManagePoFaEnvPkg::AddPoFaEnvPkg(DB_PO_FA_ENV_PKG&	dpfep)
     }
 
 	AddItem(dpfep.tDPH.nID, dpfep);
-	AddKeyIDList(&dpfep);
+	AddKeyIDListPkg(&dpfep);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoFaEnvPkg::DelPoFaEnvPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpfep);
+	DelKeyIDListPkg(pdpfep);
     DeleteItem(nID);
     return 0;
 }

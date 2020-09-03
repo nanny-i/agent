@@ -34,9 +34,16 @@ typedef struct _db_log_event
 		nRegDate			= 0;
 		nEvtTime 			= 0;
 		nEvtErrCode			= ERR_SUCCESS;
+		nSkipTarget			= 0;
 
 		nNotifyType 		= 0;
 		nNotifyID			= 0;
+
+		nHostID				= 0;
+		nUserID				= 0;
+		nRegSvrID			= 0;
+		nSyncSvrMode		= 0;
+		nSyncSvrStep		= 0;
 
 		nSubjectType 		= 0;
 		nSubjectID			= 0;
@@ -53,6 +60,25 @@ typedef struct _db_log_event
 
 		nOperationType		= 0;
 		strEventDescr		= "";
+		tDescIDStrMap.clear();
+	}
+
+	void	_set_desc_info(UINT32 nKey, String strDescValue)
+	{
+		tDescIDStrMap[nKey] = strDescValue;
+	}
+
+	void	_set_desc_info(UINT32 nKey, UINT32 nValue)
+	{
+		String strValue;
+		strValue = SPrintf("%u", nValue);
+
+		tDescIDStrMap[nKey] = strValue;
+	}
+
+	String	_get_desc_value(UINT32 nKey)
+	{
+		return tDescIDStrMap[nKey];
 	}
   
 	UINT32		nID;
@@ -60,9 +86,16 @@ typedef struct _db_log_event
 	UINT32		nRegDate;
 	UINT32		nEvtTime;
 	UINT32		nEvtErrCode;
+	UINT32		nSkipTarget;
 
 	UINT32		nNotifyType;
 	UINT32		nNotifyID;
+
+	UINT32		nHostID;
+	UINT32		nUserID;
+	UINT32		nRegSvrID;
+	UINT32		nSyncSvrMode;
+	UINT32		nSyncSvrStep;
 
 	UINT32		nSubjectType;
 	UINT32		nSubjectID;
@@ -79,7 +112,7 @@ typedef struct _db_log_event
     
 	UINT32		nOperationType;
     String		strEventDescr;    
-
+	TMapIDStr	tDescIDStrMap; 
 }DB_LOG_EVENT, *PDB_LOG_EVENT;
 
 typedef list<DB_LOG_EVENT>				TListDBLogEvent;

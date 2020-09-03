@@ -45,6 +45,8 @@ typedef struct _TIMSTM
 static const LONGLONG SECS_BETWEEN_EPOCHS = 11644473600;
 static const LONGLONG SECS_TO_100NS = 10000000; /* 10^7 */
 
+#define		ONE_HOUR		3600
+
 extern void UnixTimeToFileTime(time_t* pt, LPFILETIME pft);
 extern void FileTimeToUnixTime(LPFILETIME pft, time_t* pt);
 extern void UnixTimeToSystemTime(time_t* pt, LPSYSTEMTIME pst);
@@ -60,16 +62,26 @@ extern time_t GlobalTimeToLocalTime(time_t& nTime);
 extern void GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf);
 extern void	GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf);
 extern UINT32	GetCurrentDateTimeInt();
+extern UINT32	GetCurrentTimeZone();
 extern INT32 GetFileTimeInfo(LPCSTR pcPath, UINT32 *pdwCreateTime, UINT32 *pdwModifyTime, UINT32 *pdwAccessTime);
 extern UINT32	GetCurrentYearMon();
 extern UINT32	GetCurrentYearMon(UINT32 nTime);
 extern UINT32	GetCurrentYearMonDay(UINT32 nShort = 0);
-extern UINT32	GetDayOfWeek(UINT32 nTime);
-extern UINT32	GetDayOfDay(UINT32 nTime);
+extern UINT32	GetCurrentYearMonDay(UINT32 nTime, UINT32 nShort);
+extern UINT32	GetCurrentYearMonDayHour(UINT32 nShort);
+extern UINT32	GetCurrentYearMonDayHour(UINT32 nTime, UINT32 nShort);
+extern UINT32	GetCurrentYearMonDayHourMin();
+extern UINT32	GetCurrentYearMonDayHourMin(UINT32 nTime);
+extern UINT32	GetDayOfWeek(UINT32 nTime, UINT32 nType);
+extern UINT32	GetDayOfDay(UINT32 nTime, UINT32 nType);
 extern UINT32	GetDayOfMonth(UINT32 nTime);
+extern UINT32	GetDayOfMonth(UINT32 nTime, UINT32 nType);
 extern UINT32	GetDayDiffCurrent(UINT32 nTime);
 extern LPCTSTR	GetFormatTime(UINT32 nTime, LPTSTR lpBuf, LPTSTR lpFormat = 0);
 extern LPTSTR	GetDateTimeFmt(UINT32 nTime, OUT LPTSTR lpBuf, INT32 nFormat = 0);
+extern UINT32	GetWeekCntToday();
+extern UINT32	GetWeekCntToday(UINT32 nStartDoW);
+extern int uptime();
 
 #endif /*_AS_TIME_H__*/
 

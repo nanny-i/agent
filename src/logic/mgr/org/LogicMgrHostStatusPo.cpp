@@ -185,7 +185,7 @@ void		CLogicMgrHostStatusPo::SendPkt_HostStatusPo(DB_HOST_STATUS_PO dhsp)
 
 	SendToken.Clear();
 	t_ManageHostStatusPo->SetPkt(&dhsp, SendToken);
-	SendData(G_TYPE_HOST_STATUS_PO, G_CODE_COMMON_EDIT, SendToken);
+	SendData_Mgr(G_TYPE_HOST_STATUS_PO, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
 
 	return;
@@ -203,7 +203,7 @@ void		CLogicMgrHostStatusPo::SendPkt_HostStatusPo()
 
 	SendToken.Clear();
 	t_ManageHostStatusPo->SetPkt(pdhsp, SendToken);
-	SendData(G_TYPE_HOST_STATUS_PO, G_CODE_COMMON_EDIT, SendToken);
+	SendData_Mgr(G_TYPE_HOST_STATUS_PO, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
 
 	return;

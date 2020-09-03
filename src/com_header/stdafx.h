@@ -60,6 +60,7 @@
 #include <semaphore.h>
 #include <pwd.h>
 #include <utime.h>
+#include <iconv.h>
 #include <uuid/uuid.h>
 #include <sys/sysinfo.h>
 #include <sys/socket.h>
@@ -199,6 +200,7 @@ typedef wstring StringW;
 #define HKEY_CURRENT_USER		"user"
 #define HKEY_LOCAL_MACHINE		"machine"
 #define HKEY_USERS				"users"
+
 
 #define ERROR_SUCCESS			0L
 #define STATUS_WAIT_0       ((DWORD)0x00000000L)    

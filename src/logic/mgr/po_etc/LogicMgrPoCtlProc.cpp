@@ -107,7 +107,7 @@ INT32		CLogicMgrPoCtlProc::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoCtlProcUnit->ApplyPoCtlProcUnit(*begin))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -121,7 +121,7 @@ INT32		CLogicMgrPoCtlProc::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoCtlProcPkg->FindItem(begin->tDPH.nID))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -132,7 +132,7 @@ INT32		CLogicMgrPoCtlProc::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoCtlProc->ApplyPoCtlProc(dpcp)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
