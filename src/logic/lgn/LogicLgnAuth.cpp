@@ -310,6 +310,7 @@ void		CLogicLgnAuth::SendAuthReg()
 	SendToken.TokenAdd_String(t_EnvInfo->m_strHostKey);
 	SendToken.TokenAdd_String(strMacAddr);
 	SendToken.TokenAdd_String(t_EnvInfoOp->GetComputerName());
+
 	SendToken.TokenAdd_String(szIPAddr);
 
 	SendData_Lgn(AL_TYPE_AUTH, AL_CODE_AUTH_REG, SendToken);
@@ -381,6 +382,7 @@ void		CLogicLgnAuth::SendAuthLogin()
 	SendToken.TokenAdd_String(t_EnvInfoOp->m_strPriIPAddr);
 	SendToken.TokenAdd_String(t_EnvInfo->m_strHostBinVer);
 	SendToken.TokenAdd_String(t_EnvInfo->m_strHostPtnVer);
+	//linux/windows ±¸ºÐÀÚ
 	SendToken.TokenAdd_32(BIN_MODULE_RUN_TYPE);
 
 	SendData_Lgn(AL_TYPE_AUTH, AL_CODE_AUTH_LOGIN, SendToken);

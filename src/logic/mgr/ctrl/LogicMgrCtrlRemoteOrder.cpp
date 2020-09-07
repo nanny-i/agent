@@ -88,16 +88,19 @@ INT32		CLogicMgrCtrlRemoteOrder::ApplyRemotePolicy(PMEM_CTRL_REMOTE_ORDER pMCRO)
 	if (!pMCRO)		return nRtn;
 
 	switch(pMCRO->nType)
-	{
-		case SS_COMMON_REMOTE_ORDER_TYPE_NC_PTN_GET_FILE_INFO:		nRtn = ApplyRemotePolicy_NCScan(pMCRO);		break;				
-		case SS_COMMON_REMOTE_ORDER_TYPE_NO_PTN_GET_FILE_INFO:		nRtn = ApplyRemotePolicy_NOScan(pMCRO);		break;				
-		case SS_COMMON_REMOTE_ORDER_TYPE_NO_PTN_RE_SEND_FILE_INFO:	nRtn = ApplyRemotePolicy_NOReSend(pMCRO);		break;				
+	{	
+		case SS_COMMON_REMOTE_ORDER_TYPE_NC_PTN_GET_FILE_INFO:		nRtn = ApplyRemotePolicy_NCScan(pMCRO);			break;				
+		case SS_COMMON_REMOTE_ORDER_TYPE_NO_PTN_GET_FILE_INFO:		nRtn = ApplyRemotePolicy_NOScan(pMCRO);			break;				
+		case SS_COMMON_REMOTE_ORDER_TYPE_NO_PTN_RE_SEND_FILE_INFO:	nRtn = ApplyRemotePolicy_NOReSend(pMCRO);		break;	
+		case SS_COMMON_REMOTE_ORDER_TYPE_RE_GET_SYSTEMINFO:			nRtn = ApplyRemotePolicy_ReGetSysInfo();		break;
+		case SS_COMMON_REMOTE_ORDER_TYPE_NP_SCAN_PATCH:				nRtn = ApplyRemotePolicy_NPScan(pMCRO);			break;
+		case SS_COMMON_REMOTE_ORDER_TYPE_NO_VUIN_SCAN:				nRtn = ApplyRemotePolicy_NO_VUINScan(pMCRO);	break;
 	}
 
 
 	{
-		InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, pMCRO->nType, pMCRO->strValue, m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLE_OBJ(pMCRO->nType, pMCRO->strValue);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 	
 	return nRtn;
@@ -136,6 +139,56 @@ INT32		CLogicMgrCtrlRemoteOrder::ApplyRemotePolicy_NOReSend(PMEM_CTRL_REMOTE_ORD
 			t_LogicMgrSiteFile->SendPkt_ReSend();
 		}
 	}
+	return AZPKT_CB_RTN_SUCCESS;
+}
+//---------------------------------------------------------------------------
+INT32		CLogicMgrCtrlRemoteOrder::ApplyRemotePolicy_ReGetSysInfo()
+{
+	{
+		WriteLogN("start remote ctrl : reload system info");		
+		{			
+			t_LogicMgrHostSys->SendPkt_SysInfo();
+			t_LogicMgrHostHw->SendPkt_HostHw(FALSE);
+			t_LogicMgrHostSw->SendPkt_HostSw_Cur();
+		}
+
+		{
+			t_LogicMgrHostPatch->SendPkt_Sync();
+		}
+	}
+	return AZPKT_CB_RTN_SUCCESS;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrCtrlRemoteOrder::ApplyRemotePolicy_NPScan(PMEM_CTRL_REMOTE_ORDER pMCRO)
+{
+	WriteLogN("start remote ctrl : po pm scan : [%d]", pMCRO->nType);		
+
+	if(t_LogicMgrPtnPatch->IsInitLogic() == 0)
+	{
+		WriteLogE("[%s] is not ptn patch initialize.. by pass", m_strLogicName.c_str());
+		return -1;
+	}
+
+	{
+		t_LogicMgrHostPatch->ScanPatchList(G_TYPE_CTL_REMOTE_ORDER, pMCRO->nType);
+	}
+
+	{
+		t_LogicMgrPoPmScan->StartScanDefault();
+	}
+
+	WriteLogN("[%s] pms scan started by admin", m_strLogicName.c_str());
+	return AZPKT_CB_RTN_SUCCESS;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrCtrlRemoteOrder::ApplyRemotePolicy_NO_VUINScan(PMEM_CTRL_REMOTE_ORDER pMCRO)
+{
+	WriteLogN("start remote ctrl : po no vuin scan : [%d]", pMCRO->nOption);		
+	SendToken.TokenAdd_32(pMCRO->nOption);
+	SendData_Link(G_TYPE_PO_IN_VULN_REMOTE_SCAN, G_CODE_COMMON_SCAN, SendToken);
+	SendToken.Clear();
 	return AZPKT_CB_RTN_SUCCESS;
 }
 //---------------------------------------------------------------------------

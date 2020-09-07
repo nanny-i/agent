@@ -109,8 +109,28 @@ INT32		CLogicPoInPtnSPRule::AnalyzePkt_FromLink_Ext_Req()
 
 	}
 
+	if(ChkAutoConfirm(&data))
 	{
 		t_LogicMgrPoInPtnSPRule->SendPkt_Req(&data);
+	}
+	else
+	{
+		data.tDPH.nID = t_ManagePoInPtnSPRule->GetNextLocalID();
+
+		if(t_ManagePoInPtnSPRule->ApplyPoInPtnSPRule(data))
+		{
+			SetDLEH_EC(g_nErrRtn);
+			WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+
+			return AZPKT_CB_RTN_SUCCESS_END;
+		}
+		{
+			t_ManagePoInPtnSPRule->SetPkt(SendToken);
+			SendData_Link(G_TYPE_PO_IN_PTN_SP_RULE, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+		}
+
+		t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_EPS);
 	}
 	
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
@@ -173,6 +193,68 @@ INT32		CLogicPoInPtnSPRule::AnalyzePkt_FromLink_Del_Ext()
 // 		SendToken.Clear();
 // 	}
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicPoInPtnSPRule::ChkAutoConfirm(PDB_PO_IN_PTN_SP_RULE pdata)
+{
+	PDB_PO_IN_PTN_SP pdata_pol = (PDB_PO_IN_PTN_SP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_PTN_SP);
+	if(!pdata_pol)		return -1;
+
+	if(pdata_pol->tDPH.nUsedMode == STATUS_USED_MODE_OFF)	return -1;
+	if((pdata_pol->tDPH.nExtOption & SS_PO_IN_PTN_SP_EXT_OPTION_RULE_CHECK_AGENT) == 0)		return -2;
+	if(t_EnvInfoOp->m_nMgrSvrAuthStatus == CLIENT_CON_STATUS_CONNECTED)						return -3;
+
+	if(pdata_pol->nConfirmLevel != SS_PO_IN_PTN_SP_REQ_LEVEL_NONE && pdata_pol->nConfirmLevel <= pdata->nReqLevel)
+	{
+		pdata->nConfirmType = SS_PO_IN_PTN_SP_RULE_CONFIRM_TYPE_AGENT_POLICY;
+		pdata->nConfirmID = pdata_pol->tDPH.nID;
+		pdata->nConfirmRst = SS_PO_IN_PTN_SP_RULE_CONFIRM_RST_TYPE_ALLOW;
+		if(pdata_pol->nConfirmDay == 0)		pdata->nUseDay = pdata->nReqDay;
+		else if(pdata->nReqDay == 0)		pdata->nUseDay = pdata_pol->nConfirmDay;
+		else
+		{
+			pdata->nUseDay = (pdata_pol->nConfirmDay > pdata->nReqDay ? pdata->nReqDay : pdata_pol->nConfirmDay);
+		}
+		pdata->nEvtDate = GetCurrentDateTimeInt();		
+		return 0;
+	}
+
+	PDB_SITE_FILE pdata_sf = t_ManageSiteFile->FindItem(pdata->nFileID);
+	if(!pdata_sf)	return -2;
+
+	{
+		CMatchFilterUtil tMatchFilterUtil;
+		TMapIDItor begin, end;
+		begin = pdata_pol->tDPH.tSubIDMap.begin();	end = pdata_pol->tDPH.tSubIDMap.end();
+		for(begin; begin != end; begin++)
+		{
+			PDB_PO_IN_PTN_SP_UNIT pdata_unit = t_ManagePoInPtnSPUnit->FindItem(begin->second);
+			if(!pdata_unit)		continue;
+
+			if(pdata_unit->tDPH.nUsedMode != STATUS_USED_MODE_ON)	continue;
+
+			if(tMatchFilterUtil.IsMatchFilter(pdata_sf, pdata_unit->tDFI, pdata_unit->nFltChkType))	continue;
+
+			{
+				pdata->nConfirmType	= SS_PO_IN_PTN_SP_RULE_CONFIRM_TYPE_AGENT_POLICY_UNIT;
+				pdata->nConfirmID = pdata_unit->tDPH.nID;				
+				pdata->nConfirmRst = pdata_unit->nBlockMode;
+
+				if(pdata_unit->nUseDay == 0)		pdata->nUseDay = pdata->nReqDay;
+				else if(pdata->nReqDay == 0)		pdata->nUseDay = pdata_unit->nUseDay;
+				else
+				{
+					pdata->nUseDay = (pdata_unit->nUseDay > pdata->nReqDay ? pdata->nReqDay : pdata_unit->nUseDay);
+				}
+
+
+				pdata->nEvtDate = GetCurrentDateTimeInt();
+				return 0;
+			}
+		}
+	}
+	return -10;
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

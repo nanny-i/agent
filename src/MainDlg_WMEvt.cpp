@@ -175,11 +175,15 @@ DWORD		CMainDlg::OnThreadTimer(WPARAM wParam, LPARAM lParam)
 		}
 		case TIMER_ID_SYS_BOOT_OPERATION_END:
 		{
-			if(GetCurrentDateTimeInt() - t_EnvInfo->m_nBootChkTime > TIMER_INTERVAL_TIME_SYS_BOOT)
+			UINT32 nBootTime = uptime();
+//			if(GetCurrentDateTimeInt() - t_EnvInfo->m_nBootChkTime > TIMER_INTERVAL_TIME_SYS_BOOT)
+			if(nBootTime > TIMER_INTERVAL_TIME_SYS_BOOT)
 			{
-				if (t_EnvInfoOp)	t_EnvInfoOp->SetSysBootChkMode();
+				if (t_EnvInfoOp)
+					t_EnvInfoOp->SetSysBootChkMode();
 				WriteLogN("set system boot time disable..");
-				if (t_ThreadTimer)	t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_SYS_BOOT_OPERATION_END);
+				if (t_ThreadTimer)
+					t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_SYS_BOOT_OPERATION_END);
 			}			
 			break;
 		}
@@ -198,6 +202,9 @@ DWORD		CMainDlg::OnThreadTimer(WPARAM wParam, LPARAM lParam)
 		}
 		case TIMER_ID_SYS_OFF_OPERATION_END:
 		{
+			if (!t_ThreadChkHkNoti || !t_EnvInfoOp)
+				return -1;
+
 			if(t_ThreadPoFaClear && t_ThreadPoFaClear->IsEndWork())
 			{
 				if (!t_ThreadChkHkNoti || !t_EnvInfoOp)
@@ -219,6 +226,10 @@ DWORD		CMainDlg::OnThreadTimer(WPARAM wParam, LPARAM lParam)
 				if(tPowerUtil.SetSystemPower(nFlag, t_EnvInfoOp->m_nSysOffReason) == FALSE)
 				{
 					WriteLogE("set system power fail : [%d]", GetLastError());
+				}
+				{
+					t_EnvInfoOp->SetStopOpBySysOff(0);
+					t_EnvInfoOp->SetSysOffMode(0);
 				}
 				if (t_ThreadTimer)	t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_SYS_OFF_OPERATION_END);				
 				WriteLogN("sys log off operation end : [%d]:[%x->%x][%x]:[%d]", t_ThreadPoFaClear->IsEndWork(), t_EnvInfoOp->m_nSysOffFlag, nFlag, t_EnvInfoOp->m_nSysOffReason, GetLastError());
@@ -313,9 +324,24 @@ DWORD		CMainDlg::OnThreadTimer(WPARAM wParam, LPARAM lParam)
 			WriteLogN("apply eps policy end.. by timer");
 			break;
 		}
+		case TIMER_ID_POLICY_HOST_NOTIFY:
+		{
+			if(t_LogicMgrPoHostNotify)	t_LogicMgrPoHostNotify->OnTimer_Logic();
+			break;
+		}
 		case TIMER_ID_POLICY_APPLY_IN_PTN_OP:
 		{
 			if (t_LogicMgrPoInPtnOp)	t_LogicMgrPoInPtnOp->OnTimer();
+			break;
+		}
+		case TIMER_ID_POLICY_APPLY_IN_PTN_SP_RULE:
+		{
+			if (t_LogicMgrPoInPtnSPRule)	t_LogicMgrPoInPtnSPRule->OnTimer();
+			break;
+		}
+		case TIMER_ID_POLICY_APPLY_IN_RS_BK:
+		{
+			if (t_LogicMgrPoInRsBk)		t_LogicMgrPoInRsBk->OnTimer();
 			break;
 		}
 		case TIMER_ID_TS_PROTECT_MODE:
@@ -336,6 +362,82 @@ DWORD		CMainDlg::OnThreadTimer(WPARAM wParam, LPARAM lParam)
 			if(nRtn)
 				t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_DP_FILE_EXCUTE_END);
 
+			break;
+		}
+		case TIMER_ID_POLICY_APPLY_PM_SCAN:
+		{
+			if(!t_LogicMgrPtnPatch)						break;			
+			if(t_LogicMgrPtnPatch->IsInitLogic() != 1)	break;
+// 			if(t_LogicMgrPtnPatch->GetPatchUtilStatus() != SS_PTN_PATCH_UTIL_STATUS_CONFIRM)
+// 			{
+// 				t_LogicMgrPtnPatch->ChkPtnPatchUtil();
+// 				break;
+// 			}
+			if(t_LogicMgrPoPmScan->IsUsedOffLineScan())
+			{
+				if(t_LogicMgrPtnPatch->GetPatchWsusStatus() != SS_PTN_PATCH_WSUS_STATUS_CONFIRM)
+				{
+					t_LogicMgrPtnPatch->ChkPtnPatchWsus();
+					break;
+				}
+			}
+
+			if(t_LogicMgrPoPmScan)		t_LogicMgrPoPmScan->OnTimer();
+			break;
+		}
+		case TIMER_ID_POLICY_APPLY_PM_ROLLBACK:
+		{
+			if(!t_LogicMgrPtnPatch)						break;			
+			if(t_LogicMgrPtnPatch->IsInitLogic() != 1)	break;
+			
+			if(t_LogicMgrPoPmEx)		t_LogicMgrPoPmEx->OnTimer();
+			break;
+		}
+		case TIMER_ID_POLICY_APPLY_PM_MON_RM_PATCH:
+		{
+			if(!t_LogicMgrPtnPatch)						break;			
+			if(t_LogicMgrPtnPatch->IsInitLogic() != 1)	break;
+
+			if(t_LogicMgrPoPmOp)		t_LogicMgrPoPmOp->OnTimer();
+			break;
+		}
+		case TIMER_ID_POLICY_APPLY_IN_VULN_SCAN:
+		{
+			if(!t_LogicMgrPtnVuln)						break;			
+			if(t_LogicMgrPtnVuln->IsInitLogic() != 1)	break;
+
+			INT32 nVulnOnLineScan = t_LogicMgrPtnVuln->IsVulnWsusLive();
+			if(!nVulnOnLineScan)
+			{
+				if(t_LogicMgrPtnVuln->GetVulnWsusStatus() != SS_PTN_PATCH_WSUS_STATUS_CONFIRM)
+				{
+					t_LogicMgrPtnVuln->ChkPtnVulnWsus();
+					break;
+				}
+			}
+
+			if (t_LogicMgrPoInVulnScan)		t_LogicMgrPoInVulnScan->OnTimer();
+			break;
+		}
+		case TIMER_ID_POLICY_READY_IN_DEPLOY:
+		{
+			if(!t_LogicMgrPtnVuln)						break;			
+			if(t_LogicMgrPtnVuln->IsInitLogic() != 1)	break;
+			if(t_LogicMgrPtnVuln->GetPtnDeployStatus() != SS_PTN_DEPLOY_STATUS_CONFIRM)
+			{
+				t_LogicMgrPtnVuln->ChkPtnDeploy();
+				break;
+			}
+			else
+			{
+				t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_POLICY_READY_IN_DEPLOY);
+				WriteLogN("check valid ptn deploy file end...");
+			}
+			break;
+		}
+		case TIMER_ID_SEND_KEEP_ALIVE:
+		{
+			if(t_LogicMgrEnvSocket)		t_LogicMgrEnvSocket->OnTimer_Logic();
 			break;
 		}
 		default:
@@ -372,6 +474,16 @@ INT32 CMainDlg::OnKernelFileLog(UINT32 nLogType, PPKT_DATA pPktData)
 		case ASI_EPS_APP_LOG_TYPE_PO_IN_PTN_EX_TRUST:
 			t_LogicMgrPoInPtnExTrust->AnalyzePkt_FromMgr(pPktData);
 			break;
+		case ASI_EPS_APP_LOG_TYPE_DEVICE:
+        	t_LogicMgrLogDevice->AnalyzePkt_FromMgr(pPktData);
+            break;
+		case ASI_EPS_APP_LOG_TYPE_RS:
+        	t_LogicMgrLogRs->AnalyzePkt_FromMgr(pPktData);
+            break;
+		case ASI_EPS_APP_LOG_TYPE_RS_BK:
+        	t_LogicMgrLogRsBk->AnalyzePkt_FromMgr(pPktData);
+            break;
+
 		default:
 			nRetVal = AZPKT_CB_RTN_PKT_NOT_DEFINE_CODE;
 			break;
@@ -466,10 +578,24 @@ DWORD CMainDlg::OnFileDown(WPARAM wParam, LPARAM lParam)
 	{
 		case ASIFDL_DL_RST_STATUS_TYPE_READY:
 		case ASIFDL_DL_RST_STATUS_TYPE_START:
-		case ASIFDL_DL_RST_STATUS_TYPE_SUCCESS_END:
 		case ASIFDL_DL_RST_STATUS_TYPE_FAIL_END:
 		case ASIFDL_DL_RST_STATUS_TYPE_FAIL_HASH_END:
 		case ASIFDL_DL_RST_STATUS_TYPE_CANCEL:
+		case ASIFDL_DL_RST_STATUS_TYPE_CANCEL_REF_OVER:
+		{
+			PASI_FDL_INFO pafi = t_ManageFileDown->FindItem((UINT32)lParam);
+			if(pafi)
+			{
+				WriteLogN("file download status : [%d][%d]:[%d][%s]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName);
+				pafi->nFileStatus = wParam;
+			}
+			else
+			{
+				WriteLogN("not find file download info : [%d][%d]", lParam, wParam);
+			}
+			break;
+		}
+		case ASIFDL_DL_RST_STATUS_TYPE_SUCCESS_END:
 		{
 			PASI_FDL_INFO pafi = t_ManageFileDown->FindItem((UINT32)lParam);
 			if(pafi)
@@ -479,6 +605,27 @@ DWORD CMainDlg::OnFileDown(WPARAM wParam, LPARAM lParam)
 			else
 			{
 				WriteLogN("not find file download info : [%d][%d]", lParam, wParam);
+				break;
+			}
+
+			if(pafi->nItemType == SS_DN_FILE_TYPE_PPTN_PATCH)
+			{
+				PDB_LOG_PATCH pdata = t_ManageLogPatch->FindKeySubIDMapItem(POS_KEY_ID_POSITION_LOG_PATCH_PID_MAP, pafi->nItemID);
+				if(!pdata)	break;
+
+				if(ISSYNCSTEP(pafi->nItemPkg))
+				{
+					pafi->nFileStatus = ASIFDL_DL_RST_STATUS_TYPE_SUCCESS_END;
+					pdata->nPatchStatus = SS_LOG_PATCH_STATUS_TYPE_DOWN;
+					pdata->nEvtTime = GetCurrentDateTimeInt();
+					HISYNCSTEPUP(pdata->nSyncSvrStep);
+					t_LogicMgrLogPatch->SetLogPatch(*pdata);
+				}	
+				else
+				{
+					pafi->nFileStatus = ASIFDL_DL_RST_STATUS_TYPE_SUCCESS_END;
+					WriteLogN("file download status : [%d][%d]:[%d][%s][%d/%d]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName, LOSYNCSTEP(pafi->nItemPkg), HISYNCSTEP(pafi->nItemPkg));
+				}
 			}
 			break;
 		}
@@ -505,7 +652,7 @@ DWORD CMainDlg::OnFileDown(WPARAM wParam, LPARAM lParam)
 			
 			switch(pafi->nItemType)
 			{
-				case ASIFDL_DL_FILE_TYPE_DEPLOY:
+				case SS_DN_FILE_TYPE_DEPLOY:
 				{
 					DB_LOG_DEPLOY_FILE tDLDF;
 					tDLDF.nPolicyID = pafi->nPolicyID;

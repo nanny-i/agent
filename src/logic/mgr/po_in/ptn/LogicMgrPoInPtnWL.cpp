@@ -36,6 +36,8 @@ CLogicMgrPoInPtnWL::CLogicMgrPoInPtnWL()
 	t_ManagePoInPtnWLPkg	= new CManagePoInPtnWLPkg();
 	t_ManagePoInPtnWLUnit	= new CManagePoInPtnWLUnit();
 
+	t_LogicMgrPtnGWO		= new CLogicMgrPtnGWO();
+
 
 	t_ManagePoInPtnWL->LoadDBMS();
 	t_ManagePoInPtnWLPkg->LoadDBMS();
@@ -56,6 +58,8 @@ CLogicMgrPoInPtnWL::CLogicMgrPoInPtnWL()
 
 CLogicMgrPoInPtnWL::~CLogicMgrPoInPtnWL()
 {
+	SAFE_DELETE(t_LogicMgrPtnGWO);
+
 	SAFE_DELETE(t_ManagePoInPtnWLUnit);
 	SAFE_DELETE(t_ManagePoInPtnWLPkg);
 	SAFE_DELETE(t_ManagePoInPtnWL);
@@ -109,7 +113,7 @@ INT32		CLogicMgrPoInPtnWL::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoInPtnWLUnit->ApplyPoInPtnWLUnit(*begin))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}				
@@ -123,7 +127,7 @@ INT32		CLogicMgrPoInPtnWL::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoInPtnWLPkg->FindItem(begin->tDPH.nID))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -134,7 +138,7 @@ INT32		CLogicMgrPoInPtnWL::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoInPtnWL->ApplyPoInPtnWL(data)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -162,6 +166,11 @@ INT32		CLogicMgrPoInPtnWL::ApplyPolicy()
 			}
 			else
 			{
+				if(t_LogicMgrPtnGWO->ReloadPtnGWO())
+				{
+					WriteLogE("[%s] can not reload gwo ptn file  : [%s]", m_strLogicName.c_str(), pdata->tDPFI.strSaveName.c_str());
+					return 0;
+				}
 				t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_EPS);
 			}
 		}
@@ -188,6 +197,36 @@ INT32		CLogicMgrPoInPtnWL::CheckRunEnv()
 		if(pdata->tDPH.nUsedMode != STATUS_USED_MODE_OFF && t_ManagePoInPtnWL->IsValidPtnFile(pdata) == 0)
 		{
 			AddDpDownInfo();
+		}
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrPoInPtnWL::LoadPtn()
+{
+	PDB_PO_IN_PTN_WL pdata = (PDB_PO_IN_PTN_WL)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(!pdata)	
+	{
+		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		return 0;
+	}
+
+	{
+		if(pdata->tDPH.nUsedMode != STATUS_USED_MODE_OFF)
+		{
+			if(t_ManagePoInPtnWL->IsValidPtnFile(pdata) == 0 && t_EnvInfoOp->m_nApplyPolicyStatus)
+			{
+				AddDpDownInfo();
+			}
+			else
+			{
+				if(t_LogicMgrPtnGWO->ReloadPtnGWO())
+				{
+					WriteLogE("[%s] can not reload gwo ptn file  : [%s]", m_strLogicName.c_str(), pdata->tDPFI.strSaveName.c_str());
+					return 0;
+				}
+			}
 		}
 	}
 	return 0;

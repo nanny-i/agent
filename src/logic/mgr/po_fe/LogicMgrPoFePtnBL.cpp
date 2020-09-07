@@ -76,7 +76,7 @@ INT32		CLogicMgrPoFePtnBL::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if(SetER(t_ManagePoFePtnBL->ApplyPoFePtnBL(dpfpb)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}

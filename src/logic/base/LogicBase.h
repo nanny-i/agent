@@ -46,8 +46,8 @@ public:
 	String		m_strLogicName;
 
 public:
-	INT16		m_nPktType;
-	INT16		m_nPktCode;
+	UINT16		m_nPktType;
+	UINT16		m_nPktCode;
 	INT32		m_nSessionID;
 	PPKT_DATA	m_tPktData;
 
@@ -172,8 +172,9 @@ public:
 	UINT32	GetConnectIP_Lgn();
 
 public:
-	void	SendData(PPKT_DATA pkt_data, MemToken& SendToken);
-	void	SendData(UINT16 nType, UINT16 nCode, MemToken& SendToken);
+	INT32	SendData_Mgr(PPKT_DATA pkt_data, MemToken& SendToken);
+	INT32	SendData_Mgr(UINT16 nType, UINT16 nCode, MemToken& SendToken);
+	INT32	IsInitialize_Mgr();
 	void	EditSKey_Mgr(UINT32 nSessionKey);
 	void	Disconnected_Mgr();
 	String	GetConnectAddr_Mgr();
@@ -222,6 +223,21 @@ public:
 	INT32	SendPktToLink();
 
 public:
+	INT32	SendPktToLink_Ctrl_Etc();
+
+	INT32	SendPktToLink_Host();
+	INT32	SendPktToLink_PoEtc();
+	INT32	SendPktToLink_PoFA();
+	INT32	SendPktToLink_PoFE();
+	INT32	SendPktToLink_PoOnPtn();
+	INT32	SendPktToLink_PoOnVuln();
+	INT32	SendPktToLink_PoOnRs();
+	INT32	SendPktToLink_PoPm();
+
+	INT32	SendPktToLink_Log();
+
+
+public:
 	INT32	SetHdrAndRtn(INT32 nRtnValue);
 
 protected:
@@ -232,30 +248,28 @@ protected:
 	DB_LOG_EVENT			m_tDLE;
 	
 	
-protected:
-	void	InitDLEALL(UINT32 nOpType, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc = "");
-	void	InitDLE_PE(UINT32 nOID, String strOInfo, String strDesc = "");
+public:	
+	void	InitDLEH(UINT32 nOpType, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc = "", UINT32 nSyncMode = SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
+	void	InitDLEH_PE(UINT32 nOID, String strOInfo, String strDesc = "");
+	void	InitDLEH_Sync(UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc = "");
+	void	InitDLEH_SyncAgt(UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc = "");
+	void	InitDLEH_SyncSvr(UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc = "");
 
-protected:
-	void	InitDLEA_EC();
-	void	SetDLEA_EC(UINT32 nErrCode, INT32 nApplyPkt = 1);
+public:
+	void	InitDLEU(UINT32 nOpType, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc = "");
 
-	void	InitDLE(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc = "", String strSInfo = "", String strTInfo = "");
+public:
+	void	InitDLEH_EC();
+	void	SetDLEH_EC(UINT32 nErrCode, INT32 nApplyPkt = 1);
+
+	void	InitDLE_OBJ(UINT32 nOID, String strOInfo = "", UINT32 nSyncMode = SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
+	void	InitDLE(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc = "", String strSInfo = "", String strTInfo = "", UINT32 nSyncMode = SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
 	void	AppendDLEDesc(String strValue);
 	void	AppendDLEDesc(UINT32 nValue);
+	void	AppendDLEDesc(UINT32 nKey, String strValue);
+	void	AppendDLEDesc(UINT32 nKey, UINT32 nValue);
+	void	AppendDLEDescHex(UINT32 nKey, UINT32 nValue);
 
-protected:
-	DB_LOG_STATUS			m_tDLST;
-
-protected:
-	void	InitDLSTALL(UINT32 nOpType, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nKeyDesc = 0, String strValueDesc = "");
-	void	InitDLST_PoOp(UINT32 nOID, String strOInfo, UINT32 nOpType, UINT32 nKeyDesc = 0, String strValueDesc = "");
-
-protected:
-
-	void	InitDLST(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nOpType, UINT32 nKeyDesc = 0, String strValueDesc = "", String strSInfo = "", String strTInfo = "");
-	void	AppendDLStDesc(UINT32 nKey, String strValue);
-	void	AppendDLStDesc(UINT32 nKey, UINT32 nValue);
 
 public:
 	CLogicBase();

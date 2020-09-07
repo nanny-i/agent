@@ -237,7 +237,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileInfoUnit->ApplyPoDeployFileInfoUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub info unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -251,7 +251,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileChkUnit->ApplyPoDeployFileChkUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub chk unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -265,7 +265,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileTarUnit->ApplyPoDeployFileTarUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub tar unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -279,7 +279,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileSchUnit->ApplyPoDeployFileSchUnit(begin->second))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy sub sch unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -295,7 +295,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileUnitInfoPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub info pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -310,7 +310,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileUnitChkPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub chk pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -325,7 +325,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileUnitTarPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub tar pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -340,7 +340,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileUnitSchPkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy sub sch pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -358,7 +358,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFileUnit->ApplyPoDeployFileUnit(*begin))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -372,7 +372,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 				{
 					if(t_ManagePoDeployFilePkg->FindItem(begin->tDPH.nID))
 					{
-						SetDLEA_EC(g_nErrRtn);
+						SetDLEH_EC(g_nErrRtn);
 						WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 						continue;
 					}
@@ -383,7 +383,7 @@ INT32		CLogicMgrPoDeployFile::AnalyzePkt_FromMgr_Edit_Ext()
 
 			if(SetER(t_ManagePoDeployFile->ApplyPoDeployFile(dpdf)))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 			}

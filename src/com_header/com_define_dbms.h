@@ -25,12 +25,16 @@
 //DBMS Type
 ////////////////////////////////////////////////////////////////////////////////
 
-#define		DBMS_TYPE_FILE			0
+#define		DBMS_TYPE_NOT_USED		0
 #define		DBMS_TYPE_MYSQL			1
 #define		DBMS_TYPE_MYSQL_5X		2
 #define     DBMS_TYPE_MARIADB		3
 #define     DBMS_TYPE_SQLITE		5
-#define     DBMS_TYPE_DB2	    	30
+#define		DBMS_TYPE_MSSQL			10
+#define		DBMS_TYPE_MSSQL_25E		11
+#define		DBMS_TYPE_MSSQL_28		12
+
+#define		DBMS_TYPE_ASHIN_FILEDB	100
 
 #define		QUERY_OP_SUCCESS		0
 #define		DBMS_LOAD_EMPTY			-10

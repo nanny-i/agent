@@ -53,14 +53,14 @@ INT32			CDBMgrSiteVulnScan::LoadDB(TListDBSiteVulnScan& tDBSiteVulnScanList)
     INT32 nIndex = 0;
 
 	m_strQuery = SPrintf("SELECT "
-						"  id, used_flag, reg_date, used_mode, admin_id, ext_option"
-						", name, descr"
-						", os_type, os_id, os_pa"
-						", vuln_id, vuln_sub_id, scan_order"
-						", scan_type, custom_id"
-						", scan_path, value_type"
-						", decision_type, comp_type, comp_value"
-						" FROM site_vuln_scan;");
+							"  id, used_flag, reg_date, used_mode, admin_id, ext_option"
+							", name"
+							", vuln_id, vuln_sub_id, scan_order"
+							", sys_type, sys_sp_type, sys_arch_type"
+							", scan_type, custom_id"
+							", scan_path, value_type"
+							", decision_type, comp_type, comp_value"
+							" FROM site_vuln_scan;");
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -77,15 +77,14 @@ INT32			CDBMgrSiteVulnScan::LoadDB(TListDBSiteVulnScan& tDBSiteVulnScanList)
 		data.nExtOption					= GetDBField_UInt(nIndex++);
 
 		data.strName					= GetDBField_String(nIndex++);
-		data.strDescr					= GetDBField_String(nIndex++);
 
-		data.nOsType					= GetDBField_UInt(nIndex++);
-		data.nOsID						= GetDBField_UInt64(nIndex++);
-		data.nOsPa						= GetDBField_UInt(nIndex++);
+		data.nVulnID					= GetDBField_Int(nIndex++);
+		data.nVulnSubID					= GetDBField_Int(nIndex++);
+		data.nScanOrder					= GetDBField_Int(nIndex++);
 
-		data.nSVulnID					= GetDBField_UInt(nIndex++);
-		data.nSVulnSubID				= GetDBField_UInt(nIndex++);
-		data.nScanOrder					= GetDBField_UInt(nIndex++);
+		data.nSysType					= GetDBField_UInt64(nIndex++);
+		data.nSysSPType					= GetDBField_Int(nIndex++);
+		data.nSysArchType				= GetDBField_Int(nIndex++);
 
 		data.nScanType					= GetDBField_UInt(nIndex++);
 		data.nCustomID					= GetDBField_UInt(nIndex++);
@@ -120,29 +119,29 @@ INT32			CDBMgrSiteVulnScan::InsertSiteVulnScan(DB_SITE_VULN_SCAN& data)
 	String strCompValue = PathWinToUnix(data.strCompValue);
 
 	m_strQuery = SPrintf("INSERT INTO site_vuln_scan ("
-									"  id, reg_date, used_mode, admin_id, ext_option" //1
-									", name, descr" //2
-									", os_type, os_id, os_pa" //3
-									", vuln_id, vuln_sub_id, scan_order" //4
-									", scan_type, custom_id" //5
-									", scan_path, value_type" //6
-									", decision_type, comp_type, comp_value" //7
-									") VALUES ("
-									"  %u, %u, %u, %u, %u" //1
-									", '%s', '%s'" //2
-									", %u, '%I64u', %u" //3
-									", %u, %u, %u" //4
-									", %u, %u" //5
-									", '%s', %u" //6
-									", %u, %u, '%s'" //7
-									");",
-                                    data.nID, data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
-									data.strName.c_str(), data.strDescr.c_str(), 
-									data.nOsType, data.nOsID, data.nOsPa,
-									data.nSVulnID, data.nSVulnSubID, data.nScanOrder,
-									data.nScanType, data.nCustomID,
-									strScanPath.c_str(), data.nValueType,
-									data.nDecisionType, data.nCompType, strCompValue.c_str());
+								"  reg_date, used_mode, admin_id, ext_option" //1
+								", name" //2
+								", vuln_id, vuln_sub_id, scan_order" //3
+								", sys_type, sys_sp_type, sys_arch_type" // 4
+								", scan_type, custom_id" //5
+								", scan_path, value_type" //6
+								", decision_type, comp_type, comp_value" //7
+								") VALUES ("
+								"  %u, %u, %u, %u" //1
+								", '%s'"
+								", %u, %u, %u"
+								", '%I64u', %u, %u"
+								", %u, %u" //5
+								", '%s', %u" //6
+								", %u, %u, '%s'" //7
+								");",
+								data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
+								data.strName.c_str(), 
+								data.nVulnID, data.nVulnSubID, data.nScanOrder,
+								data.nSysType, data.nSysSPType, data.nSysArchType,
+								data.nScanType, data.nCustomID,
+								strScanPath.c_str(), data.nValueType,
+								data.nDecisionType, data.nCompType, strCompValue.c_str());
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -159,22 +158,22 @@ INT32			CDBMgrSiteVulnScan::UpdateSiteVulnScan(DB_SITE_VULN_SCAN& data)
 	String strCompValue = PathWinToUnix(data.strCompValue);
 
 	m_strQuery = SPrintf("UPDATE site_vuln_scan SET "
-						"  reg_date=%u, used_mode=%u, admin_id=%u, ext_option=%u"
-						", name='%s', descr='%s'"
-						", os_type=%u, os_id='%I64u', os_pa=%u"
-						", vuln_id=%u, vuln_sub_id=%u, scan_order=%u" //4
-						", scan_type=%u, custom_id=%u" //5
-						", scan_path='%s', value_type=%u" //6
-						", decision_type=%u, comp_type=%u, comp_value='%s'"
-						" WHERE id=%u;",
-						data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
-						data.strName.c_str(), data.strDescr.c_str(), 
-						data.nOsType, data.nOsID, data.nOsPa,
-						data.nSVulnID, data.nSVulnSubID, data.nScanOrder,
-						data.nScanType, data.nCustomID,
-						strScanPath.c_str(), data.nValueType,
-						data.nDecisionType, data.nCompType, strCompValue.c_str(), 
-						data.nID);
+							"  reg_date=%u, used_mode=%u, admin_id=%u, ext_option=%u"
+							", name='%s'"
+							", vuln_id=%u, vuln_sub_id=%u, scan_order=%u"
+							", sys_type='%I64u', sys_sp_type=%u, sys_arch_type=%u"
+							", scan_type=%u, custom_id=%u" //5
+							", scan_path='%s', value_type=%u" //6
+							", decision_type=%u, comp_type=%u, comp_value='%s'"
+							" WHERE id=%u;",
+							data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
+							data.strName.c_str(),
+							data.nVulnID, data.nVulnSubID, data.nScanOrder,
+							data.nSysType, data.nSysSPType, data.nSysArchType,
+							data.nScanType, data.nCustomID,
+							strScanPath.c_str(), data.nValueType,
+							data.nDecisionType, data.nCompType, strCompValue.c_str(), 
+							data.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_UPDATE_FAIL;

@@ -35,6 +35,8 @@ public:
 	INT32		OnTimer_Logic();
 
 private:
+	TMapID64	m_tChgPkgMap;
+	INT32		IsChangePackage(UINT64 nPkgRight);
 
 public:
 	CLogicMgrEnvLicense();

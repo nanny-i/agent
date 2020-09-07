@@ -184,10 +184,25 @@ typedef map<UINT32, TMapStr>			TMapIDMapStr;
 typedef TMapIDMapStr::iterator			TMapIDMapStrItor;
 typedef map<String, TListID>			TMapStrList;
 typedef TMapStrList::iterator			TMapStrListItor;
+typedef map<String, TListStr>			TMapStrListStr;
+typedef TMapStrListStr::iterator		TMapStrListStrItor;
 typedef map<String, TMapID>			TMapStrMapID;
 typedef TMapStrMapID::iterator			TMapStrMapIDItor;
 typedef map<UINT32, TMapStrMapID>		TMapIDMapStrMapID;
 typedef TMapIDMapStrMapID::iterator		TMapIDMapStrMapIDItor;   
+
+typedef struct _TMapStrMapStrMapID
+{
+	map<String, TMapStrMapID>				tMap;
+}stlMapStrMapStrMapID;
+typedef map<String, TMapStrMapID>::iterator	TMapStrMapStrMapIDItor;
+
+typedef struct _TMapIDMapStrMapStrMapID
+{
+	map<UINT32, stlMapStrMapStrMapID>		tMap;
+}stlMapIDMapStrMapStrMapID;
+typedef map<UINT32, stlMapStrMapStrMapID>::iterator	TMapIDMapStrMapStrMapIDItor;   
+
 typedef map<UINT32, TVectID>			TMapIDVect;
 typedef TMapIDVect::iterator			TMapIDVectItor;
 
@@ -309,6 +324,11 @@ typedef union _u64_schedule
 		UINT8 type, value, hour, min;
 		UINT8 ext_type, ext_value, ext_hour, ext_min;
 	}U8;
+
+	struct
+	{
+		UINT16 type_16, value_16, hour_16, min_16;
+	}U16;
 
 	struct
 	{

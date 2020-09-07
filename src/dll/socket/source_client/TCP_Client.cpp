@@ -60,6 +60,7 @@ CTCP_Client::CTCP_Client()
 CTCP_Client::~CTCP_Client()
 {
 	CloseSocket(1);
+	RemovePktSendWithSndPktLock();
 	pthread_mutex_destroy(&m_pkt_mutex);
 	pthread_mutex_destroy(&m_pkt_send_mutex);
 }
@@ -310,7 +311,8 @@ void *CTCP_Client::SendThread(LPVOID lParam)
 	{
 		if (pTcpClient->m_bConnected == FALSE)	
 		{		
-			pTcpClient->RemovePktSendWithSndPktLock();
+//			pTcpClient->RemovePktSendWithSndPktLock();
+//			pTcpClient->WriteLog("[Info] [%s] [SendThread] clear send buffer (%d)", pTcpClient->m_acClassName, pTcpClient->m_bContinue);
 			Sleep(10);
 			continue;
 		}
@@ -339,13 +341,8 @@ INT32	CTCP_Client::Send(UINT16 wType, UINT16 wCode, UINT32 dwLength, PVOID pData
 	INT32 nMakeBufSize = 0;
 	INT32 nRtn = 0;
 	INT32 nTimeOut = 30;
-	
-	if (m_bConnected == FALSE)
-	{
-		WriteLog("[Info] [%s] [Send] close to thread (-1)", m_acClassName);
-		return -1;
-	}
-
+	BOOL bConnected = TRUE;
+	UINT32	nPktEncType = 0;
 	if (dwLength > MAKE_BUFFER_MAX_SIZE || dwLength == 0)
 	{
 		WriteLog("[Error] [%s] [Send] invalid send length : [type:%d][code:%d][length:%d] (-2)", m_acClassName, wType, wCode, dwLength);
@@ -371,8 +368,18 @@ INT32	CTCP_Client::Send(UINT16 wType, UINT16 wCode, UINT32 dwLength, PVOID pData
 		return 0;
 	}
 
+	pthread_mutex_lock(&m_pkt_send_mutex);
+	bConnected = m_bConnected;
+	nPktEncType = m_InitData.nPktEncType;
+	pthread_mutex_unlock(&m_pkt_send_mutex);
+
+	if (bConnected == FALSE)
+	{
+		WriteLog("[Info] [%s] [Send] close to thread (-1)", m_acClassName);
+		return -4;
+	}
 	
-	if (m_InitData.nPktEncType == ASI_PKT_ENC_TYPE_SSL)
+	if (nPktEncType == ASI_PKT_ENC_TYPE_SSL)
 		nRtn = SendCoreSSLWithSndPktLock(&stPktData, nTimeOut);
 	else
 		nRtn = SendCoreWithSndPktLock(&stPktData, nTimeOut);

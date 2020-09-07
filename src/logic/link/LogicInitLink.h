@@ -41,6 +41,7 @@ private:
 	void		SendPkt_Init_Group();
 	void		SendPkt_Init_User();
 	void		SendPkt_Init_Env();
+	void		SendPkt_Init_Ptn();
 	void		SendPkt_Init_LocalEnv();
 	void		SendPkt_Init_Policy();
 	void		SendPkt_Init_Data();
@@ -51,8 +52,10 @@ private:
 	void		SendPkt_Init_Policy_FA();
 	void		SendPkt_Init_Policy_FE();
 	void		SendPkt_Init_Policy_IN();
-	void		SendPkt_Init_Policy_IN_AC();
 	void		SendPkt_Init_Policy_IN_VULN();
+	void		SendPkt_Init_Policy_IN_RS();
+	void		SendPkt_Init_Policy_IN_DEVO();
+	void		SendPkt_Init_Policy_PM();
 
     
 public:

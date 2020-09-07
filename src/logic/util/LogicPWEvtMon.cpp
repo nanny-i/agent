@@ -148,6 +148,7 @@ INT32		CLogicPWEvtMon::ExecuteEventHandler()
 			sprintf_ext(CHAR_MAX_SIZE, tATI.szTaskName, STR_TS_NAME_PWEVT_MON_ONCE, GetTickCount()); 
 			tATI.nChkPeriod = ASI_TS_CHECK_PREIOD_TYPE_ONCE;
 			tATI.nStartTime	= GetCurrentDateTimeInt() + 5;
+			tATI.nMultipleInst = ASI_TS_MULTIPLE_INST_TYPE_PARALLEL;
 
 			tATMP.strTSChildPath	= strChildPath;
 			tATMP.nTSSingleRun		= 1;
@@ -169,6 +170,12 @@ INT32		CLogicPWEvtMon::RecordTimeStamp()
 		dwTimeStamp = (pPolicy->nRunOption & SS_PO_HOST_RUN_OPTION_FLAG_SUPPORT_RESTART_SVC ? GetTickCount() : 0);
 	}
 	t_EnvInfo->SetReg_TimeStamp(dwTimeStamp);
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicPWEvtMon::IsNotExcutePwevt()
+{
 	return 0;
 }
 //---------------------------------------------------------------------------

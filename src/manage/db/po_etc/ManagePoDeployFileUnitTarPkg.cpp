@@ -54,7 +54,7 @@ INT32		CManagePoDeployFileUnitTarPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -106,7 +106,7 @@ INT32					CManagePoDeployFileUnitTarPkg::AddPoDeployFileUnitTarPkg(DB_PO_DEPLOY_
     }
 
 	AddItem(dpdfucp.tDPH.nID, dpdfucp);
-	AddKeyIDList(&dpdfucp);
+	AddKeyIDListPkg(&dpdfucp);
 
     return 0;
 }
@@ -138,7 +138,7 @@ INT32					CManagePoDeployFileUnitTarPkg::DelPoDeployFileUnitTarPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpdfucp);
+	DelKeyIDListPkg(pdpdfucp);
     DeleteItem(nID);
     return 0;
 }

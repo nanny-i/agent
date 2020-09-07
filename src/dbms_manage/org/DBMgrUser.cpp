@@ -54,7 +54,7 @@ INT32			CDBMgrUser::LoadDB(TListDBUser& tDBUserList)
 
 	m_strQuery = SPrintf("SELECT id, used_flag, reg_date, ins_type, "
 						"group_id, ugroup_id, unicode, account_id, account_pw, "
-						"name, group_code, co_id, co_rank, co_respon, co_email, co_phone, user_hphone, "
+						"name, group_code, co_id, co_rank, co_respon, co_email, co_phone, user_hphone, src_group_name,"
 						"descr, ext_option "
 						"FROM user WHERE used_flag=1;");
 
@@ -84,6 +84,7 @@ INT32			CDBMgrUser::LoadDB(TListDBUser& tDBUserList)
 		du.strCoEMail			= GetDBField_String(nIndex++);
 		du.strCoPhone			= GetDBField_String(nIndex++);
 		du.strUserHPhone		= GetDBField_String(nIndex++);
+		du.strSrcGroupName			= GetDBField_String(nIndex++);
 
 		du.strDescr				= GetDBField_String(nIndex++);
 
@@ -105,15 +106,15 @@ INT32			CDBMgrUser::InsertUser(DB_USER& du)
 {
     m_strQuery = SPrintf("INSERT INTO user (id, used_flag, reg_date, ins_type, "
 									"group_id, ugroup_id, unicode, account_id, account_pw, "
-									"name, group_code, co_id, co_rank, co_respon, co_email, co_phone, user_hphone, "
+									"name, group_code, co_id, co_rank, co_respon, co_email, co_phone, user_hphone, src_group_name,"
 									"descr, ext_option) "
                                     "VALUES (%u, %u, %u, %u, "
                                     "%u, %u, '%s', '%s', '%s', "
-									"'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', "
+									"'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',"
 									"'%s', %u);",
                                     du.nID, du.nUsedFlag, du.nRegDate, du.nInsType,								
 									du.nGroupID, du.nUGroupID, du.strUniCode.c_str(), du.strAccountID.c_str(), du.strAccountPW.c_str(),
-									du.strName.c_str(), du.strGCode.c_str(), du.strCoID.c_str(), du.strCoRank.c_str(), du.strCoRespon.c_str(), du.strCoEMail.c_str(), du.strCoPhone.c_str(), du.strUserHPhone.c_str(),
+									du.strName.c_str(), du.strGCode.c_str(), du.strCoID.c_str(), du.strCoRank.c_str(), du.strCoRespon.c_str(), du.strCoEMail.c_str(), du.strCoPhone.c_str(), du.strUserHPhone.c_str(), du.strSrcGroupName.c_str(),
 									du.strDescr.c_str(), du.nExtOption);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
@@ -128,12 +129,12 @@ INT32			CDBMgrUser::UpdateUser(DB_USER& du)
 	m_strQuery = SPrintf("UPDATE user SET "
 						"ins_type=%u, "
 						"group_id=%u, ugroup_id=%u, unicode='%s', account_id='%s', account_pw='%s', "
-						"name='%s', group_code='%s', co_id='%s', co_rank='%s', co_respon='%s', co_email='%s', co_phone='%s', user_hphone='%s', "
+						"name='%s', group_code='%s', co_id='%s', co_rank='%s', co_respon='%s', co_email='%s', co_phone='%s', user_hphone='%s', src_group_name='%s',"
 						"descr='%s', ext_option=%u "
 						"WHERE id=%u;",
 						du.nInsType,
 						du.nGroupID, du.nUGroupID, du.strUniCode.c_str(), du.strAccountID.c_str(), du.strAccountPW.c_str(),
-						du.strName.c_str(), du.strGCode.c_str(), du.strCoID.c_str(), du.strCoRank.c_str(), du.strCoRespon.c_str(), du.strCoEMail.c_str(), du.strCoPhone.c_str(), du.strUserHPhone.c_str(),
+						du.strName.c_str(), du.strGCode.c_str(), du.strCoID.c_str(), du.strCoRank.c_str(), du.strCoRespon.c_str(), du.strCoEMail.c_str(), du.strCoPhone.c_str(), du.strUserHPhone.c_str(), du.strSrcGroupName.c_str(),
 						du.strDescr.c_str(), du.nExtOption,
 						du.nID);
 

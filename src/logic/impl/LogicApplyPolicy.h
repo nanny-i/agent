@@ -50,14 +50,25 @@ public:
 private:
 	INT32		SetEPSDrvPolicy();
 	INT32		SetEPSSvcPolicy(UINT32 nUserMode = 0);
+
+private:
+	INT32		SetEPSDrvPolicy_Env();
+	INT32		SetEPSDrvPolicy_Etc();
+	INT32		SetEPSDrvPolicy_PoFa();
+	INT32		SetEPSDrvPolicy_PoFe();
+	INT32		SetEPSDrvPolicy_PoIn();
+	INT32		SetEPSDrvPolicy_PoDv();
 	
 private:
-	UINT32		m_nEPSHkPID;
+	TListID		m_tEPSHkPIDList;
 	String		m_strHijackDLL;
 
 public:	
 	INT32		SetEPSHookPolicy(INT32 nMode = 0);
 	INT32		SetEPSHookModuleByTS(INT32 nMode, UINT32 nHookPID);
+	INT32		SetEPSHookModuleByTS(INT32 nMode, TListID tHookPIDList);
+
+	INT32		SetUser32Hook(BOOL bInstall = TRUE);
 	
 public:
 	CLogicApplyPolicy();

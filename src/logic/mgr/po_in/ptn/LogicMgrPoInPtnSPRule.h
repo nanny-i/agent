@@ -28,9 +28,14 @@ class CLogicMgrPoInPtnSPRule	: public CLogicBase
 private:
 	INT32		AnalyzePkt_FromMgr_Ext();
 	INT32		AnalyzePkt_FromMgr_Edit_Ext();
+	INT32		AnalyzePkt_FromMgr_Ext_Sync();
+
+public:
+	INT32		OnTimer_Logic();
 
 public:
 	void		SendPkt_Req(PDB_PO_IN_PTN_SP_RULE pdata);
+	void		SendPkt_Sync(INT32 nOnceMaxNum = 1000);
 
 public:
 	CLogicMgrPoInPtnSPRule();

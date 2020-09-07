@@ -12,7 +12,7 @@ set -e;										\
 endef
 
 
-SUBDIR := ac ptn reg vuln
+SUBDIR := devo ptn rs vuln
 
 .PHONY: all
 

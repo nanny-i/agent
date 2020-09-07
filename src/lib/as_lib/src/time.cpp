@@ -216,7 +216,7 @@ void			GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf)
 	if(nDateTime == 0)
 		snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d", dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday);
 	else
-		snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d %.2d:%.2d:%.2d",	dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday, dt->tm_hour, dt->tm_min, dt->tm_sec);
+		snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d %.2d:%.2d:%.2d", dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday, dt->tm_hour, dt->tm_min, dt->tm_sec);
 }
 
 void GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf)
@@ -232,6 +232,99 @@ void GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf)
 		return;
 
 	snprintf(lpBuf, MAX_TIME_STR-1, "%.4d_%.2d_%.2d", dt->tm_year + 1900,dt->tm_mon + 1,dt->tm_mday);
+}
+
+UINT32	GetCurrentYearMonDayHour(UINT32 nShort)
+{
+	time_t t;
+	struct tm *dt;
+	t = time(NULL);
+	dt = localtime(&t);
+
+	UINT32 nRtn = 0;
+	if(dt)
+	{
+		if(nShort)
+		{
+			nRtn = (((dt->tm_year + 1900) % 2000) * 1000000);
+		}
+		else
+		{
+			nRtn = (((dt->tm_year + 1900)) * 1000000);
+		}
+		nRtn += ((dt->tm_mon + 1) * 10000);
+		nRtn += dt->tm_mday * 100;
+		nRtn += dt->tm_hour;
+	}
+	return nRtn;
+}
+//-------------------------------------------------------------------------
+
+UINT32	GetCurrentYearMonDayHour(UINT32 nTime, UINT32 nShort)
+{
+	if(!nTime)	return 0;
+
+	time_t t = (time_t)nTime;
+	struct tm *dt;
+	dt = gmtime(&t);
+
+	UINT32 nRtn = 0;
+	if(dt)
+	{
+		if(nShort)
+		{
+			nRtn = (((dt->tm_year + 1900) % 2000) * 1000000);
+		}
+		else
+		{
+			nRtn = (((dt->tm_year + 1900)) * 1000000);
+		}
+		nRtn += ((dt->tm_mon + 1) * 10000);
+		nRtn += dt->tm_mday * 100;
+		nRtn += dt->tm_hour;
+	}
+	return nRtn;
+}
+//-------------------------------------------------------------------------
+
+UINT32	GetCurrentYearMonDayHourMin()
+{
+	time_t t;
+	struct tm *dt;
+	t = time(NULL);
+	dt = localtime(&t);
+
+	UINT32 nRtn = 0;
+	if(dt)
+	{
+		nRtn = (((dt->tm_year + 1900) % 2000) * 100000000);
+		nRtn += ((dt->tm_mon + 1) * 1000000);
+		nRtn += dt->tm_mday * 10000;
+		nRtn += dt->tm_hour * 100;
+		nRtn += dt->tm_min;
+	}
+	return nRtn;
+}
+//-------------------------------------------------------------------------
+
+UINT32	GetCurrentYearMonDayHourMin(UINT32 nTime)
+{
+	if(!nTime)	return 0;
+
+	time_t t = (time_t)nTime;
+	struct tm *dt;
+	dt = gmtime(&t);
+
+	UINT32 nRtn = 0;
+	if(dt)
+	{
+		nRtn = (((dt->tm_year + 1900) % 2000) * 100000000);
+		nRtn += ((dt->tm_mon + 1) * 1000000);
+		nRtn += dt->tm_mday * 10000;
+		nRtn += dt->tm_hour * 100;
+		nRtn += dt->tm_min;
+	}
+	return nRtn;
 }
 
 //-------------------------------------------------------------------------
@@ -259,6 +352,32 @@ UINT32	GetCurrentYearMonDay(UINT32 nShort)
 	}
 	return nRtn;
 }
+
+UINT32	GetCurrentYearMonDay(UINT32 nTime, UINT32 nShort)
+{
+	if(!nTime)	return 0;
+
+	time_t t = (time_t)nTime;
+	struct tm *dt;
+	dt = gmtime(&t);
+
+	UINT32 nRtn = 0;
+	if(dt)
+	{
+		if(nShort)
+		{
+			nRtn = (((dt->tm_year + 1900) % 2000) * 10000);
+		}
+		else
+		{
+			nRtn = (((dt->tm_year + 1900)) * 10000);
+		}
+		nRtn += ((dt->tm_mon + 1) * 100);
+		nRtn += dt->tm_mday;
+	}
+	return nRtn;
+}
+
 //-------------------------------------------------------------------------
 
 UINT32	GetCurrentYearMon()
@@ -278,11 +397,14 @@ UINT32	GetCurrentYearMon()
 }
 //-------------------------------------------------------------------------
 
-UINT32	GetDayOfWeek(UINT32 nTime)
+UINT32	GetDayOfWeek(UINT32 nTime, UINT32 nType)
 {
 	struct tm *dt;
 	time_t t = (time_t)nTime;
-	dt = localtime(&t);
+	if(!nType)
+		dt = localtime(&t);
+	else
+		dt = gmtime(&t);
 
 	UINT32 nRtn = 0;
 	if(dt)
@@ -293,11 +415,14 @@ UINT32	GetDayOfWeek(UINT32 nTime)
 }
 //-------------------------------------------------------------------------
 
-UINT32	GetDayOfDay(UINT32 nTime)
+UINT32	GetDayOfDay(UINT32 nTime, UINT32 nType)
 {
 	struct tm *dt;
 	time_t t = (time_t)nTime;
-	dt = localtime(&t);
+	if(!nType)
+		dt = localtime(&t);
+	else
+		dt = gmtime(&t);
 
 	UINT32 nRtn = 0;
 	if(dt)
@@ -307,6 +432,100 @@ UINT32	GetDayOfDay(UINT32 nTime)
 	return nRtn;
 }
 //-------------------------------------------------------------------------
+
+UINT32	GetWeekCntEx(UINT32 nDay, UINT32 nWeek, UINT32 nStartDoW)
+{
+	UINT32 nCurDay = nDay;
+	UINT32 nOneDayWeek = nWeek;
+	while(nCurDay != 1)
+	{
+		nCurDay -= 1;
+		if(nOneDayWeek == 1)	nOneDayWeek = 7;
+		else					nOneDayWeek -= 1;
+	}
+
+	UINT32 nInterval = 0;
+	if (nStartDoW > nOneDayWeek)
+		nInterval = nStartDoW - nOneDayWeek;
+	else if (nStartDoW < nOneDayWeek)
+		nInterval = 7 - (nOneDayWeek - nStartDoW);
+	else
+		nInterval = 0;
+
+	if (nDay <= nInterval) 
+		return 1;
+
+	nOneDayWeek = nStartDoW;
+	nCurDay += nInterval;
+
+	UINT32 nWeekCnt = 1;
+	while(nDay != nCurDay)
+	{
+		nCurDay += 1;
+		if(nOneDayWeek == 7)
+		{
+			nOneDayWeek = 1;
+			nWeekCnt += 1;
+		}
+		else
+		{
+			nOneDayWeek += 1;
+		}
+	}
+	return nWeekCnt;
+}
+//-------------------------------------------------------------------------
+
+UINT32	GetWeekCnt(UINT32 nDay, UINT32 nWeek)
+{
+	UINT32 nCurDay = nDay;
+	UINT32 nOneDayWeek = nWeek;
+	while(nCurDay != 1)
+	{
+		nCurDay -= 1;
+		if(nOneDayWeek == 1)	nOneDayWeek = 7;
+		else					nOneDayWeek -= 1;
+	}
+
+	UINT32 nWeekCnt = 1;
+	while(nDay != nCurDay)
+	{
+		nCurDay += 1;
+		if(nOneDayWeek == 7)
+		{
+			nOneDayWeek = 1;
+			nWeekCnt += 1;
+		}
+		else
+		{
+			nOneDayWeek += 1;
+		}
+	}
+	return nWeekCnt;
+}
+
+UINT32	GetWeekCntToday()
+{
+	time_t t;
+	struct tm *dt = NULL;
+	t = time(NULL);
+	dt = localtime(&t);
+	if(dt == NULL)
+		return 0;
+	return GetWeekCnt((UINT32)dt->tm_mday,(UINT32)dt->tm_wday);
+}
+//-------------------------------------------------------------------------
+
+UINT32	GetWeekCntToday(UINT32 nStartDoW)
+{
+	time_t t;
+	struct tm *dt = NULL;
+	t = time(NULL);
+	dt = localtime(&t);
+	if(dt == NULL)
+		return 0;
+	return GetWeekCntEx((UINT32)dt->tm_mday,(UINT32)dt->tm_wday, nStartDoW);
+}
 
 UINT32	GetDayOfMonth(UINT32 nTime)
 {
@@ -321,6 +540,24 @@ UINT32	GetDayOfMonth(UINT32 nTime)
 	}
 	return nRtn;
 }
+
+UINT32	GetDayOfMonth(UINT32 nTime, UINT32 nType)
+{
+	struct tm *dt;
+	time_t t = (time_t)nTime;
+	if(!nType)
+		dt = localtime(&t);
+	else
+		dt = gmtime(&t);
+
+	UINT32 nRtn = 0;
+	if(dt)
+	{
+		nRtn = dt->tm_mon + 1;
+	}
+	return nRtn;
+}
+
 //-------------------------------------------------------------------------
 
 UINT32			GetCurrentYearMon(UINT32 nTime)
@@ -352,12 +589,25 @@ UINT32			GetDayDiffCurrent(UINT32 nTime)
 
 UINT32	GetCurrentDateTimeInt()
 {
-	time_t t = time(NULL);
-	struct timeb tstruct;
-	ftime(&tstruct);
+	UINT32 dwTime = 0;
+	time_t t = 0;
+	struct tm lt = {0,};
+	time(&t);
+	localtime_r(&t, &lt);
 
-	return UINT32(t + (tstruct.timezone * 60 * -1));
+	dwTime = UINT32(t + lt.tm_gmtoff);
+	return dwTime;
 }
+
+UINT32	GetCurrentTimeZone()
+{
+	time_t t = 0;
+	struct tm lt = {0,};
+	time(&t);
+	localtime_r(&t, &lt);
+	return (UINT32)lt.tm_gmtoff;
+}
+
 
 INT32 GetFileTimeInfo(LPCSTR pcPath, UINT32 *pdwCreateTime, UINT32 *pdwModifyTime, UINT32 *pdwAccessTime)
 {
@@ -425,5 +675,30 @@ LPTSTR			GetDateTimeFmt(UINT32 nTime, OUT LPTSTR lpBuf, INT32 nFormat)
 	}
 	return lpBuf;
 }
+
+
+int uptime()
+{
+	double dStartTime = 0;
+	double dIdletTme = 0;
+	char acBuf[40] = {0,};
+	FILE *fp = NULL;
+	if ((fp = fopen("/proc/uptime", "r")) == NULL)
+	{
+		return -1;
+	}
+
+	if(fgets(acBuf, 36, fp) == NULL)
+	{
+		fclose(fp);
+		return -1;
+	}
+
+	sscanf(acBuf, "%lf %lf", &dStartTime, &dIdletTme);
+	fclose(fp);
+
+	return (int)dStartTime;
+}
+
 //-------------------------------------------------------------------------
 

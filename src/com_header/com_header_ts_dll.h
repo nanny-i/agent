@@ -51,6 +51,7 @@ typedef struct _asi_ts_info
 		nStartTime	= 0;
 		nEndTime	= 0;
 		nChkPeriod	= 0;
+		nMultipleInst = 2;
 	}
 	CHAR	szTaskName[CHAR_MAX_SIZE];
 	CHAR	szProgram[CHAR_MAX_SIZE];
@@ -60,6 +61,7 @@ typedef struct _asi_ts_info
 	UINT32	nStartTime;
 	UINT32	nEndTime;
 	UINT32	nChkPeriod;
+	UINT32	nMultipleInst;
 
 }ASI_TS_INFO, *PASI_TS_INFO;
 //--------------------------------------------------------------------------
@@ -70,6 +72,14 @@ typedef struct _asi_ts_info
 #define ASI_TS_CHECK_PREIOD_TYPE_MONTHLY			3
 #define ASI_TS_CHECK_PREIOD_TYPE_SYSTEM_BOOT		4
 #define ASI_TS_CHECK_PREIOD_TYPE_USER_LOGIN			5
+
+typedef enum _ASI_TS_MULTIPLE_INST_TYPE
+{
+	ASI_TS_MULTIPLE_INST_TYPE_PARALLEL = 0,
+	ASI_TS_MULTIPLE_INST_TYPE_QUEUE,
+	ASI_TS_MULTIPLE_INST_TYPE_IGNORE_NEW,
+	ASI_TS_MULTIPLE_INST_TYPE_STOP_EXISTING,
+}ASI_TS_MULTIPLE_INST_TYPE;
 
 typedef INT32 (*CallBack_TaskInfo)(PVOID lParam, LPCTSTR);
 

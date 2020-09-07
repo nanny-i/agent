@@ -37,6 +37,9 @@ public:
 	void		SetLogSecu(DB_LOG_SECU& dls);
 
 public:
+	void		SendPkt_Sync(INT32 nOnceMaxNum = 1000);
+
+public:
 	CLogicMgrLogSecu();
     ~CLogicMgrLogSecu();
 };

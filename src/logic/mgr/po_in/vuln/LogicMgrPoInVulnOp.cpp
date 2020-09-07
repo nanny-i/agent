@@ -65,8 +65,8 @@ INT32		CLogicMgrPoInVulnOp::AnalyzePkt_FromMgr_Ext()
 
 INT32		CLogicMgrPoInVulnOp::AnalyzePkt_FromMgr_Edit_Ext()
 {
-	PDB_PO_IN_VULN_OP ppcp = NULL;
-	DB_PO_IN_VULN_OP data;
+	PDB_PO_IN_VULN_OP pdata = NULL;
+	DB_PO_IN_VULN_OP data, data_old;
 
 	m_tDPH = &(data.tDPH);
 
@@ -83,11 +83,12 @@ INT32		CLogicMgrPoInVulnOp::AnalyzePkt_FromMgr_Edit_Ext()
 		data.tDPH._add_id(dppp.tDPH.nID);
 	}
 
-	ppcp = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
-	if(ppcp)
+	pdata = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(pdata)
 	{
-		t_ManagePoInVulnOpPkg->ClearItemByPolicyID(ppcp->tDPH.nID);		
-		t_ManagePoInVulnOp->DelPoInVulnOp(ppcp->tDPH.nID);
+		data_old = *pdata;
+		t_ManagePoInVulnOpPkg->ClearItemByPolicyID(pdata->tDPH.nID);		
+		t_ManagePoInVulnOp->DelPoInVulnOp(pdata->tDPH.nID);
 	}
 
 	{
@@ -98,7 +99,7 @@ INT32		CLogicMgrPoInVulnOp::AnalyzePkt_FromMgr_Edit_Ext()
 			{
 				if(t_ManagePoInVulnOpPkg->FindItem(begin->tDPH.nID))
 				{
-					SetDLEA_EC(g_nErrRtn);
+					SetDLEH_EC(g_nErrRtn);
 					WriteLogE("[%s] add policy pkg information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 					continue;
 				}
@@ -109,10 +110,15 @@ INT32		CLogicMgrPoInVulnOp::AnalyzePkt_FromMgr_Edit_Ext()
 
 		if(SetER(t_ManagePoInVulnOp->ApplyPoInVulnOp(data)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
+	}
+
+	if(data_old.tDPIVOPF.strPtnFileName != data.tDPIVOPF.strPtnFileName)
+	{
+		m_nForceApplyPolicy = STATUS_MODE_ON;
 	}
 
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
@@ -131,4 +137,120 @@ INT32		CLogicMgrPoInVulnOp::AnalyzePkt_FromMgr_Edit_Ext()
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrPoInVulnOp::ApplyPolicy()
+{
+	PDB_PO_IN_VULN_OP pdata = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(!pdata)	
+	{
+		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		return 0;
+	}
+
+	{
+		if(pdata->tDPH.nUsedMode != STATUS_USED_MODE_OFF)
+		{
+			if(t_ManagePoInVulnOp->IsValidPtnFile(pdata) == 0 && t_EnvInfoOp->m_nApplyPolicyStatus)
+			{
+				AddDpDownInfo();
+			}
+			else if(m_nForceApplyPolicy)
+			{
+				if(t_LogicMgrPtnVuln->ReloadPtnVuln() == 0)
+				{
+					t_LogicMgrPtnVuln->InitPtnDeploy();
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrPoInVulnOp::CheckRunEnv()
+{
+	PDB_PO_IN_VULN_OP pdata = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(!pdata)	
+	{
+		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		return -1;
+	}
+
+	{
+		if(pdata->tDPH.nUsedMode != STATUS_USED_MODE_OFF && t_ManagePoInVulnOp->IsValidPtnFile(pdata) == 0)
+		{
+			AddDpDownInfo();
+			return -10;
+		}
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrPoInVulnOp::AddDpDownInfo()
+{
+	PDB_PO_SVR_INFO_UDT pdpsiu = (PDB_PO_SVR_INFO_UDT)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_SVR_INFO_UDT);
+	if(!pdpsiu)
+	{
+		WriteLogE("[%s] not find policy svr info udt", m_strLogicName.c_str());
+		return -1;
+	}
+	else if(pdpsiu->strDataSvrInfoList.empty())
+	{
+		WriteLogE("[%s] not exists udt chk svr info list", m_strLogicName.c_str());
+		return -2;
+	}
+
+	PDB_PO_IN_VULN_OP pdata = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
+	if(!pdata)
+	{
+		WriteLogE("[%s] not find current policy info", m_strLogicName.c_str());
+		return -3;
+	}
+
+	String strDnFileName, strDnFileHash;
+	strDnFileName = (pdata->tDPIVOPF.nPtnDnFileType ? pdata->tDPIVOPF.strPtnDnFileName : pdata->tDPIVOPF.strPtnFileSvName);
+	strDnFileHash = (pdata->tDPIVOPF.nPtnDnFileType ? pdata->tDPIVOPF.strPtnDnFileHash : pdata->tDPIVOPF.strPtnFileHash);
+
+	if(strDnFileName.empty() || strDnFileHash.empty())
+	{
+		WriteLogE("[%s] invalid ptn file info [%s][%s]", m_strLogicName.c_str(), strDnFileName.c_str(), strDnFileHash.c_str());
+		return -4;
+	}
+
+	{
+		ASI_FDL_INFO tAFI;
+
+		tAFI.nID = t_EnvInfoOp->GetGlobalID();
+		tAFI.nItemType = SS_DN_FILE_TYPE_VPTN_ASV;
+		tAFI.nItemID = 0;	
+		tAFI.nPolicyID = pdata->tDPH.nID;
+		tAFI.nDLSvrUsedFlag	= (ASIFDL_DL_SVR_TYPE_LOCAL | ASIFDL_DL_SVR_TYPE_PTOP | ASIFDL_DL_SVR_TYPE_SITE);
+
+		strncpy(tAFI.szDLPath, STR_DEPLOY_FILE_HOME_PPTN, MAX_PATH-1);
+
+		{	
+			strncpy(tAFI.szFileName, strDnFileName.c_str(), MAX_PATH-1);
+			strncpy(tAFI.szFileHash, strDnFileHash.c_str(), MAX_PATH-1);
+		}	
+
+		if(t_ManageFileDown->IsExistDnInfo(tAFI.nItemType, tAFI.nPolicyID, tAFI.nItemID))
+		{
+			WriteLogN("already exists po in vuln download : [%d][%d][%s]:[%s]", tAFI.nID, tAFI.nItemID, tAFI.szFileName, pdpsiu->strDataSvrInfoList.c_str());
+			return 0;
+		}
+
+		WriteLogN("start po in vuln download : [%d][%d][%s]:[%s]", tAFI.nID, tAFI.nItemID, tAFI.szFileName, pdpsiu->strDataSvrInfoList.c_str());
+/*
+		t_ASIFDLDLLUtil->SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, pdpsiu->strDataSvrInfoList);
+		t_ASIFDLDLLUtil->AddDLInfo(&tAFI);
+*/
+		SetDLSvrInfo(ASIFDL_DL_SVR_TYPE_SITE, pdpsiu->strDataSvrInfoList.c_str());
+		AddDLInfo(&tAFI);
+		t_ManageFileDown->AddItem(tAFI);
+	}
+	return 0;
+}
 //---------------------------------------------------------------------------

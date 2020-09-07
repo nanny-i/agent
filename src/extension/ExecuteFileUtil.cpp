@@ -313,7 +313,7 @@ INT32		CExecuteFileUtil::ExecuteFile_DpFile()
 
 					if(pdpdfiu->nExeUserType == SS_PO_DEPLOY_FILE_EXE_USER_TYPE_SYSTEM)
 					{
-						if(tFileUtil.FileExists(strTarPath.c_str()) == FALSE || unlink(strTarPath.c_str()))
+						if(tFileUtil.FileExists(strTarPath.c_str()) == FALSE || unlink(strTarPath.c_str()) == 0)
 						{
 							CopyFile(strExeName.c_str(), strTarPath.c_str(), TRUE);
 						}
@@ -474,7 +474,7 @@ INT32		CExecuteFileUtil::ExecuteFile_DpFile()
 					}
 
 					{
-						if(tFileUtil.FileExists(strTarPath.c_str()) == FALSE || unlink(strTarPath.c_str()))
+						if(tFileUtil.FileExists(strTarPath.c_str()) == FALSE || unlink(strTarPath.c_str()) == 0)
 						{
 							CopyFile(strExeName.c_str(), strTarPath.c_str(), TRUE);
 						}

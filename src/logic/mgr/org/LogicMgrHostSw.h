@@ -31,6 +31,7 @@ private:
 
 public:
 	void		SendPkt_HostSw();
+	void		SendPkt_HostSw_Cur();
 
 public:
 	VOID		ASISI_GetSwInfo(PASISI_SW_INFO pasi, INT32 nSize, PVOID lParam);

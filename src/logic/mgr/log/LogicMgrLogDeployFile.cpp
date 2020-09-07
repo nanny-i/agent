@@ -117,6 +117,10 @@ void		CLogicMgrLogDeployFile::SetLogDeployFile(DB_LOG_DEPLOY_FILE& dldf)
 	}	
 
 	{
+		dldf.nUserID = t_ManageHost->GetUserID(t_ManageHost->FirstID());
+	}
+
+	{
 		PDB_ENV_LOG_UNIT pDELEU = t_ManageEnvLogUnit->FindRecordLogDeployFileUnit(&dldf);
 		if(pDELEU && pDELEU->tDPH.nUsedMode == STATUS_USED_MODE_ON)
 		{
@@ -139,10 +143,49 @@ void		CLogicMgrLogDeployFile::SetLogDeployFile(DB_LOG_DEPLOY_FILE& dldf)
 		t_ManageLogDeployFile->SetPkt(&dldf, SendToken);
 		if(!ISSYNCSTEP(dldf.nSyncSvrStep) && !(dldf.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))	
 		{
-			SendData(G_TYPE_LOG_DEPLOY_FILE, G_CODE_COMMON_SYNC, SendToken);
+			SendData_Mgr(G_TYPE_LOG_DEPLOY_FILE, G_CODE_COMMON_SYNC, SendToken);
 		}
 		SendData_Link(G_TYPE_LOG_DEPLOY_FILE, G_CODE_COMMON_SYNC, SendToken);
 		SendToken.Clear();
+	}
+	return;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+void		CLogicMgrLogDeployFile::SendPkt_Sync(INT32 nOnceMaxNum)
+{
+	TListPVOID tSendList;
+	{
+		t_ManageLogDeployFile->SetPktSync(tSendList);
+
+		if(tSendList.empty())	return;
+	}
+
+	INT32 nOnceNum = nOnceMaxNum;
+	INT32 nSendNum = 0;
+
+	TListPVOIDItor begin, end;
+	begin = tSendList.begin();	end = tSendList.end();
+
+	while(nSendNum < tSendList.size())
+	{
+		nOnceNum = (((tSendList.size() - nSendNum) > nOnceMaxNum && nOnceMaxNum > 0) ? nOnceMaxNum : (tSendList.size() - nSendNum));
+
+		SendToken.Clear();
+		SendToken.TokenAdd_32(nOnceNum);
+		for(begin; begin != end && nOnceNum; begin++)
+		{
+			t_ManageLogDeployFile->SetPkt((PDB_LOG_DEPLOY_FILE)(*begin), SendToken);
+
+			nSendNum += 1;
+			nOnceNum -= 1;
+		}
+		SendData_Mgr(G_TYPE_LOG_DEPLOY_FILE, G_CODE_COMMON_SYNC, SendToken);
+		SendToken.Clear();		
 	}
 	return;
 }

@@ -31,8 +31,8 @@ typedef struct _db_env_notify_info
 		nShowSize		= 0;
 		nShowPos		= 0;
 		nMsgFmtType		= 0;
-
 		nNotifyBeforeDay	= 0;
+		nNotifySkipDay		= 0;
 	}
 
 	DB_PO_HEADER		tDPH;
@@ -47,6 +47,9 @@ typedef struct _db_env_notify_info
 	String				strMsgInfo;
 
 	UINT32				nNotifyBeforeDay;
+
+	String				strMatchInfo;
+	UINT32				nNotifySkipDay;
 
 }DB_ENV_NOTIFY_INFO, *PDB_ENV_NOTIFY_INFO;
 

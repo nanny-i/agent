@@ -25,6 +25,7 @@ typedef struct _mem_find_order_info
 	_mem_find_order_info()
 	{
 		nID					= 0;
+		nEvtTime			= 0;
 		nPoType				= 0;
 		nPoID				= 0;
 		nOpType				= 0;
@@ -46,12 +47,44 @@ typedef struct _mem_find_order_info
 		nNextOp		= _nNextOp;
 	}
 
+	void _set_opt(UINT32 nKey, UINT32 nValue)
+	{
+		tOptMap[nKey] = nValue;
+		return;
+	}
+
+	UINT32 _get_opt(UINT32 nKey)
+	{
+		TMapIDItor find = tOptMap.find(nKey);
+		if(find == tOptMap.end())	return 0;
+
+		return find->second;
+	}
+
+	void _set_str_opt(UINT32 nKey, String strValue)
+	{
+		tOptStrMap[nKey] = strValue;
+		return;
+	}
+
+	String _get_str_opt(UINT32 nKey)
+	{
+		TMapIDStrItor find = tOptStrMap.find(nKey);
+		if(find == tOptStrMap.end())	return "";
+
+		return find->second;
+	}
+
 	UINT32			nID;	
+	UINT32			nEvtTime;
 	UINT64			nPoType;
 	UINT32			nPoID;
 	UINT32			nOpType;
 	UINT32			nNextOp;
 	UINT32			nNetDrv;
+
+	TMapID			tOptMap;
+	TMapIDStr		tOptStrMap;
 
 	UINT32			nNotiPg;
 	UINT32			nNotiPgSend;

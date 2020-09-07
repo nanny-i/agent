@@ -86,7 +86,7 @@ INT32	CThreadEvtMon::ChkEvtTime()
 	begin = tEvtMonList.begin();	end = tEvtMonList.end();
 	for(begin; begin != end; begin++)
 	{
-		WriteLogN("[%s] detect over time evt : [%d]:[%d][%s][%d][%d] : %I64u", m_strThreadName.c_str(), begin->nID, begin->nClass, begin->strName.c_str(), begin->nType, begin->nCode, begin->nThreadID);
+		WriteLogN("[%s] detect over time evt : [%d]:[%d][%s][%d][%d] : %llu", m_strThreadName.c_str(), begin->nID, begin->nClass, begin->strName.c_str(), begin->nType, begin->nCode, begin->nThreadID);
 	}
 	return 0;
 }

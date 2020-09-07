@@ -47,6 +47,10 @@ CEnvironmentOp::CEnvironmentOp()
 	m_nSysOffFlag			= 0;
 	m_nSysOffReason			= 0;
 	m_nSysOffTime			= 0;
+	m_nSysLocaleID			= 0;
+
+	m_nInjectFlag			= 0;
+	m_nStopOpBySysOff		= 0;
 
 
 	m_nMgrSvrAuthStatus		= 0;
@@ -88,66 +92,10 @@ String			CEnvironmentOp::GetUserUniCode()
 	String strUserUnicode = "";
 
 	PDB_ENV_SORG_LINK pdesl = t_ManageEnvSOrgLink->FirstItem();
-	if(!pdesl || pdesl->tDPH.nUsedMode != STATUS_USED_MODE_ON)		return strUserUnicode;
+	if(!pdesl || pdesl->tDPH.nUsedMode != STATUS_USED_MODE_ON)
+		return strUserUnicode;
 
-	switch(pdesl->nUserCatchType)
-	{
-		case SS_ENV_SORG_LINK_USER_CATCH_TYPE_COM_NAME:
-			strUserUnicode = GetComputerName();		break;
-		case SS_ENV_SORG_LINK_USER_CATCH_TYPE_REGISTRY:
-		{
-			String strCompInfo = pdesl->strUserCatchValue;
-			HKEY nKey = HKEY_LOCAL_MACHINE;
-			String strCompPath, strCompValue, strCompData, strRegCompData;
-			UINT32 nRegCompData = 0;
-			{
-
-				CTokenString Token(strCompInfo.c_str(), strCompInfo.length(), '/');
-				String strKey = Token.NextToken();
-
-				if(!_stricmp(strKey.c_str(), "HKLM"))
-					nKey = HKEY_LOCAL_MACHINE;
-				else if(!_stricmp(strKey.c_str(),"HKCR"))
-					nKey = HKEY_CLASSES_ROOT;
-				else if(!_stricmp(strKey.c_str(),"HKCU"))
-					nKey = HKEY_CURRENT_USER;
-				else if(!_stricmp(strKey.c_str(),"HKU"))
-					nKey = HKEY_USERS;
-
-				strCompInfo = Token.RemainValue();
-			}
-			{
-				CTokenString Token(strCompInfo.c_str(), strCompInfo.length(), '/', 1);
-				strCompData = Token.NextToken();
-				strCompValue = Token.NextToken();
-				strCompPath = Token.RemainValue();		
-			}
-			
-			CRegUtil tRegUtil;
-			CHAR szRegBuf[CHAR_MAX_SIZE] = {0, };
-			if(tRegUtil.RegReadString(nKey, strCompPath.c_str(), strCompValue.c_str(), szRegBuf))
-			{					
-				break;
-			}
-
-			strUserUnicode = szRegBuf;
-			break;
-		}
-		case SS_ENV_SORG_LINK_USER_CATCH_TYPE_MANAGER:
-		{			
-			PDB_LOCAL_ENV_AUTH pdlea = t_ManageLocalEnvAuth->FirstItem();
-			if(pdlea)
-			{
-				strUserUnicode = pdlea->strUniCode;
-			}
-			break;
-		}
-		case SS_ENV_SORG_LINK_USER_CATCH_TYPE_USER_NAME:
-		{
-			strUserUnicode = t_ManageWinSession.GetLogonUserName();
-			break;
-		}
-	}
+	strUserUnicode = GetComputerName();
 
 	return strUserUnicode;
 }
@@ -163,7 +111,7 @@ INT32			CEnvironmentOp::SetSysBootChkMode(UINT32 nChkType, UINT32 nBootTime)
 {
 	if(!nBootTime)
 	{
-		nBootTime = (GetCurrentDateTimeInt() - (GetTickCount() / 1000));
+		nBootTime = uptime();
 	}
 
 	if(!nChkType)	
@@ -174,8 +122,8 @@ INT32			CEnvironmentOp::SetSysBootChkMode(UINT32 nChkType, UINT32 nBootTime)
 
 	if(t_EnvInfo->GetReg_DbgEnv_SysBoot() == 0)
 	{
-		WriteLogN("system boot check info : [%d][%d]:[%d]", GetCurrentDateTimeInt(), nBootTime, GetCurrentDateTimeInt() - nBootTime);
-		if(abs(INT32(GetCurrentDateTimeInt() - nBootTime)) > TIMER_INTERVAL_TIME_MIN*5)
+		WriteLogN("system boot check info : [%d]:[%d]", GetCurrentDateTimeInt(), nBootTime);
+		if(nBootTime > TIMER_INTERVAL_TIME_SYS_BOOT)
 		{
 			m_nSysBootMode = 0;
 			return 0;
@@ -194,14 +142,24 @@ INT32			CEnvironmentOp::SetSysBootChkMode(UINT32 nChkType, UINT32 nBootTime)
 
 INT32			CEnvironmentOp::SetSysBootMode(UINT32 nSysBootMode)
 {
+	UINT32 dwUpTime = uptime();
 	m_nSysBootMode = nSysBootMode;
 	if(m_nSysBootMode)
 	{
-		t_EnvInfo->SetReg_BootChkTime(GetCurrentDateTimeInt());
+		t_EnvInfo->SetReg_BootChkTime(dwUpTime);
 		t_EnvInfo->SetReg_LastOffInfo(ASI_BOOT_TYPE_NORMAL);
 	}
 	return m_nSysBootMode;
 }
+
+INT32			CEnvironmentOp::IsSysBootTime()
+{
+	INT32 nBootTime = uptime();
+	if(nBootTime > TIMER_INTERVAL_TIME_SYS_BOOT)
+		return 0;
+	return 1;
+}
+
 //---------------------------------------------------------------------------
 
 INT32			CEnvironmentOp::SetSysOffMode(UINT32 nLogOffMode, UINT32 nFlag, DWORD dwReason)

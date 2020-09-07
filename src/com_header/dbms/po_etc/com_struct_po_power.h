@@ -24,9 +24,11 @@ typedef struct _db_po_power
 {
 	_db_po_power()
 	{
+		nFastBoot		= 0;
 	}
 
 	DB_PO_HEADER		tDPH;
+	UINT32				nFastBoot;
 
 }DB_PO_POWER, *PDB_PO_POWER;
 

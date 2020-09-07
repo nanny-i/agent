@@ -101,7 +101,7 @@ INT32		CLogicMgrEnvTrustSubject::AnalyzePkt_FromMgr_Edit_Ext()
 		{
 			if(t_ManageEnvTrustSubject->ApplyEnvTrustSubject(*begin))
 			{
-				SetDLEA_EC(g_nErrRtn);
+				SetDLEH_EC(g_nErrRtn);
 				WriteLogE("[%s] apply policy unit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 				continue;
 			}

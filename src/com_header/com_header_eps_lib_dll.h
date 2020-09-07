@@ -205,6 +205,9 @@ typedef uint64_t	DDWORD;
 #define		ASI_EPS_APP_LOG_TYPE_DOC					2
 #define		ASI_EPS_APP_LOG_TYPE_SITE_FILE				3
 #define		ASI_EPS_APP_LOG_TYPE_PO_IN_PTN_EX_TRUST		4
+#define		ASI_EPS_APP_LOG_TYPE_DEVICE					5
+#define		ASI_EPS_APP_LOG_TYPE_RS						6
+#define		ASI_EPS_APP_LOG_TYPE_RS_BK					7
 
 //------------------------------------------------------------------------
 

@@ -167,9 +167,29 @@ void		CLogicMgrHostSys::SendPkt_Edit()
 SEND_PKT:
 	SendToken.Clear();
 	t_ManageHostSys->SetPkt(&dhs, SendToken);
-	SendData(G_TYPE_HOST_SYS, G_CODE_COMMON_EDIT, SendToken);
+	SendData_Mgr(G_TYPE_HOST_SYS, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
 
 	return;
 }
 //---------------------------------------------------------------------------
+void		CLogicMgrHostSys::SendPkt_SysInfo()
+{
+	INT32 nSendPkt = 1;	
+	DB_HOST_SYS dhs;
+
+	{
+		CSystemInfo tSystemInfo;
+		dhs.nOsID	= tSystemInfo.GetSystemID();
+		dhs.nOsSP	= tSystemInfo.GetSPID();
+		dhs.nOsPa	= tSystemInfo.GetSystemPaType();
+		dhs.nOsPd	= tSystemInfo.GetSystemPdType();
+	}
+
+	SendToken.Clear();
+	t_ManageHostSys->SetPkt(&dhs, SendToken);
+	SendData_Mgr(G_TYPE_HOST_SYS, G_CODE_COMMON_EDIT, SendToken);
+	SendToken.Clear();
+
+	return;
+}

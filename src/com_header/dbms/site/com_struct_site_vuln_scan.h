@@ -31,17 +31,17 @@ typedef struct _db_site_vuln_scan
 		nAdminID		= 0;
 		nExtOption		= 0;
 
-		nOsType			= ASI_SYSTEM_TYPE_ALL;
-		nOsID			= ASI_SYSTEM_ID_ALL;
-		nOsPa			= ASI_SYSTEM_ARCH_ALL;	
-
-		nSVulnID		= 0;
-		nSVulnSubID		= 0;
+		nVulnID			= 0;
+		nVulnSubID		= 0;
 		nScanOrder		= 0;
+
+		nSysType		= 0;
+		nSysSPType		= 0;
+		nSysArchType	= 0;
 
 		nScanType		= SS_SITE_VULN_TYPE_NONE;		
 		nCustomID		= SS_SITE_VULN_CUSTOM_ID_NONE;
-		
+
 		nValueType		= SS_SITE_VULN_VALUE_TYPE_UNKNOWN;
 		nCompType		= SS_SITE_VULN_COMPARE_TYPE_UNKNOWN;
 		nDecisionType	= SS_SITE_VULN_DECISION_CRITERIA_AND;
@@ -55,16 +55,15 @@ typedef struct _db_site_vuln_scan
 	UINT32			nExtOption;
 
 	String			strName;
-	String			strDescr;
 
-	UINT32			nOsType;		// ASI_SYSTEM_TYPE_XXXX
-	UINT64			nOsID;			// ASI_SYSTEM_ID_XXXX	
-	UINT32			nOsPa;			// ASI_SYSTEM_ARCH_XXXX	
-
-	UINT32			nSVulnID;
-	UINT32			nSVulnSubID;
+	UINT32			nVulnID;
+	UINT32			nVulnSubID;
 	UINT32			nScanOrder;
-	
+
+	UINT64			nSysType;
+	UINT32			nSysSPType;
+	UINT32			nSysArchType;
+
 	UINT32			nScanType;		// SS_SITE_VULN_TYPE_XXXX
 	UINT32			nCustomID;		// SS_SITE_VULN_CUSTOM_ID_XXXX
 
@@ -73,37 +72,6 @@ typedef struct _db_site_vuln_scan
 	UINT32			nDecisionType;	// SS_SITE_VULN_DECISION_CRITERIA_XXXX
 	UINT32			nCompType;		// SS_SITE_VULN_COMPARE_TYPE_XXXX
 	String			strCompValue;	
-
-	void CopyTo(_mem_site_vuln_scan_dll &rhs)
-	{
-		rhs.nID				= nID;
-		rhs.nUsedFlag		= nUsedFlag;
-		rhs.nRegDate		= nRegDate;
-		rhs.nUsedMode		= nUsedMode;
-		rhs.nAdminID		= nAdminID;
-		rhs.nExtOption		= nExtOption;
-
-		rhs.strName			= strName;
-		rhs.strDescr		= strDescr;
-
-		rhs.nOsType			= nOsType;
-		rhs.nOsID			= nOsID;
-		rhs.nOsPa			= nOsPa;	
-
-		rhs.nSVulnID		= nSVulnID;
-		rhs.nSVulnSubID		= nSVulnSubID;
-		rhs.nScanOrder		= nScanOrder;
-
-		rhs.nScanType		= nScanType;		
-		rhs.nCustomID		= nCustomID;
-
-		rhs.strScanPath		= strScanPath;
-		rhs.nValueType		= nValueType;
-		rhs.nCompType		= nCompType;
-		rhs.nDecisionType	= nDecisionType;
-		rhs.strCompValue	= strCompValue;
-	}
-
 }DB_SITE_VULN_SCAN, *PDB_SITE_VULN_SCAN;
 
 

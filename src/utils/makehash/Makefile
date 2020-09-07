@@ -7,10 +7,9 @@ OBJ = $(CPPFILES:.cpp=.o)
 
 
 all:
-	rm -f $(OBJ)
-	rm -f makehash
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 	make build
+
 clean:
 	rm -f $(OBJ)
 	rm -f makehash

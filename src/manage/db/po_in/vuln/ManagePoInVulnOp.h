@@ -42,10 +42,17 @@ public:
 	String					GetName(UINT32 nID);    
 
 public:
+	INT32					IsValidPtnFile(UINT32 nID); 
+	INT32					IsValidPtnFile(PDB_PO_IN_VULN_OP pdata);
+
+public:
 	INT32					SetPkt(MemToken& SendToken);
 	INT32					SetPkt(UINT32 nID, MemToken& SendToken);
-	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
 	INT32					SetPkt(PDB_PO_IN_VULN_OP pdata, MemToken& SendToken);
+
+	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
+	INT32					SetPktHost(PDB_PO_IN_VULN_OP pdata, MemToken& SendToken);
+
 	INT32					GetPkt(MemToken& RecvToken, DB_PO_IN_VULN_OP& data);
 
 public:

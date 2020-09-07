@@ -86,7 +86,7 @@ INT32			CDBMgrPoDeployFileTarUnit::InsertPoDeployFileTarUnit(DB_PO_DEPLOY_FILE_T
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
 						", sys_mode, sys_info"
 						") VALUES (%s"
-                        ", '%I64u', '%I64u'"
+                        ", '%llu', '%llu'"
 						");",
                         GetPoHDRQuery_InsertValue(tDPH).c_str(), 
 						dpdfcu.nSysMode, dpdfcu.nSysInfo);
@@ -105,7 +105,7 @@ INT32			CDBMgrPoDeployFileTarUnit::UpdatePoDeployFileTarUnit(DB_PO_DEPLOY_FILE_T
 	DB_PO_HEADER& tDPH = dpdfcu.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_deploy_file_tar_unit SET %s"
-						", sys_mode='%I64u', sys_info='%I64u'"
+						", sys_mode='%llu', sys_info='%llu'"
 						"WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(), 
 						dpdfcu.nSysMode, dpdfcu.nSysInfo,

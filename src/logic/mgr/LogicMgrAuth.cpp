@@ -213,7 +213,7 @@ void		CLogicMgrAuth::SendAuthLogin()
 	SendToken.TokenAdd_String(t_EnvInfo->m_strHostKey);
 	SendToken.TokenAdd_String(strCurIP);
 
-	SendData(AM_TYPE_AUTH, AM_CODE_AUTH_LOGIN, SendToken);
+	SendData_Mgr(AM_TYPE_AUTH, AM_CODE_AUTH_LOGIN, SendToken);
 
 	return;
 }
@@ -224,7 +224,7 @@ void		CLogicMgrAuth::SendMgrInitData()
 	SendToken.Clear();
 
 	{
-		t_LogicMgrHost->SendPkt_Edit();
+		t_LogicMgrHost->SendPkt_InIt();
 		t_LogicMgrHostSys->SendPkt_Edit();
 		t_LogicMgrHostHw->SendPkt_HostHw();
 		t_LogicMgrHostSw->SendPkt_HostSw();
@@ -233,75 +233,92 @@ void		CLogicMgrAuth::SendMgrInitData()
 	}
 
 	{
+		if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NPMS, 0, 0))
+		{			
+			t_LogicMgrHostPatch->ScanPatchList();
+		}
+
+		if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_VULN_OP, 0))
+		{
+			if(!t_ManageHostVulnRst->SetPktSync(SendToken))	  SendData_Mgr(G_TYPE_HOST_VULN_RST, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+		}
+	}
+
+	{
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvLicense->GetHash());
 
-			SendData(G_TYPE_ENV_LICENSE, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_LICENSE, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvLog->GetHash());
 
-			SendData(G_TYPE_ENV_LOG, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_LOG, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvLogUnit->GetHash());
 
-			SendData(G_TYPE_ENV_LOG_UNIT, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_LOG_UNIT, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvNotifyInfo->GetHash());
 
-			SendData(G_TYPE_ENV_NOTIFY_INFO, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_NOTIFY_INFO, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvSelfProtectAgt->GetHash());
 
-			SendData(G_TYPE_ENV_SELF_PROTECT_AGT, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_SELF_PROTECT_AGT, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvTrustSubject->GetHash());
 
-			SendData(G_TYPE_ENV_TRUST_SUBJECT, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_TRUST_SUBJECT, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 
 		{		
 			SendToken.TokenAdd_String(t_ManageEnvSOrgLink->GetHash());
 
-			SendData(G_TYPE_ENV_SORG_LINK, G_CODE_COMMON_HASH, SendToken);
+			SendData_Mgr(G_TYPE_ENV_SORG_LINK, G_CODE_COMMON_HASH, SendToken);
+			SendToken.Clear();
+		}
+
+		{		
+			SendToken.TokenAdd_String(t_ManageEnvSocket->GetHash());
+
+			SendData_Mgr(G_TYPE_ENV_SOCKET, G_CODE_COMMON_HASH, SendToken);
 			SendToken.Clear();
 		}
 
 		{
 			{
 				SendToken.TokenAdd_String(t_ManageSiteVuln->GetHash());
-				SendData(G_TYPE_SITE_VULN, G_CODE_COMMON_HASH, SendToken);
+				SendData_Mgr(G_TYPE_SITE_VULN, G_CODE_COMMON_HASH, SendToken);
 				SendToken.Clear();
 			}
 			{
 				SendToken.TokenAdd_String(t_ManageSiteVulnScan->GetHash());
-				SendData(G_TYPE_SITE_VULN_SCAN, G_CODE_COMMON_HASH, SendToken);
+				SendData_Mgr(G_TYPE_SITE_VULN_SCAN, G_CODE_COMMON_HASH, SendToken);
 				SendToken.Clear();
 			}
-			{
-				SendToken.TokenAdd_String(t_ManageSiteVulnRepair->GetHash());
-				SendData(G_TYPE_SITE_VULN_REPAIR, G_CODE_COMMON_HASH, SendToken);
-				SendToken.Clear();
-			}
-			{
-				SendToken.TokenAdd_String(t_ManageSiteVulnLock->GetHash());
-				SendData(G_TYPE_SITE_VULN_LOCK, G_CODE_COMMON_HASH, SendToken);
-				SendToken.Clear();
-			}
+		}
+
+		{		
+			SendToken.TokenAdd_String(t_ManagePoInDevOInfo->GetHash());
+
+			SendData_Mgr(G_TYPE_PO_DV_INFO, G_CODE_COMMON_HASH, SendToken);
+			SendToken.Clear();
 		}
 	}
 
@@ -312,7 +329,7 @@ void		CLogicMgrAuth::SendMgrInitData()
 	
 	// send last echo pkt
 	SendToken.TokenAdd_32(1);
-	SendData(AM_TYPE_AUTH, AM_CODE_AUTH_LAST, SendToken);	
+	SendData_Mgr(AM_TYPE_AUTH, AM_CODE_AUTH_LAST, SendToken);	
 	return;
 }
 //---------------------------------------------------------------------------
@@ -324,7 +341,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 
 	{
 		t_ManageUser->SetPktMgr(SendToken);
-		SendData(G_TYPE_USER, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_USER, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -333,7 +350,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_HOST_RM_INFO, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_HOST_RM_INFO, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -342,7 +359,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_HOST_RUN, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_HOST_RUN, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -363,7 +380,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		SendToken.TokenAdd_32(tCurPolicy.tDPH.nID);
 		SendToken.TokenAdd_32(tCurPolicy.tDPH.nSeqNo);
 
-		SendData(G_TYPE_PO_SVR_INFO_LGN, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_SVR_INFO_LGN, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -376,7 +393,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		SendToken.TokenAdd_32(tCurPolicy.tDPH.nID);
 		SendToken.TokenAdd_32(tCurPolicy.tDPH.nSeqNo);
 
-		SendData(G_TYPE_PO_SVR_INFO_UDT, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_SVR_INFO_UDT, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	//-----------------------------------------------------------------------------------
@@ -387,7 +404,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_CTL_PROC, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_CTL_PROC, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -396,7 +413,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_SELF_PROTECT, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_SELF_PROTECT, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	//-----------------------------------------------------------------------------------
@@ -407,7 +424,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_POWER, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_POWER, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -416,7 +433,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_WIN_RUN, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_WIN_RUN, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -425,7 +442,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_DEPLOY_FILE, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_DEPLOY_FILE, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -434,7 +451,20 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_CTL_PANEL, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_CTL_PANEL, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+
+	{
+		PDB_PO_HOST_NOTIFY pCurPolicy = (PDB_PO_HOST_NOTIFY)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_HOST_NOTIFY);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_HOST_NOTIFY, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	//-----------------------------------------------------------------------------------
@@ -445,7 +475,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FA_OP, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FA_OP, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -454,7 +484,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FA_CLEAR, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FA_CLEAR, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -463,7 +493,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FA_ENV, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FA_ENV, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -472,7 +502,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FA_PROC, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FA_PROC, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -481,7 +511,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FA_BK, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FA_BK, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -490,7 +520,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FA_NOTIFY, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FA_NOTIFY, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	//-----------------------------------------------------------------------------------
@@ -501,7 +531,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_PTN_OP, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_PTN_OP, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	
@@ -510,7 +540,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_PTN_LO, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_PTN_LO, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -519,7 +549,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_PTN_BL, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_PTN_BL, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -528,7 +558,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_PTN_WL, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_PTN_WL, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -537,7 +567,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_EXCLUDE, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_EXCLUDE, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -546,7 +576,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_NOTIFY, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_NOTIFY, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -555,7 +585,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_FE_SINGLE_PTN, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_FE_SINGLE_PTN, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	//-----------------------------------------------------------------------------------
@@ -565,7 +595,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_PTN_OP, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_OP, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -574,7 +604,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_PTN_BL, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_BL, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -583,7 +613,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_PTN_WL, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_WL, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -592,7 +622,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_PTN_EX, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_EX, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -601,7 +631,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_PTN_SP, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_SP, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -609,7 +639,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		String strHash = t_ManagePoInPtnSPRule->GetHash();		
 		SendToken.TokenAdd_String(strHash);
 
-		SendData(G_TYPE_PO_IN_PTN_SP_RULE, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_SP_RULE, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -618,7 +648,7 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_PTN_NO, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_PTN_NO, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 
@@ -626,44 +656,68 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
+// 	{
+// 		PDB_PO_IN_AC_DOC pCurPolicy = (PDB_PO_IN_AC_DOC)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_DOC);
+// 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+// 		else			SendToken.TokenAdd_String("empty");
+// 
+// 		SendData_Mgr(G_TYPE_PO_IN_AC_DOC, G_CODE_COMMON_HASH, SendToken);
+// 		SendToken.Clear();
+// 	}
+// 
+// 	{
+// 		PDB_PO_IN_AC_SF pCurPolicy = (PDB_PO_IN_AC_SF)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_SF);
+// 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+// 		else			SendToken.TokenAdd_String("empty");
+// 
+// 		SendData_Mgr(G_TYPE_PO_IN_AC_SF, G_CODE_COMMON_HASH, SendToken);
+// 		SendToken.Clear();
+// 	}
+// 
+// 	{
+// 		PDB_PO_IN_AC_FILE pCurPolicy = (PDB_PO_IN_AC_FILE)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_FILE);
+// 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+// 		else			SendToken.TokenAdd_String("empty");
+// 
+// 		SendData_Mgr(G_TYPE_PO_IN_AC_FILE, G_CODE_COMMON_HASH, SendToken);
+// 		SendToken.Clear();
+// 	}
+
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+
 	{
-		PDB_PO_IN_AC_DOC pCurPolicy = (PDB_PO_IN_AC_DOC)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_DOC);
+		PDB_PO_IN_VULN_AX pCurPolicy = (PDB_PO_IN_VULN_AX)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_AX);
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_AC_DOC, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_VULN_AX, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
-
 	{
-		PDB_PO_IN_AC_SF pCurPolicy = (PDB_PO_IN_AC_SF)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_SF);
+		PDB_PO_IN_VULN_EDIT_APP pCurPolicy = (PDB_PO_IN_VULN_EDIT_APP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_EDIT_APP);
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_AC_SF, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_VULN_EDIT_APP, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
-
-	{
-		PDB_PO_IN_AC_FILE pCurPolicy = (PDB_PO_IN_AC_FILE)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_FILE);
-		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
-		else			SendToken.TokenAdd_String("empty");
-
-		SendData(G_TYPE_PO_IN_AC_FILE, G_CODE_COMMON_HASH, SendToken);
-		SendToken.Clear();
-	}
-
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-
 	{
 		PDB_PO_IN_VULN_OP pCurPolicy = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_OP);
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_VULN_OP, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_VULN_OP, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_VULN_QNA pCurPolicy = (PDB_PO_IN_VULN_QNA)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_QNA);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_VULN_QNA, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
 	{
@@ -671,32 +725,227 @@ void		CLogicMgrAuth::SendMgrInitData_Polcy()
 		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
 		else			SendToken.TokenAdd_String("empty");
 
-		SendData(G_TYPE_PO_IN_VULN_SCAN, G_CODE_COMMON_HASH, SendToken);
+		SendData_Mgr(G_TYPE_PO_IN_VULN_SCAN, G_CODE_COMMON_HASH, SendToken);
 		SendToken.Clear();
 	}
+	{
+		PDB_PO_IN_VULN_SECU_USB pCurPolicy = (PDB_PO_IN_VULN_SECU_USB)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_SECU_USB);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_VULN_SECU_USB, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_VULN_SW pCurPolicy = (PDB_PO_IN_VULN_SW)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_SW);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_VULN_SW, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_VULN_PATCH_EXCEPTION pCurPolicy = (PDB_PO_IN_VULN_PATCH_EXCEPTION)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_PATCH_EXCEPTION);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_VULN_PATCH_EXCEPTION, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+
+	{
+		PDB_PO_IN_RS_OP pCurPolicy = (PDB_PO_IN_RS_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_OP);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_RS_OP, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_RS_BK pCurPolicy = (PDB_PO_IN_RS_BK)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_BK);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_RS_BK, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_RS_NO pCurPolicy = (PDB_PO_IN_RS_NO)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_NO);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_IN_RS_NO, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	{
+		PDB_PO_IN_DEVO_OP pCurPolicy = (PDB_PO_IN_DEVO_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_OP);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_DV_OP, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_DEVO_BL pCurPolicy = (PDB_PO_IN_DEVO_BL)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_BL);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_DV_BL, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_DEVO_WL pCurPolicy = (PDB_PO_IN_DEVO_WL)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_WL);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_DV_WL, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_DEVO_EX pCurPolicy = (PDB_PO_IN_DEVO_EX)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_EX);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_DV_EX, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_IN_DEVO_NOTIFY pCurPolicy = (PDB_PO_IN_DEVO_NOTIFY)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_NOTIFY);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_DV_NOTIFY, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+
+	{
+		PDB_PO_PM_OP pCurPolicy = (PDB_PO_PM_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_OP);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_PM_OP, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_PM_DM pCurPolicy = (PDB_PO_PM_DM)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_DM);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_PM_DM, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_PM_SCAN pCurPolicy = (PDB_PO_PM_SCAN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_SCAN);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_PM_SCAN, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_PM_EX pCurPolicy = (PDB_PO_PM_EX)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_EX);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_PM_EX, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+	{
+		PDB_PO_PM_NO pCurPolicy = (PDB_PO_PM_NO)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_NO);
+		if(pCurPolicy)	SendToken.TokenAdd_String(pCurPolicy->tDPH.strHash);
+		else			SendToken.TokenAdd_String("empty");
+
+		SendData_Mgr(G_TYPE_PO_PM_NO, G_CODE_COMMON_HASH, SendToken);
+		SendToken.Clear();
+	}
+}
+
+
+
+void		CLogicMgrAuth::SendMgrInitData_Sync()
+{
+	SendToken.Clear();
+	//-----------------------------------------------------------------------------------
 
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	
+// 	{
+// 		if(!t_ManageLogSecu->SetPkt(SendToken))			SendData_Mgr(G_TYPE_LOG_SECU, G_CODE_COMMON_SYNC, SendToken);
+// 		SendToken.Clear();
+// 	}
+// 
+// 	{
+// 		if(!t_ManageLogDoc->SetPkt(SendToken))			SendData_Mgr(G_TYPE_LOG_DOC, G_CODE_COMMON_SYNC, SendToken);
+// 		SendToken.Clear();
+// 	}
+// 
+// 	{
+// 		if(!t_ManageLogDeployFile->SetPkt(SendToken))	SendData_Mgr(G_TYPE_LOG_DEPLOY_FILE, G_CODE_COMMON_SYNC, SendToken);
+// 		SendToken.Clear();
+// 	}
+// 
+// 	{
+// 		if(!t_ManageLogEvent->SetPktSync(SendToken))	SendData_Mgr(G_TYPE_LOG_EVENT_HOST, G_CODE_COMMON_SYNC, SendToken);
+// 		SendToken.Clear();
+// 	}
+// 
+// 	{
+// 		if(!t_ManageLogDevice->SetPkt(SendToken))	SendData_Mgr(G_TYPE_LOG_DEVICE, G_CODE_COMMON_SYNC, SendToken);
+// 		SendToken.Clear();
+// 	}
+
+	INT32 nOncePktNum = 1000;
+	PDB_PO_HOST_RUN pCurPolicy = (PDB_PO_HOST_RUN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_HOST_RUN);
+	if(pCurPolicy)
 	{
-		if(!t_ManageLogSecu->SetPkt(SendToken))			SendData(G_TYPE_LOG_SECU, G_CODE_COMMON_SYNC, SendToken);
+		nOncePktNum = pCurPolicy->nOncePktNum;
+	}
+	WriteLogN("[%s] sync data once pkt num : [%d]", m_strLogicName.c_str(), nOncePktNum);
+
+	{
+		t_LogicMgrLogSecu->SendPkt_Sync(nOncePktNum);
+		SendToken.Clear();
+	}
+	{
+		t_LogicMgrLogDoc->SendPkt_Sync(nOncePktNum);
+		SendToken.Clear();
+	}
+	{
+		t_LogicMgrLogDeployFile->SendPkt_Sync(nOncePktNum);
+		SendToken.Clear();
+	}
+	{
+		t_LogicMgrLogEvent->SendPkt_Sync(nOncePktNum);
+		SendToken.Clear();
+	}
+	{
+		t_LogicMgrLogDevice->SendPkt_Sync(nOncePktNum);
 		SendToken.Clear();
 	}
 
 	{
-		if(!t_ManageLogDoc->SetPkt(SendToken))			SendData(G_TYPE_LOG_DOC, G_CODE_COMMON_SYNC, SendToken);
+		t_LogicMgrSiteFile->SendPkt_Sync(nOncePktNum);
 		SendToken.Clear();
 	}
 
 	{
-		if(!t_ManageLogDeployFile->SetPkt(SendToken))	SendData(G_TYPE_LOG_DEPLOY_FILE, G_CODE_COMMON_SYNC, SendToken);
-		SendToken.Clear();
-	}
-
-	{
-		t_LogicMgrSiteFile->SendPkt_Sync();
+		t_LogicMgrPoInPtnSPRule->SendPkt_Sync(nOncePktNum);
 		SendToken.Clear();
 	}
 	//-----------------------------------------------------------------------------------

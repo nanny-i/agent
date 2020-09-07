@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2020-2025 ASHINi corp. 
- * 
- * This library is free software; you can redistribute it and/or 
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
- * version 2.1 of the License, or (at your option) any later version. 
- * 
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * Lesser General Public License for more details. 
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this library; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
- * 
- */
-
 
 #ifndef COM_DEFINE_DB_ENV_ADMIN_ENV_H_938EF200_F60B_452A_BD30_A10E8507EDCC
 #define COM_DEFINE_DB_ENV_ADMIN_ENV_H_938EF200_F60B_452A_BD30_A10E8507EDCC
@@ -50,6 +31,7 @@
 #define SS_ENV_ADMIN_ENV_DY_COL_USER_CO_EMAIL			0x0100000000000020
 #define SS_ENV_ADMIN_ENV_DY_COL_USER_HPHONE				0x0100000000000040
 #define SS_ENV_ADMIN_ENV_DY_COL_USER_ACCOUNT_ID			0x0100000000000080
+#define SS_ENV_ADMIN_ENV_DY_COL_USER_SRC_GROUP			0x0100000000000100
 
 #define SS_ENV_ADMIN_ENV_DY_COL_PO_STATUS_FAO_DRV		0x0200000000000001
 #define SS_ENV_ADMIN_ENV_DY_COL_PO_STATUS_FAC_UNIT		0x0200000000000002
@@ -74,5 +56,22 @@
 
 #define SS_ENV_ADMIN_ENV_HOST_SHOW_TYPE_ALL					0x00000001
 
+
+//-------------------------------------------------------------------
+
+enum _admin_env_col_order_view_id
+{
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_ORG_HOST_NORMAL = 1,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_DEPLOY_FILE,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_DEVICE,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_DOC,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_EVT,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_EVT_HOST,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_PATCH,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_RS,
+	SS_ENV_ADMIN_ENV_COL_ORDER_VIEW_ID_LOG_SECU,
+};
+
+//-------------------------------------------------------------------
 
 #endif	//COM_DEFINE_DB_ENV_ADMIN_ENV_H_938EF200_F60B_452A_BD30_A10E8507EDCC

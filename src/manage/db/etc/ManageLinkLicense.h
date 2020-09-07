@@ -47,6 +47,7 @@ public:
 	UINT32					GetNextSID();
 	UINT32					DelSID(UINT32 nSID);
 	UINT32					GetSIDList(TListID& tIDList);
+	UINT32					GetSIDCount();
 	
 public:
 	INT32					SetPkt(MemToken& SendToken);

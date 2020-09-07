@@ -46,10 +46,10 @@ public:
 
 public:
 	INT32					IsRecordLogEvt(PDB_LOG_EVENT pdle, DB_ENV_LOG_UNIT& deleu);
-	INT32					IsRecordLogStatus(PDB_LOG_STATUS pdlst, DB_ENV_LOG_UNIT& deleu);
 	INT32					IsRecordLogDoc(PDB_LOG_DOC pdld, DB_ENV_LOG_UNIT& deleu);
 	INT32					IsRecordLogSecu(PDB_LOG_SECU pdls, DB_ENV_LOG_UNIT& deleu);
 	INT32					IsRecordLogDeployFile(PDB_LOG_DEPLOY_FILE pdldf, DB_ENV_LOG_UNIT& deleu);
+	INT32					IsRecordLogPatch(PDB_LOG_PATCH pdlp, DB_ENV_LOG_UNIT& deleu);
 
 public:
 	INT32					SetPkt(MemToken& SendToken);

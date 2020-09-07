@@ -55,6 +55,7 @@ INT32			CDBMgrPoHostRun::LoadDB(TListDBPoHostRun& tDBPoHostRunList)
     m_strQuery = SPrintf(DBMS_POLICY_QUERY_HDR_SELECT
 						", run_option, rm_log_day, lgn_con_period, mgr_show_type, show_log_day, boot_chk_type"
 						", integrity_mode, cross_auth_mode "
+						", once_pkt_num"
 						" FROM po_host_run WHERE used_flag=1;");
     if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -74,6 +75,7 @@ INT32			CDBMgrPoHostRun::LoadDB(TListDBPoHostRun& tDBPoHostRunList)
 		dphr.nBootChkType			= GetDBField_UInt(nIndex++);
 		dphr.nIntegrityMode			= GetDBField_UInt(nIndex++);
 		dphr.nCrossAuthMode			= GetDBField_UInt(nIndex++);
+		dphr.nOncePktNum			= GetDBField_UInt(nIndex++);
         
         tDBPoHostRunList.push_back(dphr);
         if(m_nLoadMaxID < UINT32(tDPH.nID))
@@ -94,12 +96,16 @@ INT32			CDBMgrPoHostRun::InsertPoHostRun(DB_PO_HOST_RUN& dphr)
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
 						", run_option, rm_log_day, lgn_con_period, mgr_show_type, show_log_day, boot_chk_type"
 						", integrity_mode, cross_auth_mode "
+						", once_pkt_num"
 						") VALUES (%s"
                         ", %u, %u, %u, %u, %u, %u"
-						", %u, %u);",
+						", %u, %u"
+						", %u"
+						");",
                         GetPoHDRQuery_InsertValue(tDPH).c_str(), 
 						dphr.nRunOption, dphr.nRmLogDay, dphr.nLgnConPeriod, dphr.nMgrShowType, dphr.nShowLogDay, dphr.nBootChkType, 
-						dphr.nIntegrityMode, dphr.nCrossAuthMode);
+						dphr.nIntegrityMode, dphr.nCrossAuthMode,
+						dphr.nOncePktNum);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -118,11 +124,13 @@ INT32			CDBMgrPoHostRun::UpdatePoHostRun(DB_PO_HOST_RUN& dphr)
 						", run_option=%u, rm_log_day=%u, lgn_con_period=%u, mgr_show_type=%u"
 						", show_log_day=%u, boot_chk_type=%u"
 						", integrity_mode=%u, cross_auth_mode=%u "
+						", once_pkt_num=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(), 
 						dphr.nRunOption, dphr.nRmLogDay, dphr.nLgnConPeriod, dphr.nMgrShowType, 
 						dphr.nShowLogDay, dphr.nBootChkType,
 						dphr.nIntegrityMode, dphr.nCrossAuthMode,
+						dphr.nOncePktNum,
                         tDPH.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

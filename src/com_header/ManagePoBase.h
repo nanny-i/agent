@@ -17,7 +17,10 @@
  * 
  */
 
-#pragma once
+#ifndef _MANAGE_PO_BASE_H__
+
+#define _MANAGE_PO_BASE_H__
+
 
 //-------------------------------------------------------------------------
 typedef struct _mem_mb_edit_data
@@ -42,6 +45,19 @@ typedef struct _mem_mb_edit_data
 
 		return find->second;
 	}
+	void _set_string(UINT32 nIdx, String _strValue)
+	{
+		tStrMap[nIdx] = _strValue;
+		return;
+	}
+
+	String _get_string(UINT32 nIdx)
+	{
+		TMapIDStrItor find = tStrMap.find(nIdx);
+		if(find == tStrMap.end())		return "";
+
+		return find->second;
+	}
 	union
 	{
 		UINT32 nID;
@@ -53,8 +69,9 @@ typedef struct _mem_mb_edit_data
 		UINT32 nSubID;
 		UINT32 nPkgID;
 	};
-	UINT32 nValue;
-	TMapID tValueMap;
+	UINT32		nValue;
+	TMapID		tValueMap;
+	TMapIDStr	tStrMap;
 }MEM_MB_EDIT_DATA, *PMEM_MB_EDIT_DATA, *PMMED;
 
 typedef map<UINT32, MEM_MB_EDIT_DATA>		TMapMemMBEditData;
@@ -62,6 +79,7 @@ typedef TMapMemMBEditData::iterator			TMapMemMBEditDataItor;
 //-------------------------------------------------------------------------
 
 template <class _T>
+
 class CManagePoBase
 {
 public:
@@ -114,6 +132,7 @@ public :
 	virtual _T*			GetEditMMED();
 	virtual INT32		GetEditMMEDID();
 	virtual INT32		GetEditMMEDIDList(TListID& tIDList);
+	virtual INT32		GetEditMMEDIDList(UINT8 nKey, TListID& tIDList);
 	virtual PMMED		FindEditMMED(UINT32 nID);
 	virtual INT32		IsExistEditMMEDTemp(UINT32 nUnitID);
 	virtual INT32		AddEditMMEDTemp(MEM_MB_EDIT_DATA& data);
@@ -149,17 +168,27 @@ public:
 	virtual	UINT32		FindStrKeyID(String strKey);
 	virtual _T*			FindStrKeyItem(String strKey);
 	virtual	UINT32		ClearStrKeyID();
+	virtual	UINT32		GetStrKeyID(TListStr& tStrKeyList);
 	virtual	UINT32		ConvertStrKeyID(TListStr& tStrKeyList, TListID& tIDList);
 
 public:
 	virtual	UINT32		AddKeyIDList(UINT32 nKey, UINT32 nID);
-	virtual	UINT32		AddKeyIDList(_T* t);
+	virtual	UINT32		AddKeyIDListPkg(_T* t);
 	virtual	UINT32		DelKeyIDList(UINT32 nKey);
 	virtual	UINT32		DelKeyIDList(UINT32 nKey, UINT32 nID);
-	virtual	UINT32		DelKeyIDList(_T* t);
+	virtual	UINT32		DelKeyIDListPkg(_T* t);
 	virtual	UINT32		GetKeyIDList(UINT32 nKey, TListID& tIDList);
 	virtual	UINT32		IsExistKeyIDList(UINT32 nKey, UINT32 nUnit);
 	virtual	UINT32		ClearKeyIDList();
+
+public:
+	virtual	UINT32		AddStrKeyIDList(String strKey, UINT32 nID);
+	virtual	UINT32		DelStrKeyIDList(String strKey);
+	virtual	UINT32		DelStrKeyIDList(String strKey, UINT32 nID);
+	virtual	UINT32		GetStrKeyIDList(TListStr& tKeyList);
+	virtual	UINT32		GetStrKeyIDList(String strKey, TListID& tIDList);
+	virtual	UINT32		IsExistStrKeyIDList(String strKey, UINT32 nUnit);
+	virtual	UINT32		ClearStrKeyIDList();
 
 public:
 	virtual	UINT32		AddKeyIDMap(UINT32 nKey, UINT32 nID);
@@ -182,6 +211,8 @@ public:
 	virtual	UINT32		DelKeySubIDMap(UINT32 nKey);
 	virtual	UINT32		DelKeySubIDMap(UINT32 nKey, UINT32 nSubKey);
 	virtual	UINT32		GetKeySubIDMap(UINT32 nKey, TMapID& tIDMap);
+	virtual	UINT32		FindKeySubIDMap(UINT32 nKey, UINT32 nSubKey);
+	virtual	_T*			FindKeySubIDItem(UINT32 nKey, UINT32 nSubKey);
 	virtual	UINT32		ClearKeySubIDMap();
 
 public:
@@ -215,6 +246,7 @@ protected :
 	TMapID				m_tKeyMap;
 	TMapStrID			m_tStrKeyMap;
 	TMapIDList			m_tKeyListMap;
+	TMapStrList			m_tStrKeyListMap;
 	TMapIDMap			m_tKeyMapMap;
 	TMapIDMap			m_tKeySubIDMap;
 	TMapIDMapMap		m_tPosKeyMapMap;
@@ -607,6 +639,17 @@ TEMPLATE	UINT32		CManagePoBase<_T>::ClearStrKeyID()
 	return 0;
 }
 
+TEMPLATE	UINT32		CManagePoBase<_T>::GetStrKeyID(TListStr& tStrKeyList)
+{
+	TMapStrIDItor begin, end;
+	begin = m_tStrKeyMap.begin();	end = m_tStrKeyMap.end();
+	for(begin; begin != end; begin++)
+	{
+		tStrKeyList.push_back(begin->first);
+	}
+	return tStrKeyList.size();
+}
+
 TEMPLATE	UINT32		CManagePoBase<_T>::ConvertStrKeyID(TListStr& tStrKeyList, TListID& tIDList)
 {
 	TListStrItor begin, end;
@@ -641,9 +684,9 @@ TEMPLATE	UINT32		CManagePoBase<_T>::AddKeyIDList(UINT32 nKey, UINT32 nID)
 }
 
 
-TEMPLATE	UINT32		CManagePoBase<_T>::AddKeyIDList(_T* t)
+TEMPLATE	UINT32		CManagePoBase<_T>::AddKeyIDListPkg(_T* pClass)
 {
-	PDB_PO_HEADER pDPH = (PDB_PO_HEADER)t;
+	PDB_PO_HEADER pDPH = (PDB_PO_HEADER)pClass;
 	return AddKeyIDList(pDPH->nPolicyID, pDPH->nUnitID);
 }
 
@@ -678,7 +721,7 @@ TEMPLATE	UINT32		CManagePoBase<_T>::DelKeyIDList(UINT32 nKey, UINT32 nID)
 	return 0;
 }
 
-TEMPLATE	UINT32		CManagePoBase<_T>::DelKeyIDList(_T* t)
+TEMPLATE	UINT32		CManagePoBase<_T>::DelKeyIDListPkg(_T* t)
 {
 	PDB_PO_HEADER pDPH = (PDB_PO_HEADER)t;
 	return DelKeyIDList(pDPH->nPolicyID, pDPH->nUnitID);
@@ -717,6 +760,102 @@ TEMPLATE	UINT32		CManagePoBase<_T>::ClearKeyIDList()
 	m_tKeyListMap.clear();
 	return 0;
 }
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+TEMPLATE	UINT32		CManagePoBase<_T>::AddStrKeyIDList(String strKey, UINT32 nID)
+{
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		TListID tIDList;
+		m_tStrKeyListMap[strKey] = tIDList;
+		find = m_tStrKeyListMap.find(strKey);
+	}
+
+	find->second.push_back(nID);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManagePoBase<_T>::DelStrKeyIDList(String strKey)
+{
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		return 0;
+	}
+
+	find->second.clear();
+	m_tStrKeyListMap.erase(strKey);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManagePoBase<_T>::DelStrKeyIDList(String strKey, UINT32 nID)
+{
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		return 0;
+	}
+
+	RemoveListID(find->second, nID);
+
+	if(find->second.size() == 0)
+	{
+		m_tStrKeyListMap.erase(strKey);
+	}
+	return 0;
+}
+
+TEMPLATE	UINT32		CManagePoBase<_T>::GetStrKeyIDList(TListStr& tKeyList)
+{
+	TMapStrListItor begin, end;
+	begin = m_tStrKeyListMap.begin();		end = m_tStrKeyListMap.end();
+	for(begin; begin != end; begin++)
+	{
+		tKeyList.push_back(begin->first);
+	}
+	return tKeyList.size();
+}
+
+TEMPLATE	UINT32		CManagePoBase<_T>::GetStrKeyIDList(String strKey, TListID& tIDList)
+{
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		return 0;
+	}
+
+	tIDList = find->second;
+	return 0;
+}
+
+
+TEMPLATE	UINT32		CManagePoBase<_T>::IsExistStrKeyIDList(String strKey, UINT32 nUnit)
+{
+	TListID tListID;
+	GetStrKeyIDList(strKey, tListID);
+
+	TListIDItor begin, end;
+	begin = tListID.begin();		end = tListID.end();
+
+	for(begin; begin != end; begin++)
+	{
+		if(*begin == nUnit)	return 1;
+	}
+
+	return 0;
+}
+
+TEMPLATE	UINT32		CManagePoBase<_T>::ClearStrKeyIDList()
+{
+	m_tStrKeyListMap.clear();
+	return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -956,6 +1095,29 @@ TEMPLATE	UINT32		CManagePoBase<_T>::DelKeySubIDMap(UINT32 nKey, UINT32 nSubKey)
 
 	find->second.erase(nSubKey);
 	return 0;
+}
+
+
+TEMPLATE	UINT32		CManagePoBase<_T>::FindKeySubIDMap(UINT32 nKey, UINT32 nSubKey)
+{
+	TMapIDMapItor find = m_tKeySubIDMap.find(nKey);
+	if(find == m_tKeySubIDMap.end())
+	{
+		return 0;
+	}
+
+	TMapIDItor find_sub = find->second.find(nSubKey);
+	if(find_sub == find->second.end())	return 0;
+
+	return find_sub->second;
+}
+
+TEMPLATE	_T*			CManagePoBase<_T>::FindKeySubIDItem(UINT32 nKey, UINT32 nSubKey)
+{
+	UINT32 nID = FindKeySubIDMap(nKey, nSubKey);
+	if(!nID)	return NULL;
+
+	return FindItem(nID);
 }
 
 TEMPLATE	UINT32		CManagePoBase<_T>::GetKeySubIDMap(UINT32 nKey, TMapID& tIDMap)
@@ -1522,6 +1684,21 @@ TEMPLATE	INT32		CManagePoBase<_T>::GetEditMMEDIDList(TListID& tIDList)
 }
 //-----------------------------------------------------------------------------
 
+TEMPLATE	 INT32		CManagePoBase<_T>::GetEditMMEDIDList(UINT8 nKey, TListID& tIDList)
+{
+	TMapMemMBEditDataItor begin, end;
+	begin = m_tEditMMEDMap.begin();		end = m_tEditMMEDMap.end();
+	for(begin; begin != end; begin++)
+	{
+		UINT8 _nKey = LOTYPEID32(begin->first);
+		if(nKey != _nKey)	continue;
+		
+		tIDList.push_back(begin->first);
+	}
+	return tIDList.size();
+}
+//-----------------------------------------------------------------------------
+
 TEMPLATE	PMMED		CManagePoBase<_T>::FindEditMMED(UINT32 nID)
 {
 	TMapMemMBEditDataItor find = m_tEditMMEDMap.find(nID);
@@ -1746,3 +1923,5 @@ TEMPLATE	INT32		CManagePoBase<_T>::IsSyncDBMS()
 	return (m_nDBSyncChkType & m_nDBSyncType);
 }
 //-----------------------------------------------------------------------------
+
+#endif /*_MANAGE_PO_BASE_H__*/

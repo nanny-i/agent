@@ -132,6 +132,7 @@ BOOL FileToken::_TokenDel(void *aDest, INT32 aLen)
 	PBYTE pbDest = (PBYTE)aDest;
 	INT32 nDestSize = aLen;
 	INT32 nReadSize = 0;
+	INT32 nBuffSize = 0;
 	INT32 nTotalReadSize = 0;
 	INT32 nOnceReadSize = 0;
 	INT32 nTryNum = 10;
@@ -139,16 +140,21 @@ BOOL FileToken::_TokenDel(void *aDest, INT32 aLen)
     if(m_nFd == -1 || aDest == NULL || aLen < 1)
         return FALSE;
 
-	pbBuffer = (PBYTE)malloc(CHAR_MAX_SIZE+1);
+	if(aLen > CHAR_MAX_SIZE)
+		nBuffSize = CHAR_MAX_SIZE;
+	else
+		nBuffSize = aLen;
+
+	pbBuffer = (PBYTE)malloc(nBuffSize+1);
 	if(pbBuffer == NULL)
 		return FALSE;
 	
     while(nTotalReadSize < nDestSize && nTryNum)
     {
-    	memset(pbBuffer, 0, CHAR_MAX_SIZE+1);
+    	memset(pbBuffer, 0, nBuffSize+1);
         nOnceReadSize = nDestSize - nTotalReadSize;
-		if(nOnceReadSize > CHAR_MAX_SIZE)
-			nOnceReadSize = CHAR_MAX_SIZE;
+		if(nOnceReadSize > nBuffSize)
+			nOnceReadSize = nBuffSize;
         nReadSize = read(m_nFd, pbBuffer, nOnceReadSize);
 		if(nReadSize == -1)
 		{
@@ -164,7 +170,7 @@ BOOL FileToken::_TokenDel(void *aDest, INT32 aLen)
 			}
 		}		
 		
-		if(nReadSize > 0 || nReadSize < CHAR_MAX_SIZE+1)
+		if(nReadSize > 0 || nReadSize < nBuffSize+1)
 		{
 			memcpy(&pbDest[nTotalReadSize], pbBuffer, nReadSize);
 			nTotalReadSize += nReadSize;
@@ -176,7 +182,7 @@ BOOL FileToken::_TokenDel(void *aDest, INT32 aLen)
 	safe_free(pbBuffer);
 	if(nTryNum == 0)
 		return FALSE;
-    return TRUE ;    
+    return TRUE;    
 }
 
 
@@ -203,15 +209,43 @@ BOOL FileToken::TokenAdd_64(INT64 aSrc)
 	return TRUE;
 }
 
+BOOL FileToken::TokenAdd_Char(char *acData)
+{
+	INT16 nLen = 0;
+	
+	if(acData == NULL)
+		return FALSE;
+
+
+	nLen = strlen(acData);
+	if(nLen < 1)
+	{
+		nLen = 4;
+		if( !TokenAdd_16( nLen ) )
+			return FALSE ;
+		if( !_TokenAdd((PVOID)"null", nLen) )
+			return FALSE ;
+
+	}
+	else
+	{
+		if( !TokenAdd_16( nLen ) )
+			return FALSE ;
+		if( !_TokenAdd((PVOID)acData, nLen) )
+			return FALSE ;
+	}
+	return TRUE ;
+}
+
 BOOL FileToken::TokenAdd_String(String aSrc)
 {
 	INT16 nLen = aSrc.length();
 	if(nLen < 1)
 	{
-		nLen = 1;
+		nLen = 4;
 		if( !TokenAdd_16( nLen ) )
 			return FALSE ;
-		if( !_TokenAdd((PVOID)"a", nLen) )
+		if( !_TokenAdd((PVOID)"null", nLen) )
 			return FALSE ;
 		
 	}
@@ -233,7 +267,7 @@ BOOL FileToken::TokenAdd_StringW(StringW aSrc)
 		nLen = 2;
 		if( !TokenAdd_16( nLen ) )
 			return FALSE ;
-		if( !_TokenAdd((PVOID)L"a", nLen) )
+		if( !_TokenAdd((PVOID)L"n", nLen) )
 			return FALSE ;
 		
 	}
@@ -325,11 +359,11 @@ INT16 FileToken::TokenDel_String(String& aSrc)
 	if(nLen < 1)
 		return -2;
 
-	char* pszBuff = (char*)malloc(nLen + 1);
+	char* pszBuff = (char*)malloc(nLen + 2);
 	if(pszBuff == NULL)
 		return -3;
 	
-	memset(pszBuff, 0, nLen+1);
+	memset(pszBuff, 0, nLen+2);
 
     if( !_TokenDel( (PVOID)pszBuff, nLen) )
 	{
@@ -337,17 +371,56 @@ INT16 FileToken::TokenDel_String(String& aSrc)
         return -4;
 	}
 	
-	if(nLen == 1 && pszBuff[0] == 'a')
+	if(nLen == 4 && !_stricmp(pszBuff, "null"))
 	{
 		safe_free(pszBuff);
 		return 0;
 	}
-	
+	pszBuff[nLen] = 0;
 
 	aSrc = String(pszBuff);
 	safe_free(pszBuff);
 
     return nLen;
+}
+
+INT16 FileToken::TokenDel_Char(char *acData, INT16 nMaxLen)
+{
+	INT16 i, nLen = 0;
+
+	if(acData == NULL || nMaxLen < 1)
+		return -1;
+
+	if( !TokenDel_16( nLen ) )
+		return -2;
+
+	if(nLen < 1 || nLen > nMaxLen-1)
+		return -3;
+
+	char* pszBuff = (char*)malloc(nLen + 2);
+	if(pszBuff == NULL)
+		return -4;
+
+	memset(pszBuff, 0, nLen+2);
+
+	if( !_TokenDel( (PVOID)pszBuff, nLen) )
+	{
+		safe_free(pszBuff);
+		return -5;
+	}
+
+	if(nLen == 4 && !_stricmp(pszBuff, "null"))
+	{
+		safe_free(pszBuff);
+		return 0;
+	}
+	pszBuff[nLen] = 0;
+
+	strncpy(acData, pszBuff, nMaxLen-1);
+
+	safe_free(pszBuff);
+
+	return nLen;
 }
 
 INT16 FileToken::TokenDel_StringW(StringW& aSrc)
@@ -372,7 +445,7 @@ INT16 FileToken::TokenDel_StringW(StringW& aSrc)
 		return -4;
 	}
 
-	if(nLen == 2 && pszBuff[0] == L'a')
+	if(nLen == 2 && pszBuff[0] == L'n')
 	{
 		safe_free(pszBuff);
 		return 0;

@@ -31,6 +31,7 @@ private:
 
 public:
 	void		SendPkt_Edit();
+	void		SendPkt_SysInfo();
 
 public:
 	CLogicMgrHostSys();

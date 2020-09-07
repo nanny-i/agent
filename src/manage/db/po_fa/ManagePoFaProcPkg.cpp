@@ -54,7 +54,7 @@ INT32		CManagePoFaProcPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -69,7 +69,7 @@ INT32					CManagePoFaProcPkg::InitPkg()
 		PDB_PO_FA_PROC pdpfp = t_ManagePoFaProc->FindItem(begin->second.tDPH.nPolicyID);
 		if(!pdpfp)
 		{
-			WriteLogE("not find po_fa_proc_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+//			WriteLogE("not find po_fa_proc_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -105,7 +105,7 @@ INT32					CManagePoFaProcPkg::AddPoFaProcPkg(DB_PO_FA_PROC_PKG&	dpfpp)
     }
 
 	AddItem(dpfpp.tDPH.nID, dpfpp);
-	AddKeyIDList(&dpfpp);
+	AddKeyIDListPkg(&dpfpp);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoFaProcPkg::DelPoFaProcPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpfpp);
+	DelKeyIDListPkg(pdpfpp);
     DeleteItem(nID);
     return 0;
 }

@@ -25,11 +25,13 @@ typedef struct _db_po_in_ptn_no
 	_db_po_in_ptn_no()
 	{
 		nMsgType		= 0;
+		nReqSkipOpt		= 0;
 	}
 
 	DB_PO_HEADER		tDPH;
 
 	UINT32				nMsgType;
+	UINT32				nReqSkipOpt;
 
 }DB_PO_IN_PTN_NO, *PDB_PO_IN_PTN_NO;
 

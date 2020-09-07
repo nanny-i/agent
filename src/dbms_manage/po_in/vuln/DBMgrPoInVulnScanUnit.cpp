@@ -87,7 +87,7 @@ INT32			CDBMgrPoInVulnScanUnit::InsertPoInVulnScanUnit(DB_PO_IN_VULN_SCAN_UNIT& 
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
 						", sch_time, scan_type"
 						") VALUES (%s"
-						", '%I64u', %u"
+						", '%llu', %u"
 						");",
 						GetPoHDRQuery_InsertValue(tDPH).c_str(), 
 						data.nSchTime, data.nScanType);
@@ -106,7 +106,7 @@ INT32			CDBMgrPoInVulnScanUnit::UpdatePoInVulnScanUnit(DB_PO_IN_VULN_SCAN_UNIT& 
 	DB_PO_HEADER& tDPH = data.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_in_vuln_scan_unit SET %s"
-						", sch_time='%I64u', scan_type=%u"
+						", sch_time='%llu', scan_type=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(), 
 						data.nSchTime, data.nScanType, 

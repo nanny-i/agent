@@ -44,6 +44,9 @@ public:
 	INT32					IsExistLogDocByBkName(String strBkName, UINT32 nChkRmTime = 0, UINT32 nChkBkTime = 0);
 
 public:
+	INT32					SetPktSync(TListPVOID& tIDList);
+
+public:
 	INT32					SetPkt(MemToken& SendToken);
 	INT32					SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_LOG_DOC& dld);

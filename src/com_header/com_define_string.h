@@ -53,8 +53,10 @@
 #define		STR_TS_NAME_NANNY_MGR_ONCE		"nannymanager_%u"
 #define		STR_TS_NAME_SDELETE_ONCE		"sdelete_%u"
 #define		STR_TS_NAME_DTLOCK_ONCE			"dtlock_%u"
+#define		STR_TS_NAME_DTLOCK_ONCE_BY_HOOK	"dtlock_%u_%u"
 #define		STR_TS_NANE_RENAMECOM			"rename_computer"
-
+#define		STR_TS_NAME_HOST_NOTIFY			"host_notify"
+#define		STR_TS_NAME_PTN_PATCH			"ptn_patch_%u_%u"
 
 //------------------------------------------------------------------------------
 
@@ -79,14 +81,23 @@
 #define		STR_DEPLOY_FILE_HOME_AGT_UP		"/agt_up"
 #define		STR_DEPLOY_FILE_HOME_FILE		"/file"
 #define		STR_DEPLOY_FILE_HOME_WPTN		"/wptn"
+#define		STR_DEPLOY_FILE_HOME_PPTN		"/pptn"
+#define		STR_DEPLOY_FILE_HOME_PPTN_PATCH	"/pptn/patch"
+#define		STR_DEPLOY_FILE_HOME_PPTN_UTIL	"/pptn/util"
+#define		STR_DEPLOY_FILE_HOME_VPTN_PATCH	"/pptn/patch"
 
 #define		STR_DEPLOY_FILE_LOCAL_DOWN		"inven/_down"
 #define		STR_DEPLOY_FILE_LOCAL_TEMP		"inven/_temp"
 #define		STR_BACKUP_DOC_FILE				"inven/_docbk"
 #define		STR_BACKUP_MBR_FILE				"inven/_md"
+#define		STR_BACKUP_RS_BK				"inven/_rsbk"
 #define		STR_WENG_PTN_FILE				"inven/_wptn"
 #define		STR_BIN_CAPTURE_FILE			"inven/_bc"
 #define		STR_UNZIP_PATH_FOR_UPDATE		"inven/_update"
+#define		STR_PTN_PATCH_FILE				"inven/ptn"
+#define		STR_PTN_PATCH_FILE_PATCH		"inven/ptn/patch"
+#define		STR_PTN_VULN_FILE				"inven/ptn_vuln"
+#define		STR_PTN_VULN_FILE_PATCH			"inven/ptn_vuln/patch"
 #define		STR_BACKUP_CRC_FILE				"crc"
 #define		STR_BIN_CAPTURE_FILE_NAME		"bc.info"
 

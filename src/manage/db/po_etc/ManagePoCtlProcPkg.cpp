@@ -54,7 +54,7 @@ INT32		CManagePoCtlProcPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -105,7 +105,7 @@ INT32					CManagePoCtlProcPkg::AddPoCtlProcPkg(DB_PO_CTL_PROC_PKG&	dpcpp)
     }
 
     AddItem(dpcpp.tDPH.nID, dpcpp);
-	AddKeyIDList(&dpcpp);
+	AddKeyIDListPkg(&dpcpp);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoCtlProcPkg::DelPoCtlProcPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpcpp);
+	DelKeyIDListPkg(pdpcpp);
     DeleteItem(nID);
     return 0;
 }

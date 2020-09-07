@@ -17,8 +17,6 @@
  * 
  */
 
-//---------------------------------------------------------------------------
-
 #ifndef LogicMgrPoInVulnScanH
 #define LogicMgrPoInVulnScanH
 //---------------------------------------------------------------------------
@@ -28,6 +26,12 @@ class CLogicMgrPoInVulnScan	: public CLogicBase
 private:
 	INT32		AnalyzePkt_FromMgr_Ext();
 	INT32		AnalyzePkt_FromMgr_Edit_Ext();
+
+public:
+	INT32		OnTimer_Logic();
+
+private:
+	INT32		SendData_Link_PoInVulnScan(UINT32 nType);
 
 public:
 	CLogicMgrPoInVulnScan();

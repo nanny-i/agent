@@ -25,31 +25,59 @@
 
 //---------------------------------------------------------------------------
 
-
-void	CLogicBase::InitDLEALL(UINT32 nOpType, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc)
+void	CLogicBase::InitDLEH(UINT32 nOpType, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc, UINT32 nSyncMode)
 {
-	return InitDLE(EVENT_NOTIFY_TYPE_ALL, 0, nSType, nSID, nTType, nTID, nOType, nOCode, nOID, strOInfo, nOpType, strDesc);
+	return InitDLE(EVENT_NOTIFY_TYPE_HOST, 0, EVENT_SUBJECT_TYPE_HOST, 0, EVENT_TARGET_TYPE_HOST, 0, nOType, nOCode, nOID, strOInfo, nOpType, strDesc, "", "", nSyncMode);
 }
 //---------------------------------------------------------------------------
 
-void	CLogicBase::InitDLE_PE(UINT32 nOID, String strOInfo, String strDesc)
+void	CLogicBase::InitDLEH_PE(UINT32 nOID, String strOInfo, String strDesc)
 {
-	return InitDLEALL(EVENT_OPERATION_TYPE_EDIT, EVENT_SUBJECT_TYPE_HOST, 0, EVENT_TARGET_TYPE_HOST, 0, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, strDesc);
+	return InitDLEH(EVENT_OPERATION_TYPE_EDIT, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, strDesc, SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
 }
 //---------------------------------------------------------------------------
 
-void	CLogicBase::InitDLEA_EC()
+void	CLogicBase::InitDLEH_Sync(UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc)
+{
+	return InitDLEH(nOpType, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, strDesc, SS_LOG_EVENT_HOST_SYNC_MODE_ALL);
+}
+//---------------------------------------------------------------------------
+
+void	CLogicBase::InitDLEH_SyncAgt(UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc)
+{
+	return InitDLEH(nOpType, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, strDesc, SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
+}
+//---------------------------------------------------------------------------
+
+void	CLogicBase::InitDLEH_SyncSvr(UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc)
+{
+	return InitDLEH(nOpType, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, strDesc, SS_LOG_EVENT_HOST_SYNC_MODE_SVR);
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+void	CLogicBase::InitDLEU(UINT32 nOpType, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, String strDesc)
+{
+	return InitDLE(EVENT_NOTIFY_TYPE_HOST, 0, EVENT_SUBJECT_TYPE_USER, 0, EVENT_TARGET_TYPE_HOST, 0, nOType, nOCode, nOID, strOInfo, nOpType, strDesc, "", "", SS_LOG_EVENT_HOST_SYNC_MODE_AGT);
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+void	CLogicBase::InitDLEH_EC()
 {	
-	InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, 0, "", "");
+	InitDLEH(m_nEvtOpType, m_nEvtObjType, m_nEvtObjCode, 0, "", "");
 	return;
 }
 //---------------------------------------------------------------------------
 
-void	CLogicBase::SetDLEA_EC(UINT32 nErrCode, INT32 nApplyPkt)
+void	CLogicBase::SetDLEH_EC(UINT32 nErrCode, INT32 nApplyPkt)
 {
 	if(nErrCode)	m_nLastErrCode = nErrCode;
-	InitDLEA_EC();
-	t_LogicLogEvent->SetLogEvent(m_tDLE);
+	InitDLEH_EC();
+	t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 
 	if(nApplyPkt)
 	{
@@ -59,8 +87,20 @@ void	CLogicBase::SetDLEA_EC(UINT32 nErrCode, INT32 nApplyPkt)
 	return;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-void	CLogicBase::InitDLE(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc, String strSInfo, String strTInfo)
+void	CLogicBase::InitDLE_OBJ(UINT32 nOID, String strOInfo, UINT32 nSyncMode)
+{	
+	return InitDLE(EVENT_NOTIFY_TYPE_HOST, 0, m_nEvtSubType, 0, EVENT_TARGET_TYPE_HOST, 0, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, m_nEvtOpType, "", "", "", nSyncMode);
+}
+//---------------------------------------------------------------------------
+
+void	CLogicBase::InitDLE(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nOpType, String strDesc, String strSInfo, String strTInfo, UINT32 nSyncMode)
 {
 	m_tDLE._init();
 	String strSubjectName = "";
@@ -68,6 +108,9 @@ void	CLogicBase::InitDLE(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID,
 	m_tDLE.nRegDate			= GetCurrentDateTimeInt();
 	m_tDLE.nEvtTime			= GetCurrentDateTimeInt();
 	m_tDLE.nEvtErrCode		= m_nLastErrCode;
+
+	m_tDLE.nSyncSvrMode		= nSyncMode;
+	if(nSyncMode & SS_LOG_EVENT_HOST_SYNC_MODE_SVR)		HISYNCSTEPUP(m_tDLE.nSyncSvrStep);
 
 	m_tDLE.nNotifyType		= nNType;
 	m_tDLE.nNotifyID		= nNID;
@@ -136,97 +179,36 @@ void	CLogicBase::AppendDLEDesc(UINT32 nValue)
 	return;
 }
 //---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
 
-void	CLogicBase::InitDLSTALL(UINT32 nOpType, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nKeyDesc, String strValueDesc)
+void	CLogicBase::AppendDLEDesc(UINT32 nKey, String strValue)
 {
-	return InitDLST(EVENT_NOTIFY_TYPE_ALL, 0, nSType, nSID, nTType, nTID, nOType, nOCode, nOID, strOInfo, nOpType, nKeyDesc, strValueDesc);
-}
-//---------------------------------------------------------------------------
-
-void	CLogicBase::InitDLST_PoOp(UINT32 nOID, String strOInfo, UINT32 nOpType, UINT32 nKeyDesc, String strValueDesc)
-{
-	return InitDLSTALL(nOpType, EVENT_SUBJECT_TYPE_HOST, m_nSessionID, EVENT_TARGET_TYPE_HOST, m_nSessionID, m_nEvtObjType, m_nEvtObjCode, nOID, strOInfo, nKeyDesc, strValueDesc);
-}
-//---------------------------------------------------------------------------
-
-void	CLogicBase::InitDLST(UINT32 nNType, UINT32 nNID, UINT32 nSType, UINT32 nSID, UINT32 nTType, UINT32 nTID, UINT32 nOType, UINT32 nOCode, UINT32 nOID, String strOInfo, UINT32 nOpType, UINT32 nKeyDesc, String strValueDesc, String strSInfo, String strTInfo)
-{
-	m_tDLST._init();
-	String strSubjectName = "";
-
-	m_tDLST.nRegDate		= 0;
-	m_tDLST.nEvtTime		= 0;
-	m_tDLST.nEvtErrCode		= m_nLastErrCode;
-
-	m_tDLST.nNotifyType		= nNType;
-	m_tDLST.nNotifyID		= nNID;
-
-	m_tDLST.nSyncSvrStep	= 0;
-
-	m_tDLST.nSubjectType	= nSType;
-	m_tDLST.nSubjectID		= nSID;
-	m_tDLST.strSubjectInfo	= strSInfo;
-
-	m_tDLST.nTargetType		= nTType;
-	m_tDLST.nTargetID		= nTID;
-	m_tDLST.strTargetInfo	= strTInfo;
-
-	m_tDLST.nObjectType		= nOType;
-	m_tDLST.nObjectCode		= nOCode;
-	m_tDLST.nObjectID		= nOID;
-	m_tDLST.strObjectInfo	= strOInfo;
-
-	m_tDLST.nOperationType	= nOpType;
-	AppendDLStDesc(nKeyDesc, strValueDesc);
-
-	if(m_tDLST.strSubjectInfo.empty())
-	{
-		switch(nSType)
-		{
-		case EVENT_SUBJECT_TYPE_ADMIN:		m_tDLST.strSubjectInfo = "admin";		break;
-		case EVENT_SUBJECT_TYPE_GROUP:		m_tDLST.strSubjectInfo = "group";		break;
-		case EVENT_SUBJECT_TYPE_HOST:		m_tDLST.strSubjectInfo = "host";		break;
-		case EVENT_SUBJECT_TYPE_USER:		m_tDLST.strSubjectInfo = "user";		break;		// USER로 변경
-		case EVENT_SUBJECT_TYPE_SVR:		m_tDLST.strSubjectInfo = "system";		break;
-		}
-	}
-
-	if(m_tDLST.strTargetInfo.empty())
-	{
-		switch(nTType)
-		{
-		case EVENT_TARGET_TYPE_ADMIN:		m_tDLST.strTargetInfo = "admin";		break;
-		case EVENT_TARGET_TYPE_GROUP:		m_tDLST.strTargetInfo = "group";		break;
-		case EVENT_TARGET_TYPE_HOST:		m_tDLST.strTargetInfo = "host";			break;
-		case EVENT_TARGET_TYPE_USER:		m_tDLST.strTargetInfo = "user";			break;		// USER로 변경
-		case EVENT_TARGET_TYPE_SVR:			m_tDLST.strTargetInfo = "system";		break;
-		}
-	}
-}
-//---------------------------------------------------------------------------
-
-void	CLogicBase::AppendDLStDesc(UINT32 nKey, String strValue)
-{
-
-
-
 	if(!nKey)	return;
 
-	m_tDLST._set_desc_info(nKey, strValue);
+	m_tDLE._set_desc_info(nKey, strValue);
 	return;
 }
 //---------------------------------------------------------------------------
 
-void	CLogicBase::AppendDLStDesc(UINT32 nKey, UINT32 nValue)
+void	CLogicBase::AppendDLEDesc(UINT32 nKey, UINT32 nValue)
 {
 	if(!nKey)	return;
 
 	String strValue;
 	strValue = SPrintf("%u", nValue);
 
-	AppendDLStDesc(nKey, strValue);
+	AppendDLEDesc(nKey, strValue);
+	return;
+}
+//---------------------------------------------------------------------------
+
+void	CLogicBase::AppendDLEDescHex(UINT32 nKey, UINT32 nValue)
+{
+	if(!nKey)	return;
+
+	String strValue;
+	strValue = SPrintf("%u", nValue);
+
+	AppendDLEDesc(nKey, strValue);
 	return;
 }
 //---------------------------------------------------------------------------

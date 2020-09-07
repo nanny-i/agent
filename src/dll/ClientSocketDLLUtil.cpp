@@ -75,7 +75,9 @@ void    CCltSocketUtil::SetInitialize(INT32 nFlag)
 
 INT32   CCltSocketUtil::IsInitialize()
 {
-    return m_nInitalize;
+	if(m_pObject == NULL || m_fSend_CLD == NULL)
+		return 0;
+    return 1;
 }
 //---------------------------------------------------------------------------
 

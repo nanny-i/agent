@@ -28,16 +28,17 @@
 #include	"LogicAuth.h"
 #include	"LogicInitLink.h"
 #include	"LogicLogDeployFile.h"
-//#include	"LogicLogDoc.h"
+#include	"LogicLogDoc.h"
 #include	"LogicLogEvent.h"
 #include	"LogicLogSecu.h"
-#include	"LogicLogStatus.h"
+#include	"LogicLogPatch.h"
+#include	"LogicLogDevice.h"
+#include	"LogicLogRs.h"
+#include	"LogicLogRsBk.h"
 
 #include	"LogicSiteFile.h"
 #include	"LogicSiteVuln.h"
 #include	"LogicSiteVulnScan.h"
-#include	"LogicSiteVulnRepair.h"
-#include	"LogicSiteVulnLock.h"
 
 #include	"LogicPoFaClear.h"
 #include	"LogicLogDocDScan.h"
@@ -45,6 +46,12 @@
 #include	"LogicPoInPtnSPRule.h"
 
 #include	"LogicEnvNotifyInfo.h"
+
+#include	"LogicPtnPatch.h"
+#include	"LogicPtnVuln.h"
+#include	"LogicHostVulnRst.h"
+
+#include	"LogicCtrlVuln.h"
 
 //------------------------------------------------------------------------------
 
@@ -56,14 +63,14 @@
 #include	"LogicMgrHostStatusPo.h"
 #include	"LogicMgrHostSys.h"
 #include	"LogicMgrHostKey.h"
+#include	"LogicMgrHostPatch.h"
+#include	"LogicMgrHostVulnRst.h"
 
 #include	"LogicMgrUser.h"
 
 #include	"LogicMgrSiteFile.h"
 #include	"LogicMgrSiteVuln.h"
 #include	"LogicMgrSiteVulnScan.h"
-#include	"LogicMgrSiteVulnRepair.h"
-#include	"LogicMgrSiteVulnLock.h"
 
 #include	"LogicMgrPoCtlPanel.h"
 #include	"LogicMgrPoCtlProc.h"
@@ -76,6 +83,7 @@
 #include	"LogicMgrPoSelfProtect.h"
 #include	"LogicMgrPoSvrInfoUdt.h"
 #include	"LogicMgrPoSvrInfoLgn.h"
+#include	"LogicMgrPoHostNotify.h"
 
 #include	"LogicMgrPoSch.h"
 
@@ -85,6 +93,7 @@
 #include	"LogicMgrPoFaClear.h"
 #include	"LogicMgrPoFaBk.h"
 #include	"LogicMgrPoFaNotify.h"
+#include	"LogicMgrPoFaDelFileAfterBoot.h"
 
 #include	"LogicMgrPoFePtnOp.h"
 #include	"LogicMgrPoFePtnLo.h"
@@ -102,11 +111,34 @@
 #include	"LogicMgrPoInPtnSP.h"
 #include	"LogicMgrPoInPtnSPRule.h"
 #include	"LogicMgrPoInPtnNo.h"
-#include	"LogicMgrPoInAcDoc.h"
-#include	"LogicMgrPoInAcSf.h"
-#include	"LogicMgrPoInAcFile.h"
+
+#include	"LogicMgrPoInDevOOp.h"
+#include	"LogicMgrPoInDevOBL.h"
+#include	"LogicMgrPoInDevOWL.h"
+#include	"LogicMgrPoInDevOEx.h"
+#include	"LogicMgrPoInDevOInfo.h"
+#include	"LogicMgrPoInDevONotify.h"
+#include	"LogicMgrPoDvLo.h"
+
+#include	"LogicMgrPoInVulnAx.h"
+#include	"LogicMgrPoInVulnEditApp.h"
 #include	"LogicMgrPoInVulnOp.h"
+#include	"LogicMgrPoInVulnQna.h"
 #include	"LogicMgrPoInVulnScan.h"
+#include	"LogicMgrPoInVulnSecuUsb.h"
+#include	"LogicMgrPoInVulnSw.h"
+#include	"LogicMgrPoInVulnPatchException.h"
+
+#include	"LogicMgrPoInRsOp.h"
+#include	"LogicMgrPoInRsBk.h"
+#include	"LogicMgrPoInRsNo.h"
+
+#include	"LogicMgrPoPmOp.h"
+#include	"LogicMgrPoPmDm.h"
+#include	"LogicMgrPoPmScan.h"
+#include	"LogicMgrPoPmEx.h"
+#include	"LogicMgrPoPmNo.h"
+
 
 #include	"LogicMgrEnvLicense.h"
 #include	"LogicMgrEnvLog.h"
@@ -115,11 +147,16 @@
 #include	"LogicMgrEnvSelfProtectAgt.h"
 #include	"LogicMgrEnvSOrgLink.h"
 #include	"LogicMgrEnvTrustSubject.h"
+#include	"LogicMgrEnvSocket.h"
 
+#include	"LogicMgrLogEvent.h"
 #include	"LogicMgrLogDeployFile.h"
 #include	"LogicMgrLogDoc.h"
 #include	"LogicMgrLogSecu.h"
-#include	"LogicMgrLogStatus.h"
+#include	"LogicMgrLogPatch.h"
+#include	"LogicMgrLogDevice.h"
+#include	"LogicMgrLogRs.h"
+#include	"LogicMgrLogRsBk.h"
 
 #include	"LogicMgrCtrlRemoteCtrl.h"
 #include	"LogicMgrCtrlRemotePower.h"
@@ -127,6 +164,11 @@
 #include	"LogicMgrCtrlHostRes.h"
 #include	"LogicMgrCtrlRestore.h"
 #include	"LogicMgrCtrlRemoteOrder.h"
+
+#include	"LogicMgrPtnPatch.h"
+#include	"LogicMgrPtnVuln.h"
+#include	"LogicMgrPtnGWO.h"
+#include	"LogicMgrPtnGBO.h"
 // 
 //------------------------------------------------------------------------------
 
@@ -136,6 +178,7 @@
 #include	"LogicPWEvtMon.h"
 #include	"LogicLocalEnvLog.h"
 #include	"LogicLocalEnvAuth.h"
+#include	"LogicDocDeleteInfo.h"
 //------------------------------------------------------------------------------
 
 //agent lgn svr

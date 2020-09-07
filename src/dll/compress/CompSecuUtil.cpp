@@ -85,15 +85,16 @@ INT32		CCompSecuUtil::WriteHdr(ASI_COMP_SECU_FILE_HDR& tACSFH, INT32 nTarFd)
 		return -1;
 	
 	FileToken tFileToken(nTarFd);
+
 	if(tFileToken.TokenAdd_32(tACSFH.nCompVer) == FALSE)
 		return -2;
 	if(tFileToken.TokenAdd_32(tACSFH.nEncType) == FALSE)
 		return -3;
-	if(tFileToken.TokenAdd_String(tACSFH.strEncHash) == FALSE)
+	if(tFileToken.TokenAdd_Char(tACSFH.acEncHash) == FALSE)
 		return -4;
-	if(tFileToken.TokenAdd_String(tACSFH.strRelativePath) == FALSE)
+	if(tFileToken.TokenAdd_Char(tACSFH.acRelativePath) == FALSE)
 		return -5;
-	if(tFileToken.TokenAdd_String(tACSFH.strFileName) == FALSE)
+	if(tFileToken.TokenAdd_Char(tACSFH.acFileName) == FALSE)
 		return -6;
 	if(tFileToken.TokenAdd_64(tACSFH.nFileSize) == FALSE)
 		return -7;
@@ -124,29 +125,34 @@ INT32		CCompSecuUtil::ReadHdr(ASI_COMP_SECU_FILE_HDR& tACSFH, INT32 nSrcFd)
 	if(tACSFH.nEncType > 1)
 		return -5;
 
-	nRetVal = tFileToken.TokenDel_String(tACSFH.strEncHash);
+	nRetVal = tFileToken.TokenDel_Char(tACSFH.acEncHash, MAX_QBUFF);
 	if( nRetVal < 0)
 	{
 		nRetVal -= 10;
 		return nRetVal;
 	}
 
-	nRetVal = tFileToken.TokenDel_String(tACSFH.strRelativePath);
+	nRetVal = tFileToken.TokenDel_Char(tACSFH.acRelativePath, MAX_QBUFF);
 	if( nRetVal < 0)
 	{
 		nRetVal -= 20;
 		return nRetVal;
 	}
-	nRetVal = tFileToken.TokenDel_String(tACSFH.strFileName);
+
+
+	nRetVal = tFileToken.TokenDel_Char(tACSFH.acFileName, MAX_QBUFF);
 	if( nRetVal < 0)
 	{
 		nRetVal -= 30;
 		return nRetVal;
 	}
+
 	if(!tFileToken.TokenDel_64(tACSFH.nFileSize))
 		return -6;
+
 	if(!tFileToken.TokenDel_32(tACSFH.nFileMode))
 		return -7;
+
 	if(!tFileToken.TokenDel_32(tACSFH.nTokenSize))
 		return -8;
 
@@ -323,10 +329,11 @@ INT32		CCompSecuUtil::CompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 		}
 		tACSFH.nCompVer			= 0;
 		tACSFH.nEncType			= tACS.pSeedKey[0] ? 1 : 0;
-		tACSFH.strEncHash		= GetSHA2(tACS.pSeedKey, 16);
+		strncpy(tACSFH.acEncHash, GetSHA2(tACS.pSeedKey, 16).c_str(), MAX_QBUFF-1);
+		tACSFH.acEncHash[MAX_QBUFF-1] = 0;
 		tACSFH.nFileSize		= dwSize;	
 		tACSFH.nTokenSize		= ASI_COMP_SECU_TOKEN_SIZE;
-		tACSFH.strFileName		= acCompFileName;
+		strncpy(tACSFH.acFileName, acCompFileName, MAX_QBUFF-1);
 		tACSFH.nFileSize		= dwSize;	
 		tACSFH.nFileMode		= dwMode;
 
@@ -400,7 +407,7 @@ INT32		CCompSecuUtil::DecompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 		return -4;
 	}
 	
-	if(_stricmp(tACSFH.strEncHash.c_str(), GetSHA2(tACS.pSeedKey, 16).c_str()))
+	if(_stricmp(tACSFH.acEncHash, GetSHA2(tACS.pSeedKey, 16).c_str()))
 	{
 		close(nSrcFd);
 		return -5;
@@ -415,7 +422,7 @@ INT32		CCompSecuUtil::DecompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 	}
 	else
 	{
-		strSvFile = SPrintf("%s/%s", tACS.acTarPath, tACSFH.strFileName.c_str());
+		strSvFile = SPrintf("%s/%s", tACS.acTarPath, tACSFH.acFileName);
 	}
 	if(tACSFH.nFileMode == 0)
 	{

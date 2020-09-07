@@ -30,7 +30,7 @@ CLogicApplyPolicy::CLogicApplyPolicy()
 	m_strLogicName			= "logic apply policy";
 	m_nChkTSProtectMode		= t_EnvInfo->GetReg_LocalEnv_TSProtectMode();
 
-	m_nEPSHkPID		= 0;
+	m_tEPSHkPIDList.clear();
 }
 //---------------------------------------------------------------------------
 
@@ -52,6 +52,16 @@ INT32		CLogicApplyPolicy::CheckRunEnv()
 
 	t_LogicMgrPoInPtnBL->CheckRunEnv();
 	t_LogicMgrPoInPtnWL->CheckRunEnv();
+
+	if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NPMS, 0, 0))
+	{
+		t_LogicMgrPoPmOp->CheckRunEnv();
+	}
+
+	if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_VULN_OP, 0))
+	{
+		t_LogicMgrPoInVulnOp->CheckRunEnv();
+	}
 	return 0;
 }
 //---------------------------------------------------------------------------
@@ -252,7 +262,7 @@ INT32		CLogicApplyPolicy::IsActiveEPS()
 		PDB_PO_IN_PTN_BL pCurPolicy = (PDB_PO_IN_PTN_BL)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_PTN_BL);
 		if(pCurPolicy)
 		{
-			if(t_ManagePoInPtnBL->IsValidPtnFile(pCurPolicy->tDPH.nID))
+			if(t_ManagePoInPtnBL->IsValidPtnFile(pCurPolicy->tDPH.nID) && t_LogicMgrPtnGBO->IsInitLogic())
 			{
 				nUsedMode += pCurPolicy->tDPH.nUsedMode;
 			}
@@ -269,7 +279,7 @@ INT32		CLogicApplyPolicy::IsActiveEPS()
 		PDB_PO_IN_PTN_WL pCurPolicy = (PDB_PO_IN_PTN_WL)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_PTN_WL);
 		if(pCurPolicy)
 		{
-			if(t_ManagePoInPtnWL->IsValidPtnFile(pCurPolicy->tDPH.nID))
+			if(t_ManagePoInPtnWL->IsValidPtnFile(pCurPolicy->tDPH.nID) && t_LogicMgrPtnGWO->IsInitLogic())
 			{
 				nUsedMode += pCurPolicy->tDPH.nUsedMode;
 			}
@@ -283,31 +293,21 @@ INT32		CLogicApplyPolicy::IsActiveEPS()
 
 	{
 		nReadyStatus = STATUS_USED_MODE_ON;
-		PDB_PO_IN_AC_DOC pCurPolicy = (PDB_PO_IN_AC_DOC)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_DOC);
+		PDB_PO_IN_RS_OP pCurPolicy = (PDB_PO_IN_RS_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_OP);
 		if(pCurPolicy)
 		{
 			nUsedMode += pCurPolicy->tDPH.nUsedMode;
-			m_tStatusMap[SS_POLICY_TYPE_IN_AC_DOC] = MAKEUINT64(pCurPolicy->tDPH.nUsedMode, nReadyStatus);
+			m_tStatusMap[SS_POLICY_TYPE_IN_RS_OP] = MAKEUINT64(pCurPolicy->tDPH.nUsedMode, nReadyStatus);
 		}
 	}
 
 	{
 		nReadyStatus = STATUS_USED_MODE_ON;
-		PDB_PO_IN_AC_SF pCurPolicy = (PDB_PO_IN_AC_SF)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_SF);
+		PDB_PO_IN_DEVO_OP pCurPolicy = (PDB_PO_IN_DEVO_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_OP);
 		if(pCurPolicy)
 		{
 			nUsedMode += pCurPolicy->tDPH.nUsedMode;
-			m_tStatusMap[SS_POLICY_TYPE_IN_AC_SF] = MAKEUINT64(pCurPolicy->tDPH.nUsedMode, nReadyStatus);
-		}
-	}
-
-	{
-		nReadyStatus = STATUS_USED_MODE_ON;
-		PDB_PO_IN_AC_FILE pCurPolicy = (PDB_PO_IN_AC_FILE)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_FILE);
-		if(pCurPolicy)
-		{
-			nUsedMode += pCurPolicy->tDPH.nUsedMode;
-			m_tStatusMap[SS_POLICY_TYPE_IN_AC_FILE] = MAKEUINT64(pCurPolicy->tDPH.nUsedMode, nReadyStatus);
+			m_tStatusMap[SS_POLICY_TYPE_DV_OP] = MAKEUINT64(pCurPolicy->tDPH.nUsedMode, nReadyStatus);
 		}
 	}
 
@@ -605,7 +605,7 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 			PDB_PO_FE_SINGLE_PTN pCurPolicy = (PDB_PO_FE_SINGLE_PTN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FE_SINGLE_PTN);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po fe single ptn fail : not find cur policy", m_strLogicName.c_str());
+//				WriteLogE("[%s] set po fe single ptn fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
@@ -643,6 +643,25 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 			WriteLogN("[%s] set po in ptn bl success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
+			if(pCurPolicy->tDPH.nUsedMode != STATUS_USED_MODE_OFF)
+			{
+				if(t_ManagePoInPtnBL->IsValidPtnFile(pCurPolicy) && t_LogicMgrPtnGBO->IsInitLogic() == 0)
+				{
+					WriteLogE("[%s] po in ptn bl ptn init fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+					return -1;
+				}
+/*
+				t_MMPPGBO->t_ManagePtnProcFile->SetPkt(SendToken);
+				if(SetER(t_ASIEPSAPPDLLUtil->SetPoInPtnBLPtn(SendToken.GetData(), SendToken.GetLength())))
+				{
+					WriteLogE("[%s] set po in ptn bl ptn fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+					return -1;
+				}
+*/
+				WriteLogN("[%s] set po in ptn bl ptn success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+				SendToken.Clear();
+			}			
+
 		}while(FALSE);
 
 		do
@@ -657,6 +676,25 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 			t_ManagePoInPtnWL->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
 			WriteLogN("[%s] set po in ptn wl success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
+
+			if(pCurPolicy->tDPH.nUsedMode != STATUS_USED_MODE_OFF)
+			{
+				if(t_ManagePoInPtnWL->IsValidPtnFile(pCurPolicy) && t_LogicMgrPtnGWO->IsInitLogic() == 0)
+				{
+					WriteLogE("[%s] po in ptn wl ptn init fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+					return -1;
+				}
+/*
+				t_MMPPGWO->t_ManagePtnProcFile->SetPkt(SendToken);
+				if(SetER(t_ASIEPSAPPDLLUtil->SetPoInPtnWLPtn(SendToken.GetData(), SendToken.GetLength())))
+				{
+					WriteLogE("[%s] set po in ptn wl ptn fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+					return -1;
+				}
+*/
+				WriteLogN("[%s] set po in ptn wl ptn success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+				SendToken.Clear();
+			}			
 
 		}while(FALSE);
 
@@ -704,49 +742,78 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 
 		do
 		{		
-			PDB_PO_IN_AC_DOC pCurPolicy = (PDB_PO_IN_AC_DOC)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_DOC);
+			PDB_PO_IN_RS_OP pCurPolicy = (PDB_PO_IN_RS_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_OP);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po in ac doc fail : not find cur policy", m_strLogicName.c_str());
+				WriteLogE("[%s] set po in rs op fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
-			t_ManagePoInAcDoc->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
-			WriteLogN("[%s] set po in ac doc success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+			t_ManagePoInRsOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+/*
+			if(SetER(t_ASIEPSAPPDLLUtil->SetPoInRsOp(SendToken.GetData(), SendToken.GetLength())))
+			{
+				WriteLogE("[%s] set po in rs op fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+				return -1;
+			}
+*/
+			WriteLogN("[%s] set po in rs op success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
 		}while(FALSE);
 
 		do
 		{		
-			PDB_PO_IN_AC_SF pCurPolicy = (PDB_PO_IN_AC_SF)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_SF);
+			PDB_PO_IN_RS_BK pCurPolicy = (PDB_PO_IN_RS_BK)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_BK);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po in ac sf fail : not find cur policy", m_strLogicName.c_str());
+//				WriteLogE("[%s] set po in rs bk fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
-			t_ManagePoInAcSf->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
-			WriteLogN("[%s] set po in ac sf success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
-			SendToken.Clear();
-
-		}while(FALSE);
-
-		do
-		{		
-			PDB_PO_IN_AC_FILE pCurPolicy = (PDB_PO_IN_AC_FILE)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_FILE);
-			if(!pCurPolicy)
+			t_ManagePoInRsBk->SetPkt(pCurPolicy->tDPH.nID, SendToken);
+/*
+			if(SetER(t_ASIEPSAPPDLLUtil->SetPoInRsBk(SendToken.GetData(), SendToken.GetLength())))
 			{
-				WriteLogE("[%s] set po in ac file fail : not find cur policy", m_strLogicName.c_str());
-				break;
+				WriteLogE("[%s] set po in rs bk fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+				return -1;
 			}
-
-			t_ManagePoInAcFile->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
-			WriteLogN("[%s] set po in ac file success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+*/
+			WriteLogN("[%s] set po in rs bk success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
 			SendToken.Clear();
 
 		}while(FALSE);
 	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32		CLogicApplyPolicy::SetEPSDrvPolicy_PoDv()
+{
+	MemToken SendToken(1000);
+
+	do
+	{		
+		PDB_PO_IN_DEVO_OP pCurPolicy = (PDB_PO_IN_DEVO_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_OP);
+		if(!pCurPolicy)
+		{
+			WriteLogE("[%s] set po in dv fail : not find cur policy", m_strLogicName.c_str());
+			break;
+		}
+
+		t_ManageDevOInfo->SetPkt(SendToken);
+/*
+		if(SetER(t_ASIEPSAPPDLLUtil->SetPoDvOp(SendToken.GetData(), SendToken.GetLength())))
+		{
+			WriteLogE("[%s] set po in dv fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
+			return -1;
+		}
+*/
+		WriteLogN("[%s] set po in dv success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+		SendToken.Clear();
+
+	}while(FALSE);
 
 	return 0;
 }
@@ -795,7 +862,7 @@ INT32		CLogicApplyPolicy::ResetEPSDrv()
 			break;
 		}
 
-		if(t_EnvInfoOp->IsSysOffMode() == STATUS_USED_MODE_ON)
+		if(t_EnvInfoOp->IsSysOffMode())
 		{
 			WriteLogN("[%s] sys off mode enabled..skip reset eps drv", m_strLogicName.c_str());
 			break;
@@ -883,3 +950,8 @@ INT32		CLogicApplyPolicy::GetDrvStatus(UINT32 nPoType, UINT32 nStartDrv)
 	return SS_ORG_HOST_STATUS_PO_DRV_TYPE_NOT_USED;
 }
 //---------------------------------------------------------------------------
+
+INT32		CLogicApplyPolicy::SetUser32Hook(BOOL bInstall)
+{
+	return 0;
+}

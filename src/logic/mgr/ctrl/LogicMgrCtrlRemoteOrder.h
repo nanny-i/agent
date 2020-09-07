@@ -35,6 +35,9 @@ private:
 	INT32		ApplyRemotePolicy_NCScan(PMEM_CTRL_REMOTE_ORDER pMCRO);
 	INT32		ApplyRemotePolicy_NOScan(PMEM_CTRL_REMOTE_ORDER pMCRO);
 	INT32		ApplyRemotePolicy_NOReSend(PMEM_CTRL_REMOTE_ORDER pMCRO);
+	INT32		ApplyRemotePolicy_ReGetSysInfo();
+	INT32		ApplyRemotePolicy_NPScan(PMEM_CTRL_REMOTE_ORDER pMCRO);
+	INT32		ApplyRemotePolicy_NO_VUINScan(PMEM_CTRL_REMOTE_ORDER pMCRO);
 
 
 public:

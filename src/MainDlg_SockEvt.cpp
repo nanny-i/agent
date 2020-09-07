@@ -72,18 +72,19 @@ DWORD		CMainDlg::OnSockEvtCltMgr(PPKT_DATA pPktData)
 		case G_TYPE_HOST_SYS:				t_LogicMgrHostSys->AnalyzePkt_FromMgr(pPktData);						break;
 		case G_TYPE_HOST_STATUS_PO:			t_LogicMgrHostStatusPo->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_HOST_KEY:				t_LogicMgrHostKey->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_HOST_PATCH:				t_LogicMgrHostPatch->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_HOST_VULN_RST:			t_LogicMgrHostVulnRst->AnalyzePkt_FromMgr(pPktData);					break;
 
 		case G_TYPE_USER:					t_LogicMgrUser->AnalyzePkt_FromMgr(pPktData);							break;
 		case G_TYPE_SITE_FILE:				t_LogicMgrSiteFile->AnalyzePkt_FromMgr(pPktData);						break;
 		case G_TYPE_SITE_VULN:				t_LogicMgrSiteVuln->AnalyzePkt_FromMgr(pPktData);						break;
 		case G_TYPE_SITE_VULN_SCAN:			t_LogicMgrSiteVulnScan->AnalyzePkt_FromMgr(pPktData);					break;
-		case G_TYPE_SITE_VULN_REPAIR:		t_LogicMgrSiteVulnRepair->AnalyzePkt_FromMgr(pPktData);					break;
-		case G_TYPE_SITE_VULN_LOCK:			t_LogicMgrSiteVulnLock->AnalyzePkt_FromMgr(pPktData);					break;
-
+		
 		case G_TYPE_PO_HOST_RM_INFO:		t_LogicMgrPoHostRmInfo->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_PO_HOST_RUN:			t_LogicMgrPoHostRun->AnalyzePkt_FromMgr(pPktData);						break;
 		case G_TYPE_PO_SVR_INFO_LGN:		t_LogicMgrPoSvrInfoLgn->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_PO_SVR_INFO_UDT:		t_LogicMgrPoSvrInfoUdt->AnalyzePkt_FromMgr(pPktData);					break;
+		case G_TYPE_PO_HOST_NOTIFY:			t_LogicMgrPoHostNotify->AnalyzePkt_FromMgr(pPktData);					break;
 
 		case G_TYPE_PO_SCH:					t_LogicMgrPoSch->AnalyzePkt_FromMgr(pPktData);							break;
 
@@ -117,11 +118,33 @@ DWORD		CMainDlg::OnSockEvtCltMgr(PPKT_DATA pPktData)
  		case G_TYPE_PO_IN_PTN_SP:			t_LogicMgrPoInPtnSP->AnalyzePkt_FromMgr(pPktData);						break;		
 		case G_TYPE_PO_IN_PTN_SP_RULE:		t_LogicMgrPoInPtnSPRule->AnalyzePkt_FromMgr(pPktData);					break;		
 		case G_TYPE_PO_IN_PTN_NO:			t_LogicMgrPoInPtnNo->AnalyzePkt_FromMgr(pPktData);						break;
-		case G_TYPE_PO_IN_AC_DOC:			t_LogicMgrPoInAcDoc->AnalyzePkt_FromMgr(pPktData);						break;
-		case G_TYPE_PO_IN_AC_SF:			t_LogicMgrPoInAcSf->AnalyzePkt_FromMgr(pPktData);						break;
-		case G_TYPE_PO_IN_AC_FILE:			t_LogicMgrPoInAcFile->AnalyzePkt_FromMgr(pPktData);						break;
+		
+		case G_TYPE_PO_IN_VULN_AX:			t_LogicMgrPoInVulnAx->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_IN_VULN_EDIT_APP:	t_LogicMgrPoInVulnEditApp->AnalyzePkt_FromMgr(pPktData);				break;
 		case G_TYPE_PO_IN_VULN_OP:			t_LogicMgrPoInVulnOp->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_IN_VULN_QNA:			t_LogicMgrPoInVulnQna->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_PO_IN_VULN_SCAN:		t_LogicMgrPoInVulnScan->AnalyzePkt_FromMgr(pPktData);					break;
+		case G_TYPE_PO_IN_VULN_SECU_USB:	t_LogicMgrPoInVulnSecuUsb->AnalyzePkt_FromMgr(pPktData);				break;
+		case G_TYPE_PO_IN_VULN_SW:			t_LogicMgrPoInVulnSw->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_IN_VULN_PATCH_EXCEPTION:	t_LogicMgrPoInVulnPatchException->AnalyzePkt_FromMgr(pPktData);		break;
+
+		case G_TYPE_PO_IN_RS_OP:			t_LogicMgrPoInRsOp->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_IN_RS_BK:			t_LogicMgrPoInRsBk->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_IN_RS_NO:			t_LogicMgrPoInRsNo->AnalyzePkt_FromMgr(pPktData);						break;
+
+		case G_TYPE_PO_PM_OP:				t_LogicMgrPoPmOp->AnalyzePkt_FromMgr(pPktData);							break;
+		case G_TYPE_PO_PM_DM:				t_LogicMgrPoPmDm->AnalyzePkt_FromMgr(pPktData);							break;
+		case G_TYPE_PO_PM_SCAN:				t_LogicMgrPoPmScan->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_PM_EX:				t_LogicMgrPoPmEx->AnalyzePkt_FromMgr(pPktData);							break;
+		case G_TYPE_PO_PM_NO:				t_LogicMgrPoPmNo->AnalyzePkt_FromMgr(pPktData);							break;
+
+		case G_TYPE_PO_DV_OP:				t_LogicMgrPoInDevOOp->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_DV_BL:				t_LogicMgrPoInDevOBL->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_DV_WL:				t_LogicMgrPoInDevOWL->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_DV_EX:				t_LogicMgrPoInDevOEx->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_PO_DV_INFO:				t_LogicMgrPoInDevOInfo->AnalyzePkt_FromMgr(pPktData);					break;
+		case G_TYPE_PO_DV_NOTIFY:			t_LogicMgrPoInDevONotify->AnalyzePkt_FromMgr(pPktData);					break;
+		case G_TYPE_PO_DV_LO:				t_LogicMgrPoDvLo->AnalyzePkt_FromMgr(pPktData);							break;
 		
 		case G_TYPE_ENV_LICENSE:			t_LogicMgrEnvLicense->AnalyzePkt_FromMgr(pPktData);						break;
 		case G_TYPE_ENV_LOG:				t_LogicMgrEnvLog->AnalyzePkt_FromMgr(pPktData);							break;
@@ -130,10 +153,16 @@ DWORD		CMainDlg::OnSockEvtCltMgr(PPKT_DATA pPktData)
 		case G_TYPE_ENV_SELF_PROTECT_AGT:	t_LogicMgrEnvSelfProtectAgt->AnalyzePkt_FromMgr(pPktData);				break;
 		case G_TYPE_ENV_SORG_LINK:			t_LogicMgrEnvSOrgLink->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_ENV_TRUST_SUBJECT:		t_LogicMgrEnvTrustSubject->AnalyzePkt_FromMgr(pPktData);				break;
+		case G_TYPE_ENV_SOCKET:				t_LogicMgrEnvSocket->AnalyzePkt_FromMgr(pPktData);						break;
 
 		case G_TYPE_LOG_DEPLOY_FILE:		t_LogicMgrLogDeployFile->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_LOG_DOC:				t_LogicMgrLogDoc->AnalyzePkt_FromMgr(pPktData);							break;
 		case G_TYPE_LOG_SECU:				t_LogicMgrLogSecu->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_LOG_EVENT_HOST:			t_LogicMgrLogEvent->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_LOG_PATCH:				t_LogicMgrLogPatch->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_LOG_DEVICE:				t_LogicMgrLogDevice->AnalyzePkt_FromMgr(pPktData);						break;
+		case G_TYPE_LOG_RS:					t_LogicMgrLogRs->AnalyzePkt_FromMgr(pPktData);							break;
+		case G_TYPE_LOG_RS_BK:				t_LogicMgrLogRsBk->AnalyzePkt_FromMgr(pPktData);						break;
 
 		case G_TYPE_CTL_REMOTE:				t_LogicMgrCtrlRemoteCtrl->AnalyzePkt_FromMgr(pPktData);					break;
 		case G_TYPE_CTL_REMOTE_POWER:		t_LogicMgrCtrlRemotePower->AnalyzePkt_FromMgr(pPktData);				break;
@@ -197,12 +226,16 @@ DWORD		CMainDlg::OnSockEvtSvrLink(PPKT_DATA pPktData)
 		case G_TYPE_LOG_EVENT:			t_LogicLogEvent->AnalyzePkt_LogEvent(pPktData);			break;
 		case G_TYPE_PO_FA_CLEAR:		t_LogicPoFaClear->AnalyzePkt_FromLink(pPktData);		break;
 		case G_TYPE_LOG_DOC_DSCAN:		t_LogicLogDocDScan->AnalyzePkt_FromLink(pPktData);		break;
+		case G_TYPE_LOG_RS_BK:			t_LogicLogRsBk->AnalyzePkt_FromLink(pPktData);			break;
 
 		case G_TYPE_USER:				t_LogicUser->AnalyzePkt_FromLink_User(pPktData);		break;
 		case G_TYPE_PO_FE_SINGLE_PTN:	t_LogicMgrPoFeSinglePtn->AnalyzePkt_FromLink(pPktData);	break;
 		case G_TYPE_ENV_NOTIFY_INFO:	t_LogicEnvNotifyInfo->AnalyzePkt_FromLink(pPktData);	break;
 		
 		case G_TYPE_PO_IN_PTN_SP_RULE:	t_LogicPoInPtnSPRule->AnalyzePkt_FromLink(pPktData);	break;
+		case G_TYPE_HOST_VULN_RST:		t_LogicHostVulnRst->AnalyzePkt_FromLink(pPktData);		break;
+
+		case G_TYPE_CTL_VULN:			t_LogicCtrlVuln->AnalyzePkt_FromLink(pPktData);			break;
 		default:
 		{
 			WriteLogE("invalid pkt type from svr link : [%d]", pPktData->hdr.type);

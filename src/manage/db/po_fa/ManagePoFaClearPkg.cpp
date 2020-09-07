@@ -54,7 +54,7 @@ INT32		CManagePoFaClearPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -105,7 +105,7 @@ INT32					CManagePoFaClearPkg::AddPoFaClearPkg(DB_PO_FA_CLEAR_PKG&	dpfcp)
     }
 
 	AddItem(dpfcp.tDPH.nID, dpfcp);
-	AddKeyIDList(&dpfcp);
+	AddKeyIDListPkg(&dpfcp);
 
     return 0;
 }
@@ -137,7 +137,7 @@ INT32					CManagePoFaClearPkg::DelPoFaClearPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpfcp);
+	DelKeyIDListPkg(pdpfcp);
     DeleteItem(nID);
     return 0;
 }

@@ -17,8 +17,6 @@
  * 
  */
 
-//---------------------------------------------------------------------------
-
 #ifndef LogicMgrPoInVulnOpH
 #define LogicMgrPoInVulnOpH
 //---------------------------------------------------------------------------
@@ -28,6 +26,13 @@ class CLogicMgrPoInVulnOp	: public CLogicBase
 private:
 	INT32		AnalyzePkt_FromMgr_Ext();
 	INT32		AnalyzePkt_FromMgr_Edit_Ext();
+
+public:
+	INT32		ApplyPolicy();
+	INT32		CheckRunEnv();
+
+private:
+	INT32		AddDpDownInfo();
 
 public:
 	CLogicMgrPoInVulnOp();

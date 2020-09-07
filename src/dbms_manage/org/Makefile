@@ -2,14 +2,14 @@ include ../../build.config
 
 CFLAGS = $(DEFINES) $(INCLUDES)
 
-CPPFILES = DBMgrHost.cpp DBMgrHostHw.cpp DBMgrHostKey.cpp DBMgrHostPolicy.cpp DBMgrHostStatusPo.cpp DBMgrHostSw.cpp DBMgrHostSys.cpp DBMgrUser.cpp DBMgrUserPolicy.cpp
+CPPFILES = DBMgrHost.cpp DBMgrHostHw.cpp DBMgrHostKey.cpp DBMgrHostPolicy.cpp DBMgrHostStatusPo.cpp DBMgrHostSw.cpp DBMgrHostSys.cpp DBMgrUser.cpp DBMgrUserPolicy.cpp DBMgrHostPatch.cpp DBMgrHostVulnRst.cpp DBMgrHostVulnRstUnit.cpp
 
 OBJ = $(CPPFILES:.cpp=.o)
 
 all: $(OBJ)
 
 .cpp.o:
-	$(CC) $(CFLAGS) -c $*.cpp
+	$(CC) $(CFLAGS) -c $(CPPFILES)
 
 clean:
-	rm -f ./*.o
+	rm -f $(OBJ)

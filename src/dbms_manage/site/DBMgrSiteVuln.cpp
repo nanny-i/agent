@@ -53,11 +53,12 @@ INT32			CDBMgrSiteVuln::LoadDB(TListDBSiteVuln& tDBSiteVulnList)
     INT32 nIndex = 0;
 
 	m_strQuery = SPrintf("SELECT "
-						"  id, used_flag, reg_date, used_mode, admin_id, ext_option"
-						", name, descr"
-						", os_type, os_id, os_pa"
-						", risk_level, def_score"
-						" FROM site_vuln;");
+							"  id, used_flag, reg_date, used_mode, admin_id, ext_option"
+							", class"
+							", name, descr"
+							", sys_type, sys_sp_type, sys_arch_type"
+							", support_option, risk_level, def_score"
+							" FROM site_vuln;");
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -66,22 +67,23 @@ INT32			CDBMgrSiteVuln::LoadDB(TListDBSiteVuln& tDBSiteVulnList)
     {
     	nIndex = 0;
     	
-		data.nID						= GetDBField_UInt(nIndex++);
-		data.nUsedFlag					= GetDBField_UInt(nIndex++);
-		data.nRegDate					= GetDBField_UInt(nIndex++);
-		data.nUsedMode					= GetDBField_UInt(nIndex++);
-		data.nAdminID					= GetDBField_UInt(nIndex++);
-		data.nExtOption					= GetDBField_UInt(nIndex++);
+		data.nID					= GetDBField_UInt(nIndex++);
+		data.nUsedFlag				= GetDBField_UInt(nIndex++);
+		data.nRegDate				= GetDBField_UInt(nIndex++);
+		data.nUsedMode				= GetDBField_UInt(nIndex++);
+		data.nAdminID				= GetDBField_UInt(nIndex++);
+		data.nExtOption				= GetDBField_UInt(nIndex++);
 
-		data.strName					= GetDBField_String(nIndex++);
-		data.strDescr					= GetDBField_String(nIndex++);
+		data.strName				= GetDBField_String(nIndex++);
+		data.strDescr				= GetDBField_String(nIndex++);
 
-		data.nOsType					= GetDBField_UInt(nIndex++);
-		data.nOsID						= GetDBField_UInt64(nIndex++);
-		data.nOsPa						= GetDBField_UInt(nIndex++);
+		data.nSysType				= GetDBField_UInt64(nIndex++);
+		data.nSysSPType				= GetDBField_Int(nIndex++);
+		data.nSysArchType			= GetDBField_Int(nIndex++);
 
-		data.nRiskLevel					= GetDBField_UInt(nIndex++);
-		data.nDefScore					= GetDBField_UInt(nIndex++);
+		data.nSupportOption			= GetDBField_Int(nIndex++);
+		data.nRiskLevel				= GetDBField_Int(nIndex++);
+		data.nDefScore				= GetDBField_Int(nIndex++);
 		
         tDBSiteVulnList.push_back(data);
         if(m_nLoadMaxID < UINT32(data.nID))
@@ -97,20 +99,24 @@ INT32			CDBMgrSiteVuln::LoadDB(TListDBSiteVuln& tDBSiteVulnList)
 INT32			CDBMgrSiteVuln::InsertSiteVuln(DB_SITE_VULN& data)
 {
 	m_strQuery = SPrintf("INSERT INTO site_vuln ("
-									"  id, reg_date, used_mode, admin_id, ext_option"
-									", name, descr"
-									", os_type, os_id, os_pa"
-									", risk_level, def_score"
-									") VALUES ("
-									"  %u, %u, %u, %u, %u"
-									", '%s', '%s'"
-									", %u, '%I64u', %u"
-									", %u, %u"
-									");",
-                                    data.nID, data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
-									data.strName.c_str(), data.strDescr.c_str(), 
-									data.nOsType, data.nOsID, data.nOsPa,
-									data.nRiskLevel, data.nDefScore);
+								"  reg_date, used_mode, admin_id, ext_option"
+								", class"
+								", name, descr"
+								", sys_type, sys_sp_type, sys_arch_type"
+								", support_option, risk_level, def_score"
+								") VALUES ("
+								"  %u, %u, %u, %u"
+								", %u"
+								", '%s', '%s'"
+								", '%I64u', %u, %u"
+								", %u, %u, %u"
+								");",
+								data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
+								data.nClass,
+								data.strName.c_str(), data.strDescr.c_str(), 
+								data.nClass,
+								data.nSysType, data.nSysSPType, data.nSysArchType,
+								data.nSupportOption, data.nRiskLevel, data.nDefScore);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -124,16 +130,18 @@ INT32			CDBMgrSiteVuln::InsertSiteVuln(DB_SITE_VULN& data)
 INT32			CDBMgrSiteVuln::UpdateSiteVuln(DB_SITE_VULN& data)
 {
 	m_strQuery = SPrintf("UPDATE site_vuln SET "
-						"  reg_date=%u, used_mode=%u, admin_id=%u, ext_option=%u"
-						", name='%s', descr='%s'"
-						", os_type=%u, os_id='%I64u', os_pa=%u"
-						", risk_level=%u, def_score=%u"
-						" WHERE id=%u;",
-						data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
-						data.strName.c_str(), data.strDescr.c_str(), 
-						data.nOsType, data.nOsID, data.nOsPa,
-						data.nRiskLevel, data.nDefScore, 
-						data.nID);
+								"  reg_date=%u, used_mode=%u, admin_id=%u, ext_option=%u"
+								", class=%u"
+								", name='%s', descr='%s'"
+								", sys_type='%llu', sys_sp_type=%u, sys_arch_type=%u"
+								", support_option=%u, risk_level=%u, def_score=%u"
+								" WHERE id=%u;",
+								data.nRegDate, data.nUsedMode, data.nAdminID, data.nExtOption,
+								data.nClass,
+								data.strName.c_str(), data.strDescr.c_str(),
+								data.nSysType, data.nSysSPType, data.nSysArchType,
+								data.nSupportOption, data.nRiskLevel, data.nDefScore,
+								data.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_UPDATE_FAIL;

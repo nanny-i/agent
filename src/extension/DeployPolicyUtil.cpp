@@ -87,14 +87,35 @@ INT32		CDeployPolicyUtil::SetPolicy(DB_POLICY& dp, UINT32 nPkgID, UINT64 nPolicy
  		case SS_POLICY_TYPE_IN_PTN_WL:			dp.nPInPtnWLID	= nPkgID;			break;	//35
  		case SS_POLICY_TYPE_IN_PTN_EX:			dp.nPInPtnExID	= nPkgID;			break;	//36
  		case SS_POLICY_TYPE_IN_PTN_SP:			dp.nPInPtnSPID	= nPkgID;			break;	//37
-		case SS_POLICY_TYPE_IN_PTN_NO:			dp.nPInPtnNoID	= nPkgID;			break;	//37
+		case SS_POLICY_TYPE_IN_PTN_NO:			dp.nPInPtnNoID	= nPkgID;			break;	//38
 
-		case SS_POLICY_TYPE_IN_AC_DOC:			dp.nPInAcDocID	= nPkgID;			break;	//39
-		case SS_POLICY_TYPE_IN_AC_SF:			dp.nPInAcSfID	= nPkgID;			break;	//40
-		case SS_POLICY_TYPE_IN_AC_FILE:			dp.nPInAcFileID	= nPkgID;			break;	//41
+		case SS_POLICY_TYPE_IN_VULN_OP:			dp.nPInVulnOpID	= nPkgID;			break;	//44
+		case SS_POLICY_TYPE_IN_VULN_SCAN:		dp.nPInVulnScanID = nPkgID;			break;	//46
 
-		case SS_POLICY_TYPE_IN_VULN_OP:			dp.nPInVulnOpID	= nPkgID;			break;	//37
-		case SS_POLICY_TYPE_IN_VULN_SCAN:		dp.nPInVulnScanID = nPkgID;			break;	//37
+		case SS_POLICY_TYPE_HOST_NOTIFY:		dp.nPHostNotifyID = nPkgID;			break;
+
+		case SS_POLICY_TYPE_PM_OP:				dp.nPPmOpID	= nPkgID;				break;
+		case SS_POLICY_TYPE_PM_DM:				dp.nPPmDmID	= nPkgID;				break;
+		case SS_POLICY_TYPE_PM_SCAN:			dp.nPPmScanID = nPkgID;				break;
+		case SS_POLICY_TYPE_PM_EX:				dp.nPPmExID	= nPkgID;				break;
+		case SS_POLICY_TYPE_PM_NO:				dp.nPPmNoID	= nPkgID;				break;
+
+		case SS_POLICY_TYPE_IN_VULN_AX:			dp.nPInVulnAxID	= nPkgID;			break;	//42
+		case SS_POLICY_TYPE_IN_VULN_EDIT_APP:	dp.nPInVulnEditAppID= nPkgID;		break;	//43
+		case SS_POLICY_TYPE_IN_VULN_QNA:		dp.nPInVulnQnaID= nPkgID;			break;	//45
+		case SS_POLICY_TYPE_IN_VULN_SECU_USB:	dp.nPInVulnSecuUsbID= nPkgID;		break;	//47
+		case SS_POLICY_TYPE_IN_VULN_SW:			dp.nPInVulnSwID	= nPkgID;			break;	//48
+		case SS_POLICY_TYPE_IN_VULN_PATCH_EXCEPTION:	dp.nPInVulnPatchExceptionID= nPkgID;		break;	//49
+
+		case SS_POLICY_TYPE_DV_OP:				dp.nPInDevOOpID	= nPkgID;			break;
+		case SS_POLICY_TYPE_DV_BL:				dp.nPInDevOBLID	= nPkgID;			break;
+		case SS_POLICY_TYPE_DV_WL:				dp.nPInDevOWLID	= nPkgID;			break;
+		case SS_POLICY_TYPE_DV_EX:				dp.nPInDevOExID	= nPkgID;			break;
+		case SS_POLICY_TYPE_DV_NOTIFY:			dp.nPInDevONotifyID	= nPkgID;		break;
+
+		case SS_POLICY_TYPE_IN_RS_OP:			dp.nPInRsOpID	= nPkgID;			break;	//39
+		case SS_POLICY_TYPE_IN_RS_BK:			dp.nPInRsBkID	= nPkgID;			break;	//40
+		case SS_POLICY_TYPE_IN_RS_NO:			dp.nPInRsNoID	= nPkgID;			break;	//41
 	}
     return 0;
 }
@@ -143,14 +164,37 @@ UINT32		CDeployPolicyUtil::GetPolicy(DB_POLICY& dp, UINT64 nPolicyType)
  		case SS_POLICY_TYPE_IN_PTN_WL:			nPkgID	= dp.nPInPtnWLID;			break;	//35
 		case SS_POLICY_TYPE_IN_PTN_EX:			nPkgID	= dp.nPInPtnExID;			break;	//36
 		case SS_POLICY_TYPE_IN_PTN_SP:			nPkgID	= dp.nPInPtnSPID;			break;	//37
-		case SS_POLICY_TYPE_IN_PTN_NO:			nPkgID	= dp.nPInPtnNoID;			break;	//37
+		case SS_POLICY_TYPE_IN_PTN_NO:			nPkgID	= dp.nPInPtnNoID;			break;	//38
 
-		case SS_POLICY_TYPE_IN_AC_DOC:			nPkgID	= dp.nPInAcDocID;			break;	//39
-		case SS_POLICY_TYPE_IN_AC_SF:			nPkgID	= dp.nPInAcSfID;			break;	//40
-		case SS_POLICY_TYPE_IN_AC_FILE:			nPkgID	= dp.nPInAcFileID;			break;	//41
+		case SS_POLICY_TYPE_IN_VULN_OP:			nPkgID	= dp.nPInVulnOpID;			break;	//44
+		case SS_POLICY_TYPE_IN_VULN_SCAN:		nPkgID	= dp.nPInVulnScanID;		break;	//46
 
-		case SS_POLICY_TYPE_IN_VULN_OP:			nPkgID	= dp.nPInVulnOpID;			break;	//37
-		case SS_POLICY_TYPE_IN_VULN_SCAN:		nPkgID	= dp.nPInVulnScanID;		break;	//37
+		case SS_POLICY_TYPE_HOST_NOTIFY:		nPkgID	= dp.nPHostNotifyID;		break;
+
+		case SS_POLICY_TYPE_PM_OP:				nPkgID	= dp.nPPmOpID;				break;	
+		case SS_POLICY_TYPE_PM_DM:				nPkgID	= dp.nPPmDmID;				break;	
+		case SS_POLICY_TYPE_PM_SCAN:			nPkgID	= dp.nPPmScanID;			break;	
+		case SS_POLICY_TYPE_PM_EX:				nPkgID	= dp.nPPmExID;				break;	
+		case SS_POLICY_TYPE_PM_NO:				nPkgID	= dp.nPPmNoID;				break;	
+
+		case SS_POLICY_TYPE_IN_VULN_AX:			nPkgID	= dp.nPInVulnAxID;			break;	//42
+		case SS_POLICY_TYPE_IN_VULN_EDIT_APP:	nPkgID	= dp.nPInVulnEditAppID;		break;	//43
+		case SS_POLICY_TYPE_IN_VULN_QNA:		nPkgID	= dp.nPInVulnQnaID;			break;	//45
+		case SS_POLICY_TYPE_IN_VULN_SECU_USB:	nPkgID	= dp.nPInVulnSecuUsbID;		break;	//47
+		case SS_POLICY_TYPE_IN_VULN_SW:			nPkgID	= dp.nPInVulnSwID;			break;	//48
+		case SS_POLICY_TYPE_IN_VULN_PATCH_EXCEPTION:	nPkgID	= dp.nPInVulnPatchExceptionID;	break;	//49
+
+		case SS_POLICY_TYPE_DV_OP:				nPkgID	= dp.nPInDevOOpID;			break;
+		case SS_POLICY_TYPE_DV_BL:				nPkgID	= dp.nPInDevOBLID;			break;
+		case SS_POLICY_TYPE_DV_WL:				nPkgID	= dp.nPInDevOWLID;			break;
+		case SS_POLICY_TYPE_DV_EX:				nPkgID	= dp.nPInDevOExID;			break;
+		case SS_POLICY_TYPE_DV_NOTIFY:			nPkgID	= dp.nPInDevONotifyID;		break;
+
+		case SS_POLICY_TYPE_IN_RS_OP:			nPkgID	= dp.nPInRsOpID;			break;	//39
+		case SS_POLICY_TYPE_IN_RS_BK:			nPkgID	= dp.nPInRsBkID;			break;	//40
+		case SS_POLICY_TYPE_IN_RS_NO:			nPkgID	= dp.nPInRsNoID;			break;	//41
+
+
 	}
 
 	return nPkgID;
@@ -228,24 +272,43 @@ PVOID		CDeployPolicyUtil::GetPoPtr(UINT32 nID, UINT64 nPolicyType)
 		case SS_POLICY_TYPE_FE_SINGLE_PTN:	pPolicy	= t_ManagePoFeSinglePtn->FindItem(nID);		break;	//24
 		case SS_POLICY_TYPE_FE_PTN_LO:		pPolicy	= t_ManagePoFePtnLo->FindItem(nID);			break;
 		
-		case SS_POLICY_TYPE_FA_NOTIFY:		pPolicy	= t_ManagePoFaNotify->FindItem(nID);		break;	//26
-		
-		case SS_POLICY_TYPE_SCH:			pPolicy = t_ManagePoSch->FindItem(nID);				break;	//32
+		case SS_POLICY_TYPE_FA_NOTIFY:				pPolicy	= t_ManagePoFaNotify->FindItem(nID);		break;	//26
+		case SS_POLICY_TYPE_SCH:					pPolicy = t_ManagePoSch->FindItem(nID);				break;	//32
 
-		case SS_POLICY_TYPE_IN_PTN_OP:		pPolicy	= t_ManagePoInPtnOp->FindItem(nID);			break;	//33
- 		case SS_POLICY_TYPE_IN_PTN_BL:		pPolicy	= t_ManagePoInPtnBL->FindItem(nID);			break;	//34
- 		case SS_POLICY_TYPE_IN_PTN_WL:		pPolicy	= t_ManagePoInPtnWL->FindItem(nID);			break;	//35
-		case SS_POLICY_TYPE_IN_PTN_EX:		pPolicy	= t_ManagePoInPtnEx->FindItem(nID);			break;	//36
-		case SS_POLICY_TYPE_IN_PTN_SP:		pPolicy	= t_ManagePoInPtnSP->FindItem(nID);			break;	//37
-		case SS_POLICY_TYPE_IN_PTN_NO:		pPolicy	= t_ManagePoInPtnNo->FindItem(nID);			break;	//37
+		case SS_POLICY_TYPE_IN_PTN_OP:				pPolicy	= t_ManagePoInPtnOp->FindItem(nID);			break;	//32
+		case SS_POLICY_TYPE_IN_PTN_BL:				pPolicy	= t_ManagePoInPtnBL->FindItem(nID);			break;	//33
+		case SS_POLICY_TYPE_IN_PTN_WL:				pPolicy	= t_ManagePoInPtnWL->FindItem(nID);			break;	//34
+		case SS_POLICY_TYPE_IN_PTN_EX:				pPolicy	= t_ManagePoInPtnEx->FindItem(nID);			break;	//35
+		case SS_POLICY_TYPE_IN_PTN_SP:				pPolicy	= t_ManagePoInPtnSP->FindItem(nID);			break;	//36
+		case SS_POLICY_TYPE_IN_PTN_NO:				pPolicy	= t_ManagePoInPtnNo->FindItem(nID);			break;	//37
 
+		case SS_POLICY_TYPE_IN_VULN_OP:				pPolicy	= t_ManagePoInVulnOp->FindItem(nID);		break;	//40
+		case SS_POLICY_TYPE_IN_VULN_SCAN:			pPolicy	= t_ManagePoInVulnScan->FindItem(nID);		break;	//42
 
-		case SS_POLICY_TYPE_IN_AC_DOC:		pPolicy	= t_ManagePoInAcDoc->FindItem(nID);			break;	//39
-		case SS_POLICY_TYPE_IN_AC_SF:		pPolicy	= t_ManagePoInAcSf->FindItem(nID);			break;	//40
-		case SS_POLICY_TYPE_IN_AC_FILE:		pPolicy	= t_ManagePoInAcFile->FindItem(nID);		break;	//41
+		case SS_POLICY_TYPE_HOST_NOTIFY:			pPolicy = t_ManagePoHostNotify->FindItem(nID);		break;
 
-		case SS_POLICY_TYPE_IN_VULN_OP:		pPolicy	= t_ManagePoInVulnOp->FindItem(nID);		break;	//37
-		case SS_POLICY_TYPE_IN_VULN_SCAN:	pPolicy	= t_ManagePoInVulnScan->FindItem(nID);		break;	//37
+		case SS_POLICY_TYPE_PM_OP:					pPolicy	= t_ManagePoPmOp->FindItem(nID);			break;
+		case SS_POLICY_TYPE_PM_DM:					pPolicy	= t_ManagePoPmDm->FindItem(nID);			break;
+		case SS_POLICY_TYPE_PM_SCAN:				pPolicy	= t_ManagePoPmScan->FindItem(nID);			break;
+		case SS_POLICY_TYPE_PM_EX:					pPolicy	= t_ManagePoPmEx->FindItem(nID);			break;
+		case SS_POLICY_TYPE_PM_NO:					pPolicy	= t_ManagePoPmNo->FindItem(nID);			break;
+
+		case SS_POLICY_TYPE_IN_VULN_AX:				pPolicy	= t_ManagePoInVulnAx->FindItem(nID);		break;	//38
+		case SS_POLICY_TYPE_IN_VULN_EDIT_APP:		pPolicy	= t_ManagePoInVulnEditApp->FindItem(nID);	break;	//39
+		case SS_POLICY_TYPE_IN_VULN_QNA:			pPolicy	= t_ManagePoInVulnQna->FindItem(nID);		break;	//41
+		case SS_POLICY_TYPE_IN_VULN_SECU_USB:		pPolicy	= t_ManagePoInVulnSecuUsb->FindItem(nID);	break;	//43
+		case SS_POLICY_TYPE_IN_VULN_SW:				pPolicy	= t_ManagePoInVulnSw->FindItem(nID);		break;	//44
+		case SS_POLICY_TYPE_IN_VULN_PATCH_EXCEPTION:		pPolicy	= t_ManagePoInVulnPatchException->FindItem(nID);	break;	//45
+
+		case SS_POLICY_TYPE_DV_OP:					pPolicy = t_ManagePoInDevOOp->FindItem(nID);		break;
+		case SS_POLICY_TYPE_DV_BL:					pPolicy = t_ManagePoInDevOBL->FindItem(nID);		break;
+		case SS_POLICY_TYPE_DV_WL:					pPolicy = t_ManagePoInDevOWL->FindItem(nID);		break;
+		case SS_POLICY_TYPE_DV_EX:					pPolicy = t_ManagePoInDevOEx->FindItem(nID);		break;
+		case SS_POLICY_TYPE_DV_NOTIFY:				pPolicy = t_ManagePoInDevONotify->FindItem(nID);	break;
+
+		case SS_POLICY_TYPE_IN_RS_OP:				pPolicy	= t_ManagePoInRsOp->FindItem(nID);			break;	//38
+ 		case SS_POLICY_TYPE_IN_RS_BK:				pPolicy	= t_ManagePoInRsBk->FindItem(nID);			break;	//39
+ 		case SS_POLICY_TYPE_IN_RS_NO:				pPolicy	= t_ManagePoInRsNo->FindItem(nID);			break;	//40
 
 		default:
 		{

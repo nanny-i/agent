@@ -138,7 +138,7 @@ INT32			StrToMapStr(String strMapList, TMapStr& tStrMap, CHAR chCellTok, CHAR ch
 }
 //------------------------------------------------------------------------------
 
-String			MapID_StrToStr(TMapIDStr& tIDMapStr, CHAR chCellTok, CHAR chBlockTok)
+String			MapIDStrToStr(TMapIDStr& tIDMapStr, CHAR chCellTok, CHAR chBlockTok)
 {
 	String strValue;
 	TMapIDStrItor begin, end;
@@ -151,6 +151,58 @@ String			MapID_StrToStr(TMapIDStr& tIDMapStr, CHAR chCellTok, CHAR chBlockTok)
 	return strValue;
 }
 //------------------------------------------------------------------------------
+
+INT32			StrToMapIDStr(String strMapList, TMapIDStr& tIDMapStr, CHAR chCellTok)
+{
+	INT32 nIdx = 1;
+	CTokenString Token(strMapList.c_str(), strMapList.length(), chCellTok);
+	while(Token.IsNextToken())
+	{
+		String strValue = Token.NextToken();
+		tIDMapStr[nIdx++] = strValue;
+	}
+	return tIDMapStr.size();
+}
+
+String			ListStrToStr(TListStr& tStrList, CHAR chBlockTok)
+{
+	String strValue;
+	TListStrItor begin, end;
+	begin = tStrList.begin();	end = tStrList.end();
+	for(begin; begin != end; begin++)
+	{
+		String strCell;
+		strCell = SPrintf("%s%c", (*begin).c_str(), chBlockTok);
+		strValue += strCell;
+	}
+	return strValue;
+}
+
+INT32			StrToListStr(String strListList, TListStr& tStrList, CHAR chBlockTok)
+{
+	CTokenString Token(strListList.c_str(), strListList.length(), chBlockTok);
+	while(Token.IsNextToken())
+	{
+		String strKey = Token.NextToken();
+
+		tStrList.push_back(strKey);
+	}
+	return tStrList.size();
+}
+
+String			MapIDToStr_Str(TMapIDStr& tIDMapStr, CHAR chCellTok, CHAR chBlockTok)
+{
+	String strValue;
+	TMapIDStrItor begin, end;
+	begin = tIDMapStr.begin();	end = tIDMapStr.end();
+	for(begin; begin != end; begin++)
+	{
+		String strCell;
+		strCell = SPrintf("%u%c%s%c", begin->first, chCellTok, begin->second, chBlockTok);
+		strValue += strCell;
+	}
+	return strValue;
+}
 
 INT32			StrToMapID_Str(String strMapList, TMapIDStr& tIDMapStr, CHAR chCellTok, CHAR chBlockTok)
 {
@@ -168,6 +220,42 @@ INT32			StrToMapID_Str(String strMapList, TMapIDStr& tIDMapStr, CHAR chCellTok, 
 	}
 	return tIDMapStr.size();
 }
+
+//------------------------------------------------------------------------------
+
+String			MapIDToStr_ID(TMapID& tIDMap, CHAR chCellTok, CHAR chBlockTok)
+{
+	String strValue;
+	TMapIDItor begin, end;
+	begin = tIDMap.begin();	end = tIDMap.end();
+	for(begin; begin != end; begin++)
+	{
+		String strCell;
+		strCell= SPrintf("%u%c%u%c", begin->first, chCellTok, begin->second, chBlockTok);
+		strValue += strCell;
+	}
+	return strValue;
+}
+//------------------------------------------------------------------------------
+
+INT32			StrToMapID_ID(String strMapList, TMapID& tIDMap, CHAR chCellTok, CHAR chBlockTok)
+{
+	CTokenString Token(strMapList.c_str(), strMapList.length(), chBlockTok);
+	while(Token.IsNextToken())
+	{
+		String strCell = Token.NextToken();
+
+		CTokenString TokenCel(strCell.c_str(), strCell.length(), chCellTok);
+
+		UINT32 nKey = TokenCel.NextToken_UInt();
+		UINT32 nValue = TokenCel.NextToken_UInt();
+
+		tIDMap[nKey] = nValue;
+	}
+	return tIDMap.size();
+}
+
+
 //------------------------------------------------------------------------------
 
 INT32			MaptoMapStr_64(TMapID64& tIDMap, TMapStr& tStrMap)
@@ -193,6 +281,35 @@ INT32			MapStrToMap_64(TMapStr& tStrMap, TMapID64& tIDMap)
 	}
 
 	return tIDMap.size();
+}
+//------------------------------------------------------------------------------
+
+INT32			HexToP32(String strHexValue, PINT32 pValue, INT32 nValNum)
+{
+	INT32 nIdx = 0;
+	CTokenString Token(strHexValue.c_str(), strHexValue.length());
+	while(Token.IsNextToken() && nIdx < nValNum)
+	{
+		String strBlock = Token.NextToken_Len(8);
+		UINT32 nValue = HexToInt(strBlock.c_str());
+
+		pValue[nIdx] = nValue;
+		nIdx += 1;
+	}
+	return 0;
+}
+//------------------------------------------------------------------------------
+
+INT32			P32ToHex(PINT32 pValue, INT32 nValNum, String& strHexValue)
+{
+	INT32 nIdx = 0;
+	while(nIdx < nValNum)
+	{
+		UINT32 nValue = pValue[nIdx];		
+		strHexValue += IntToHex(nValue);
+		nIdx += 1;
+	}
+	return 0;
 }
 //------------------------------------------------------------------------------
 

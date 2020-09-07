@@ -80,11 +80,20 @@ INT32					CManageEnvNotifyInfo::InitHash()
 		}
 
 		{
-			String strOrgValueItem = SPrintf("%s,%I64u,%I64u,%u,%u,%u,%u,%u,%s,%u,", 
+			String strOrgValueItem = SPrintf("%s,"
+								"%llu,%llu,%u,"
+								"%u,%u,%u,"
+								"%u,%s,"
+								"%u,"
+								"%s,"
+								"%u,",
 								GetHdrHashInfo(pdeni).c_str(),
-								pdeni->nPolicyType, pdeni->nPolicyCode,
-								pdeni->nPosType, pdeni->nShowSize, pdeni->nShowPos, pdeni->nShowTime,
-								pdeni->nMsgFmtType, pdeni->strMsgInfo.c_str(), pdeni->nNotifyBeforeDay);
+								pdeni->nPolicyType, pdeni->nPolicyCode, pdeni->nPosType, 
+								pdeni->nShowSize, pdeni->nShowPos, pdeni->nShowTime,
+								pdeni->nMsgFmtType, pdeni->strMsgInfo.c_str(), 
+								pdeni->nNotifyBeforeDay,
+								pdeni->strMatchInfo.c_str(),
+								pdeni->nNotifySkipDay);
 
 			strOrgValue += strOrgValueItem;
 		}
@@ -116,11 +125,20 @@ INT32					CManageEnvNotifyInfo::GetHash(UINT32 nID, String& strOrgValue)
 	}
 
 	{
-		strOrgValue = SPrintf("%s,%I64u,%I64u,%u,%u,%u,%u,%u,%s,%u,", 
+		strOrgValue = SPrintf("%s,"
+						"%llu,%llu,%u,"
+						"%u,%u,%u,"
+						"%u,%s,"
+						"%u,"
+						"%s,"
+						"%u,",
 						GetHdrHashInfo(pdeni).c_str(),
-						pdeni->nPolicyType, pdeni->nPolicyCode,
-						pdeni->nPosType, pdeni->nShowSize, pdeni->nShowPos, pdeni->nShowTime,
-						pdeni->nMsgFmtType, pdeni->strMsgInfo.c_str(), pdeni->nNotifyBeforeDay);
+						pdeni->nPolicyType, pdeni->nPolicyCode, pdeni->nPosType, 
+						pdeni->nShowSize, pdeni->nShowPos, pdeni->nShowTime,
+						pdeni->nMsgFmtType, pdeni->strMsgInfo.c_str(), 
+						pdeni->nNotifyBeforeDay,
+						pdeni->strMatchInfo.c_str(),
+						pdeni->nNotifySkipDay);
 	}
 	return 0;
 }
@@ -249,6 +267,9 @@ INT32					CManageEnvNotifyInfo::SetPkt(PDB_ENV_NOTIFY_INFO pdeni, MemToken& Send
 	SendToken.TokenAdd_String(pdeni->strMsgInfo);
 	SendToken.TokenAdd_32(pdeni->nNotifyBeforeDay);
 
+	SendToken.TokenAdd_String(pdeni->strMatchInfo);
+	SendToken.TokenAdd_32(pdeni->nNotifySkipDay);
+
 	SendToken.TokenSet_Block();
 
     return 0;
@@ -268,6 +289,9 @@ INT32					CManageEnvNotifyInfo::GetPkt(MemToken& RecvToken, DB_ENV_NOTIFY_INFO& 
 	if (!RecvToken.TokenDel_32(deni.nMsgFmtType))				goto	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(deni.strMsgInfo) < 0)		goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(deni.nNotifyBeforeDay))			goto	INVALID_PKT;
+
+	if ( RecvToken.TokenDel_String(deni.strMatchInfo) < 0)		goto	INVALID_PKT;
+	if (!RecvToken.TokenDel_32(deni.nNotifySkipDay))			goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;
@@ -334,6 +358,9 @@ INT32					CManageEnvNotifyInfo::GetIDLIstByNotifyPolType(UINT32 nNotifyPolType, 
 				return -1;
 			}
 
+			if(ppfn->tDPH.nUsedMode == STATUS_USED_MODE_OFF)
+				return -1;
+
 			t_ManagePoFaNotifyPkg->GetKeyIDList(ppfn->tDPH.nID, tIDList);
 			break;
 		}
@@ -345,6 +372,9 @@ INT32					CManageEnvNotifyInfo::GetIDLIstByNotifyPolType(UINT32 nNotifyPolType, 
 				WriteLogE("get notify_info list fail : not find cur policy [po_fe_notify]");
 				return -1;
 			}
+
+			if(ppfen->tDPH.nUsedMode == STATUS_USED_MODE_OFF)
+				return -1;
 
 			t_ManagePoFeNotifyPkg->GetKeyIDList(ppfen->tDPH.nID, tIDList);
 

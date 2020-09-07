@@ -48,6 +48,9 @@ public:
 	INT32					GetPkt(MemToken& RecvToken, DB_ENV_TRUST_SUBJECT& dets);
 
 public:
+	INT32					SetPktDbg(MemToken& SendToken);
+
+public:
 	CManageEnvTrustSubject();
     ~CManageEnvTrustSubject();
 

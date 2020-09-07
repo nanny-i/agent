@@ -45,8 +45,11 @@ public:
 public:
 	void		SetLogDoc(DB_LOG_DOC& dld);
 	void		SetLogDoc_Mgr(DB_LOG_DOC& dld);
-	INT32		ChkDelBackupOp();
-	INT32		ChkBackupOp(UINT32 nDelMethod = 0, UINT32 nDelCnt = 7, UINT32 nLimitSize = 0, UINT32 nLimitDelCnt = 0, UINT32 nChkFDTType = 0, UINT32 nDelAfterDay = 0);
+	INT32		ChkDelBackupOp(UINT32& nContinue);
+	INT32		ChkBackupOp(UINT32 nDelMethod /*0*/, UINT32 nDelCnt /*7*/, UINT32 nLimitSize /*0*/, UINT32 nLimitDelCnt /*0*/, UINT32 nChkFDTType /*0*/, UINT32 nDelAfterDay /*0*/, UINT32& nContinue);
+
+public:
+	void		SendPkt_Sync(INT32 nOnceMaxNum = 1000);
 
 public:
 	CLogicMgrLogDoc();

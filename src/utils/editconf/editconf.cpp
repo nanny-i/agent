@@ -214,12 +214,13 @@ int SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 	String strLgnSvrInfo;
 	char acLogMsg[MAX_LOGMSG+1] = {0,};
 
-	
 	if(pcLgnSvrIp == NULL || pcLgnSvrPort == NULL)
 	{
 		printf("fail to set logon server info : invalid input data\n", acLogMsg);
 		return 3;
 	}
+
+
 		
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_CON_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{

@@ -78,7 +78,7 @@ INT32		CLogicMgrPoWinRun::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if(SetER(t_ManagePoWinRun->ApplyPoWinRun(dpwr)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -115,13 +115,13 @@ INT32		CLogicMgrPoWinRun::DumpMBR()
 	PDB_PO_WIN_RUN pdpwr = (PDB_PO_WIN_RUN)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if (!pdpwr)
 	{
-		WriteLogE("[%s] not find current policy.", m_strLogicName);
+		WriteLogE("[%s] not find current policy.", m_strLogicName.c_str());
 		return -1;
 	}
 	
 	if (pdpwr->nMbrUsedMode == STATUS_USED_MODE_OFF)
 	{
-		WriteLogN("[%s] current policy used mode off.", m_strLogicName);
+		WriteLogN("[%s] current policy used mode off.", m_strLogicName.c_str());
 		return -2;
 	}
 
@@ -165,13 +165,13 @@ INT32		CLogicMgrPoWinRun::RestoreMBR()
 	PDB_PO_WIN_RUN pdpwr = (PDB_PO_WIN_RUN)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if (!pdpwr)
 	{
-		WriteLogE("[%s] not find current policy.", m_strLogicName);
+		WriteLogE("[%s] not find current policy.", m_strLogicName.c_str());
 		return -1;
 	}
 
 	if (pdpwr->nMbrUsedMode == STATUS_USED_MODE_OFF)
 	{
-		WriteLogN("[%s] current policy used mode off.", m_strLogicName);
+		WriteLogN("[%s] current policy used mode off.", m_strLogicName.c_str());
 		return -2;
 	}
 
@@ -196,7 +196,7 @@ INT32		CLogicMgrPoWinRun::RestoreMBR()
 
 		if (dwFalsify == TRUE)
 		{			
-			WriteLogN("[%s] md is not falsification.", m_strLogicName);
+			WriteLogN("[%s] md is not falsification.", m_strLogicName.c_str());
 			return 0;
 		}
 
@@ -231,7 +231,7 @@ INT32		CLogicMgrPoWinRun::RestoreMBR()
 
 	if (!bFind)
 	{
-		WriteLogE("[%s] not found adjust md file.", m_strLogicName);
+		WriteLogE("[%s] not found adjust md file.", m_strLogicName.c_str());
 		return -3;
 	}
 

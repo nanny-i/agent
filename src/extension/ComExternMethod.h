@@ -29,11 +29,23 @@ INT32			MapToHex_64(TMapID64& tValueMap, String& strHexValue, INT32 nMaxLen);
 String			MapStrToStr(TMapStr& tStrMap, CHAR chCellTok = '/', CHAR chBlockTok = '|');
 INT32			StrToMapStr(String strMapList, TMapStr& tStrMap, CHAR chCellTok = '/', CHAR chBlockTok = '|');
 
-String			MapID_StrToStr(TMapIDStr& tIDMapStr, CHAR chCellTok = '/', CHAR chBlockTok = '|');
+String			MapIDStrToStr(TMapIDStr& tIDMapStr, CHAR chCellTok = ',');
+INT32			StrToMapIDStr(String strMapList, TMapIDStr& tIDMapStr, CHAR chCellTok = ',');
+
+String			ListStrToStr(TListStr& tStrList, CHAR chBlockTok);
+INT32			StrToListStr(String strList, TListStr& tStrList, CHAR chBlockTok);
+
+String			MapIDToStr_Str(TMapIDStr& tIDMapStr, CHAR chCellTok = '/', CHAR chBlockTok = '|');
 INT32			StrToMapID_Str(String strMapList, TMapIDStr& tIDMapStr, CHAR chCellTok = '/', CHAR chBlockTok = '|');
+
+String			MapIDToStr_ID(TMapID& tIDMap, CHAR chCellTok = '/', CHAR chBlockTok = '|');
+INT32			StrToMapID_ID(String strMapList, TMapID& tIDMap, CHAR chCellTok = '/', CHAR chBlockTok = '|');
 
 INT32			MaptoMapStr_64(TMapID64& tIDMap, TMapStr& tStrMap);
 INT32			MapStrToMap_64(TMapStr& tStrMap, TMapID64& tIDMap);
+
+INT32			HexToP32(String strHexValue, PINT32 pValue, INT32 nValNum);
+INT32			P32ToHex(PINT32 pValue, INT32 nValNum, String& strHexValue);
 
 INT32			CheckDumpFile(String &strPath, INT32 nRestDumpCount = 3);
 
@@ -41,6 +53,8 @@ INT32			RemoveDumpFiles();
 INT32			RemoveSdeltemp();
 INT32			RemoveInvenFiles();
 void			DeletePrefixFiles(String strPath, LPCTSTR lpszPrefixed);
+
+INT32			FindMemory(PBYTE lpBuff, UINT32 nBuffLen, PBYTE lpFindBuff, UINT32 nFindBuffLen);
 
 void			WriteLogA(char* fmt,...);
 

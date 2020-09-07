@@ -90,7 +90,7 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Add_Ext()
 	{
 		if(SetER(t_ManageUser->ApplyUser(du)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply user information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -112,7 +112,7 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if(SetER(t_ManageUser->ApplyUser(du)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply user information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -138,12 +138,12 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Del_Ext()
 	{
 		if(SetER(t_ManageUser->DelUser(m_nRecvID)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] delete user information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
 
-		WriteLogE("[%s] del user info ", m_strLogicName.c_str());
+		WriteLogN("[%s] del user info ", m_strLogicName.c_str());
 	}
 
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
@@ -186,7 +186,7 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Ext_Auth()
 
 		if(SetER(t_ManageLocalEnvAuth->EditLocalEnvAuth(*pdlea)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] edit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			m_nPktRst = ERR_DBMS_UPDATE_FAIL;
 		}
@@ -208,8 +208,8 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Ext_Auth()
 			goto SEND_PKT;
 		}
 
-		InitDLEALL(m_nEvtOpType, EVENT_SUBJECT_TYPE_USER, m_nSessionID, EVENT_TARGET_TYPE_HOST, pdh->nID , EVENT_OBJECT_TYPE_USER, 0, du.nID, du.strAccountID , m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLEU(m_nEvtOpType, EVENT_OBJECT_TYPE_USER, 0, du.nID, du.strAccountID,  m_strEvtDesc);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	goto SEND_PKT;
@@ -249,7 +249,7 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Ext_ChgPW()
 	{
 		if(SetER(t_ManageUser->ApplyUser(du)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply user information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			m_nPktRst = ERR_DBMS_UPDATE_FAIL;
 		}
@@ -268,7 +268,7 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Ext_ChgPW()
 
 		if(SetER(t_ManageLocalEnvAuth->EditLocalEnvAuth(*pdlea)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] edit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			m_nPktRst = ERR_DBMS_UPDATE_FAIL;
 		}
@@ -291,7 +291,7 @@ INT32		CLogicMgrUser::SendPkt_Auth(PDB_USER pdu)
 {
 	SendToken.Clear();
 	t_ManageUser->SetPkt(pdu, SendToken);
-	SendData(G_TYPE_USER, G_CODE_COMMON_AUTH, SendToken);
+	SendData_Mgr(G_TYPE_USER, G_CODE_COMMON_AUTH, SendToken);
 	SendToken.Clear();
 
 	return 0;
@@ -303,7 +303,7 @@ INT32		CLogicMgrUser::SendPkt_ChgPW(String strAccountID, String strPassword)
 	SendToken.Clear();
 	SendToken.TokenAdd_String(strAccountID);
 	SendToken.TokenAdd_String(strPassword);
-	SendData(G_TYPE_USER, G_CODE_COMMON_CHANGE, SendToken);
+	SendData_Mgr(G_TYPE_USER, G_CODE_COMMON_CHANGE, SendToken);
 	SendToken.Clear();
 
 	return 0;
@@ -369,7 +369,7 @@ INT32		CLogicMgrUser::SetUserLogout(INT32 nExtOption)
 
 		if(SetER(t_ManageLocalEnvAuth->EditLocalEnvAuth(dlea)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] edit information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return 0;
 		}
@@ -398,8 +398,8 @@ INT32		CLogicMgrUser::SetUserLogout(INT32 nExtOption)
 			return 0;
 		}
 
-		InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, EVENT_TARGET_TYPE_HOST, pdh->nID , EVENT_OBJECT_TYPE_USER, 0, pdh->nUserID, pdu->strAccountID , m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLEU(m_nEvtOpType, EVENT_OBJECT_TYPE_USER, 0, pdh->nUserID, pdu->strAccountID,  m_strEvtDesc);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 
 	return 0;

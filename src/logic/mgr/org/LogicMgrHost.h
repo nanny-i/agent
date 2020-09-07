@@ -35,6 +35,7 @@ private:
 
 public:
 	void		SendPkt_Edit();
+	void		SendPkt_InIt();
 
 public:
 	void		SetUninstallHost();

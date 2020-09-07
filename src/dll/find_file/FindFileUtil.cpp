@@ -222,7 +222,7 @@ INT32		CFindFileUtil::StopThread_Common(CThreadBase* tThreadObject, UINT32 nWait
 
 	while(m_SemExt.WaitForSingleObject(100) == WAIT_TIMEOUT)
 	{
-		if(tThreadObject->IsRunThread() == 0)
+		if(tThreadObject->GetContinue() == 0)
 			break;
 		if(!nLWaitTime)
 			break;
@@ -554,8 +554,8 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 					strSubAddPathA = (strSubDir.empty() ? strRootPath + "/" + strFileNameA : strRootPath + "/" + strSubDir + "/" + strFileNameA);
 					get_file_size(strSubAddPathA.c_str(), &dwFileLen);
 					tAFFI.nFileSize		= dwFileLen;
-					tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
-					tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
+//					tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
+//					tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
 					tAFFI.strFilePath	= strChkDirA;
 					tAFFI.strFileName	= strFileNameA;
 					tAFFI.nFindType		= nMatchType;
@@ -625,8 +625,8 @@ INT32		CFindFileUtil::Recursive_SearchFile(UINT32 nOrderID, String strSearchPath
 			strDirA = strChkDirA + "/" + strFileNameA;
 			get_file_size(strDirA.c_str(), &dwFileLen);
 			tAFFI.nFileSize		= dwFileLen;
-			tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
-			tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
+//			tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
+//			tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
 			tAFFI.strFilePath	= strChkDirA;
 			tAFFI.strFileName	= strFileNameA;
 			tAFFI.nFindType		= nMatchType;
@@ -711,8 +711,8 @@ INT32		CFindFileUtil::Recursive_SearchDirFile(UINT32 nOrderID, String strSearchP
 				strPathA = strChkDirA + "/" + strFileNameA;
 				get_file_size(strPathA.c_str(), &dwFileLen);
 				tAFFI.nFileSize		= dwFileLen;
-				tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
-				tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
+//				tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
+//				tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
 				tAFFI.strFilePath	= strChkDirA;
 				tAFFI.strFileName	= strFileNameA;
 				tAFFI.nFindType		= nMatchType;
@@ -1372,7 +1372,7 @@ INT32		CFindFileUtil::AddFindSubDirItem(UINT32 nOrderID, UINT32 nSubSearch, TLis
 	{
 		tFDI.nOrderID		= nOrderID;
 		tFDI.strSearchDir	= *begin;
-		tFDI.strSearchDirW = ConvertWideString(tFDI.strSearchDir);
+//		tFDI.strSearchDirW = ConvertWideString(tFDI.strSearchDir);
 		tFDI.nSubSearch		= nSubSearch;
 		m_tFindSubDirItemList.push_back(tFDI);
 	}
@@ -1428,7 +1428,7 @@ INT32		CFindFileUtil::AddFindFileDirItem(UINT32 nOrderID, TListStr& tNameList, P
 	{
 		tFDI.nOrderID		= nOrderID;
 		tFDI.strSearchDir	= *begin;	
-		tFDI.strSearchDirW	= ConvertWideString(tFDI.strSearchDir);
+//		tFDI.strSearchDirW	= ConvertWideString(tFDI.strSearchDir);
 		m_tFindFileDirItemList.push_back(tFDI);
 	}
 	if(pnWorkNum)	

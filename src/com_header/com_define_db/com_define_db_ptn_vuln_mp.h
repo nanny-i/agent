@@ -1,0 +1,17 @@
+
+#ifndef COM_DEFINE_DB_PTN_VULN_MP_H_938EF200_F60B_452A_BD30_A10E8507EDCC
+#define COM_DEFINE_DB_PTN_VULN_MP_H_938EF200_F60B_452A_BD30_A10E8507EDCC
+
+//-------------------------------------------------------------------
+//RISK
+#define SS_PTN_VULN_MP_CHECK_TYPE_PATCH				0
+#define SS_PTN_VULN_MP_CHECK_TYPE_SCAN_ENV			1
+
+
+#define SS_PTN_VULN_MP_TYPE_HWP_PATCH				0
+#define SS_PTN_VULN_MP_TYPE_ADOBE_READER_PATCH		1
+#define SS_PTN_VULN_MP_TYPE_ADOBE_FLASH_PATCH		2
+#define SS_PTN_VULN_MP_TYPE_EDITER_APP_INSTALL		3
+
+//--------------------------------------------------------------------
+#endif	//COM_DEFINE_DB_PTN_VULN_MP_H_938EF200_F60B_452A_BD30_A10E8507EDCC

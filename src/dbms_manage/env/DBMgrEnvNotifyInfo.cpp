@@ -55,7 +55,11 @@ INT32			CDBMgrEnvNotifyInfo::LoadDB(TListDBEnvNotifyInfo& tDBEnvNotifyInfoList)
     INT32 nIndex = 0;
 
 	m_strQuery = SPrintf(DBMS_POLICY_QUERY_HDR_SELECT
-						", policy_type, policy_code, pos_type, show_size, show_pos, show_time, msg_fmt_type, msg_info, notify_before_day"
+						", policy_type, policy_code"
+						", pos_type, show_size, show_pos, show_time"
+						", msg_fmt_type, msg_info, notify_before_day"
+						", match_info"
+						", notify_skip_day"
 						" FROM env_notify_info WHERE used_flag=1;");
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -77,6 +81,8 @@ INT32			CDBMgrEnvNotifyInfo::LoadDB(TListDBEnvNotifyInfo& tDBEnvNotifyInfoList)
 		deni.strMsgInfo				= GetDBField_String(nIndex++);
 
 		deni.nNotifyBeforeDay		= GetDBField_UInt(nIndex++);
+		deni.strMatchInfo			= GetDBField_String(nIndex++);
+		deni.nNotifySkipDay			= GetDBField_UInt(nIndex++);
 
 		tDBEnvNotifyInfoList.push_back(deni);
 		if(m_nLoadMaxID < UINT32(tDPH.nID))	m_nLoadMaxID = tDPH.nID;
@@ -94,15 +100,28 @@ INT32			CDBMgrEnvNotifyInfo::InsertEnvNotifyInfo(DB_ENV_NOTIFY_INFO& deni)
 
 	m_strQuery = SPrintf("INSERT INTO env_notify_info("
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
-						", policy_type, policy_code"
-						", pos_type, show_size, show_pos, show_time, msg_fmt_type, msg_info, notify_before_day"
+						", policy_type, policy_code, pos_type"
+						", show_size, show_pos, show_time"
+						", msg_fmt_type, msg_info"
+						", notify_before_day"
+						", match_info"
+						", notify_skip_day"
 						") VALUES (%s"
-                        ", '%I64u', '%I64u'"
-						", %u, %u, %u, %u, %u, '%s', %u);",
-                        GetPoHDRQuery_InsertValue(tDPH).c_str(),
-						deni.nPolicyType, deni.nPolicyCode,
-						deni.nPosType, deni.nShowSize, deni.nShowPos, deni.nShowTime,
-						deni.nMsgFmtType, deni.strMsgInfo.c_str(), deni.nNotifyBeforeDay);
+                        ", '%llu', '%llu', %u"
+						", %u, %u, %u"
+						", %u, '%s'"
+						", %u"
+						", '%s'"
+						", %u"
+						");",
+                        GetPoHDRQuery_InsertValue(tDPH).c_str(), 
+						deni.nPolicyType, deni.nPolicyCode, deni.nPosType, 
+						deni.nShowSize, deni.nShowPos, deni.nShowTime,
+						deni.nMsgFmtType, deni.strMsgInfo.c_str(), 
+						deni.nNotifyBeforeDay,
+						deni.strMatchInfo.c_str(),
+						deni.nNotifySkipDay
+						);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -118,14 +137,20 @@ INT32			CDBMgrEnvNotifyInfo::UpdateEnvNotifyInfo(DB_ENV_NOTIFY_INFO& deni)
 	DB_PO_HEADER& tDPH = deni.tDPH;
 
 	m_strQuery = SPrintf("UPDATE env_notify_info SET %s"
-						", policy_type='%I64u', policy_code='%I64u'"
-						", pos_type=%u, show_size=%u, show_pos=%u, show_time=%u"
-						", msg_fmt_type=%u, msg_info='%s', notify_before_day=%u"
+						", policy_type='%llu', policy_code='%llu', pos_type=%u"
+						", show_size=%u, show_pos=%u, show_time=%u"
+						", msg_fmt_type=%u, msg_info='%s'"
+						", notify_before_day=%u"
+						", match_info='%s'"
+						", notify_skip_day=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(), 
 						deni.nPolicyType, deni.nPolicyCode,
 						deni.nPosType, deni.nShowSize, deni.nShowPos, deni.nShowTime,
-						deni.nMsgFmtType, deni.strMsgInfo.c_str(), deni.nNotifyBeforeDay,
+						deni.nMsgFmtType, deni.strMsgInfo.c_str(), 
+						deni.nNotifyBeforeDay,
+						deni.strMatchInfo.c_str(),
+						deni.nNotifySkipDay,
                         tDPH.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

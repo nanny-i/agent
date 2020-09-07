@@ -54,7 +54,7 @@ INT32		CManagePoSchPkg::LoadDBMS()
 	for(begin; begin != end; begin++)
 	{
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
 	}
 	return 0;
 }
@@ -110,7 +110,7 @@ INT32					CManagePoSchPkg::AddPoSchPkg(DB_PO_SCH_PKG&	dphpsp)
 	}
 
 	AddItem(dphpsp.tDPH.nID, dphpsp);
-	AddKeyIDList(&dphpsp);
+	AddKeyIDListPkg(&dphpsp);
 
 	return 0;
 }
@@ -142,7 +142,7 @@ INT32					CManagePoSchPkg::DelPoSchPkg(UINT32 nID)
 		return g_nErrRtn;
 	}
 
-	DelKeyIDList(pdphpsp);
+	DelKeyIDListPkg(pdphpsp);
 	DeleteItem(nID);
 	return 0;
 }

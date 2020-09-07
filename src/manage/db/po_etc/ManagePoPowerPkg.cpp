@@ -54,7 +54,7 @@ INT32		CManagePoPowerPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -72,7 +72,7 @@ INT32					CManagePoPowerPkg::InitPkg()
 		pDpp = t_ManagePoPower->FindItem(nPolicyID);
 		if(pDpp == NULL)
 		{
-			WriteLogE("not find po_power_pkg information [%d]:po_id[%d]:[%d]", nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+//			WriteLogE("not find po_power_pkg information [%d]:po_id[%d]:[%d]", nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -109,7 +109,7 @@ INT32					CManagePoPowerPkg::AddPoPowerPkg(DB_PO_POWER_PKG&	dppp)
     }
 
 	AddItem(dppp.tDPH.nID, dppp);
-	AddKeyIDList(&dppp);
+	AddKeyIDListPkg(&dppp);
 
     return 0;
 }
@@ -141,7 +141,7 @@ INT32					CManagePoPowerPkg::DelPoPowerPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdppp);
+	DelKeyIDListPkg(pdppp);
     DeleteItem(nID);
     return 0;
 }

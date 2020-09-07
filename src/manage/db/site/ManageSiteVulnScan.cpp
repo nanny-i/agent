@@ -53,7 +53,8 @@ INT32		CManageSiteVulnScan::LoadDBMS()
     begin = tDBSiteVulnScanList.begin();	end = tDBSiteVulnScanList.end();
     for(begin; begin != end; begin++)
     {
-    	AddItem(begin->nID, *begin);
+		AddItem(begin->nID, *begin);
+		AddKeyIDList(begin->nVulnID, begin->nID);
     }
     return 0;
 }
@@ -97,17 +98,17 @@ INT32					CManageSiteVulnScan::GetHashData(UINT32 nID, String& strOrgValue)
 	}
 
 	{
-		strOrgValue = SPrintf("%u,%u,%u,%u,%u,%u,"
-							"%s,%s,"
-							"%u,%I64u,%u,"
-							"%u,%u,%u,"
-							"%u,%u,"
-							"%s, %u,"
-							"%u,%u,%s,", 
+		strOrgValue = SPrintf("%u,%u,%u,%u,%u,%u"
+							",%s"
+							",%u,%u,%u"
+							",%I64u,%u,%u"
+							",%u,%u"
+							",%s,%u"
+							",%u,%u,%s", 
 							pdata->nID, pdata->nUsedFlag, pdata->nRegDate, pdata->nUsedMode, pdata->nAdminID, pdata->nExtOption,
-							pdata->strName.c_str(), pdata->strDescr.c_str(), 
-							pdata->nOsType, pdata->nOsID, pdata->nOsPa, 
-							pdata->nSVulnID, pdata->nSVulnSubID, pdata->nScanOrder,
+							pdata->strName.c_str(), 
+							pdata->nVulnID, pdata->nVulnSubID, pdata->nScanOrder,
+							pdata->nSysType, pdata->nSysSPType, pdata->nSysArchType,
 							pdata->nScanType, pdata->nCustomID,
 							pdata->strScanPath.c_str(), pdata->nValueType,
 							pdata->nDecisionType, pdata->nCompType, pdata->strCompValue.c_str());
@@ -217,15 +218,14 @@ INT32					CManageSiteVulnScan::SetPkt(PDB_SITE_VULN_SCAN pdata, MemToken& SendTo
 	SendToken.TokenAdd_32(pdata->nExtOption);
 
 	SendToken.TokenAdd_String(pdata->strName);
-	SendToken.TokenAdd_String(pdata->strDescr);
 
-	SendToken.TokenAdd_32(pdata->nOsType);
-	SendToken.TokenAdd_64(pdata->nOsID);
-	SendToken.TokenAdd_32(pdata->nOsPa);
-
-	SendToken.TokenAdd_32(pdata->nSVulnID);
-	SendToken.TokenAdd_32(pdata->nSVulnSubID);
+	SendToken.TokenAdd_32(pdata->nVulnID);
+	SendToken.TokenAdd_32(pdata->nVulnSubID);
 	SendToken.TokenAdd_32(pdata->nScanOrder);
+
+	SendToken.TokenAdd_64(pdata->nSysType);
+	SendToken.TokenAdd_32(pdata->nSysSPType);
+	SendToken.TokenAdd_32(pdata->nSysArchType);
 
 	SendToken.TokenAdd_32(pdata->nScanType);
 	SendToken.TokenAdd_32(pdata->nCustomID);
@@ -252,15 +252,14 @@ INT32					CManageSiteVulnScan::GetPkt(MemToken& RecvToken, DB_SITE_VULN_SCAN& da
 	if(!RecvToken.TokenDel_32(data.nExtOption))				goto INVALID_PKT;
 
 	if( RecvToken.TokenDel_String(data.strName) < 0)		goto INVALID_PKT;
-	if( RecvToken.TokenDel_String(data.strDescr) < 0)		goto INVALID_PKT;
 
-	if(!RecvToken.TokenDel_32(data.nOsType))				goto INVALID_PKT;
-	if(!RecvToken.TokenDel_64(data.nOsID))					goto INVALID_PKT;
-	if(!RecvToken.TokenDel_32(data.nOsPa))					goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nVulnID))				goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nVulnSubID))			goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nScanOrder))			goto INVALID_PKT;
 
-	if(!RecvToken.TokenDel_32(data.nSVulnID))				goto INVALID_PKT;
-	if(!RecvToken.TokenDel_32(data.nSVulnSubID))			goto INVALID_PKT;
-	if(!RecvToken.TokenDel_32(data.nScanOrder))				goto INVALID_PKT;
+	if (!RecvToken.TokenDel_64(data.nSysType))				goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nSysSPType))			goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nSysArchType))			goto INVALID_PKT;
 
 	if(!RecvToken.TokenDel_32(data.nScanType))				goto INVALID_PKT;
 	if(!RecvToken.TokenDel_32(data.nCustomID))				goto INVALID_PKT;

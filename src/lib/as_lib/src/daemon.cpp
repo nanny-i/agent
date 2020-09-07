@@ -23,9 +23,8 @@
 
 void daemon_init(void)
 {
-	int    i;
+	int i = 0;
 	pid_t  pid;
-
 	if ( (pid = fork()) == -1)
 	{
 		exit(0);
@@ -57,13 +56,13 @@ void daemon_init(void)
 	chdir("/");
 	umask(022);
 
-	for (i = 3; i < ASI_DAEMON_MAX_FD; i++) {
-		close(i);
-	}
-
 	freopen("/dev/null", "r", stdin);
 	freopen("/dev/null", "w", stdout);
 	freopen("/dev/null", "w", stderr);
+	for (i = 3; i < ASI_DAEMON_MAX_FD; i++) 
+	{
+		close(i);
+	}
 }
 
 

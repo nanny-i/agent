@@ -99,12 +99,13 @@ INT32					CManageSiteVuln::GetHashData(UINT32 nID, String& strOrgValue)
 	{
 		strOrgValue = SPrintf("%u,%u,%u,%u,%u,%u,"
 							"%s,%s,"
-							"%u,%I64u,%u,"
-							"%u,%u,", 
+							",%llu,%u,%u"
+							",%u,%u,%u", 
 							pdata->nID, pdata->nUsedFlag, pdata->nRegDate, pdata->nUsedMode, pdata->nAdminID, pdata->nExtOption,
+							pdata->nClass,
 							pdata->strName.c_str(), pdata->strDescr.c_str(), 
-							pdata->nOsType, pdata->nOsID, pdata->nOsPa, 
-							pdata->nRiskLevel, pdata->nDefScore);	
+							pdata->nSysType, pdata->nSysSPType, pdata->nSysArchType,
+							pdata->nSupportOption, pdata->nRiskLevel, pdata->nDefScore);	
 	}
 	return 0;
 }
@@ -208,13 +209,16 @@ INT32					CManageSiteVuln::SetPkt(PDB_SITE_VULN pdata, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdata->nAdminID);
 	SendToken.TokenAdd_32(pdata->nExtOption);
 
+	SendToken.TokenAdd_32(pdata->nClass);
+
 	SendToken.TokenAdd_String(pdata->strName);
 	SendToken.TokenAdd_String(pdata->strDescr);
 
-	SendToken.TokenAdd_32(pdata->nOsType);
-	SendToken.TokenAdd_64(pdata->nOsID);
-	SendToken.TokenAdd_32(pdata->nOsPa);
+	SendToken.TokenAdd_64(pdata->nSysType);
+	SendToken.TokenAdd_32(pdata->nSysSPType);
+	SendToken.TokenAdd_32(pdata->nSysArchType);
 
+	SendToken.TokenAdd_32(pdata->nSupportOption);
 	SendToken.TokenAdd_32(pdata->nRiskLevel);
 	SendToken.TokenAdd_32(pdata->nDefScore);
 
@@ -232,13 +236,16 @@ INT32					CManageSiteVuln::GetPkt(MemToken& RecvToken, DB_SITE_VULN& data)
 	if (!RecvToken.TokenDel_32(data.nAdminID))				goto INVALID_PKT;
 	if (!RecvToken.TokenDel_32(data.nExtOption))			goto INVALID_PKT;
 
+	if (!RecvToken.TokenDel_32(data.nClass))				goto INVALID_PKT;
+
 	if ( RecvToken.TokenDel_String(data.strName) < 0)		goto INVALID_PKT;
 	if ( RecvToken.TokenDel_String(data.strDescr) < 0)		goto INVALID_PKT;
 
-	if (!RecvToken.TokenDel_32(data.nOsType))				goto INVALID_PKT;
-	if (!RecvToken.TokenDel_64(data.nOsID))					goto INVALID_PKT;
-	if (!RecvToken.TokenDel_32(data.nOsPa))					goto INVALID_PKT;
+	if (!RecvToken.TokenDel_64(data.nSysType))				goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nSysSPType))			goto INVALID_PKT;
+	if (!RecvToken.TokenDel_32(data.nSysArchType))			goto INVALID_PKT;
 
+	if (!RecvToken.TokenDel_32(data.nSupportOption))		goto INVALID_PKT;
 	if (!RecvToken.TokenDel_32(data.nRiskLevel))			goto INVALID_PKT;
 	if (!RecvToken.TokenDel_32(data.nDefScore))				goto INVALID_PKT;
 

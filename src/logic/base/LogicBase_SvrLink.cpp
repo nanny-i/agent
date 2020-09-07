@@ -311,6 +311,46 @@ INT32	CLogicBase::SendPktToLink()
 	PKT_DATA tPktData = *m_tPktData;
 	tPktData.nSessionID = 0;	
 
+	do 
+	{
+		if(SendPktToLink_Ctrl_Etc())	break;
+
+		if(SendPktToLink_Host())		break;
+		if(SendPktToLink_PoEtc())		break;
+		if(SendPktToLink_PoFA())		break;
+		if(SendPktToLink_PoFE())		break;
+		if(SendPktToLink_PoOnPtn())		break;
+		if(SendPktToLink_PoOnVuln())	break;
+		if(SendPktToLink_PoOnRs())		break;
+		if(SendPktToLink_PoPm())		break;
+
+
+		if(SendPktToLink_Log())			break;
+
+	} while (FALSE);
+
+
+	if(m_nPolicyType)		return 0;
+
+	switch(m_nPolicyUnitType)
+	{
+		case SS_POLICY_UNIT_TYPE_IN_PTN_SP_RULE:
+		{
+			t_ManagePoInPtnSPRule->SetPkt(SendToken);
+			SendData_Link(G_TYPE_PO_IN_PTN_SP_RULE, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_ptn_sp_rule][%d]", t_ManagePoInPtnSPRule->Count());	
+		}
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_Ctrl_Etc()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
 	switch(m_nControlType)
 	{
 		case SS_CONTROL_TYPE_ENV_NOTIFY_INFO:
@@ -323,8 +363,36 @@ INT32	CLogicBase::SendPktToLink()
 			WriteLogN("[logic link] send sync link data [env_notify_info][%d]", t_ManageEnvNotifyInfo->Count());	
 			break;
 		}
+		case SS_CONTROL_TYPE_DVMS_DV_INFO:
+		{
+			tPktData.hdr.type = G_TYPE_INIT;
+			tPktData.hdr.code = G_CODE_INIT_PO_DV_INFO;
+			t_ManagePoInDevOInfo->SetPkt(SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_in_devo_info][%d]", t_ManagePoInDevOInfo->Count());	
+			break;
+		}
+		default:
+		{
+			nProcess = 0;
+			break;
+		}
 	}
-	
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+
+INT32	CLogicBase::SendPktToLink_Host()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
 	switch(m_nPolicyType)
 	{
 		case SS_POLICY_TYPE_HOST_RM_INFO:
@@ -357,6 +425,49 @@ INT32	CLogicBase::SendPktToLink()
 			WriteLogN("[logic link] send sync link data [po_host_run][%d]", t_ManagePoHostRun->Count());	
 			break;
 		}
+		case SS_POLICY_TYPE_HOST_NOTIFY:
+		{
+			tPktData.hdr.code = G_CODE_INIT_PO_HOST_NOTIFY;
+			t_ManagePoHostNotify->SetPkt(SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_host_notify][%d]", t_ManagePoHostNotify->Count());
+
+			tPktData.hdr.code = G_CODE_INIT_PO_HOST_NOTIFY_PKG;
+			t_ManagePoHostNotifyPkg->SetPkt(SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_host_notify_pkg][%d]", t_ManagePoHostNotifyPkg->Count());		
+
+			tPktData.hdr.code = G_CODE_INIT_PO_HOST_NOTIFY_UNIT;
+			t_ManagePoHostNotifyUnit->SetPkt(SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_host_notify_unit][%d]", t_ManagePoHostNotifyUnit->Count());		
+			break;
+		}
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_Log()
+{
+	return 0;
+}
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoEtc()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{
 		case SS_POLICY_TYPE_SVR_INFO_LGN:
 		{			
 			PDB_PO_SVR_INFO_LGN pCurPolicy = (PDB_PO_SVR_INFO_LGN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_SVR_INFO_LGN);
@@ -493,6 +604,26 @@ INT32	CLogicBase::SendPktToLink()
 			WriteLogN("[logic link] send sync link data [po_self_protect][%d]", t_ManagePoSelfProtect->Count());		
 			break;
 		}
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoFA()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{
 		case SS_POLICY_TYPE_FA_OP:
 		{			
 			PDB_PO_FA_OP pCurPolicy = (PDB_PO_FA_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FA_OP);
@@ -583,6 +714,27 @@ INT32	CLogicBase::SendPktToLink()
 			WriteLogN("[logic link] send sync link data [po_fa_Notify][%d]", t_ManagePoFaNotify->Count());		
 			break;
 		}
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoFE()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{
+		
 		case SS_POLICY_TYPE_FE_PTN_OP:
 		{		
 			PDB_PO_FE_PTN_OP pCurPolicy = (PDB_PO_FE_PTN_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FE_PTN_OP);
@@ -678,7 +830,7 @@ INT32	CLogicBase::SendPktToLink()
 			PDB_PO_FE_SINGLE_PTN pCurPolicy = (PDB_PO_FE_SINGLE_PTN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FE_SINGLE_PTN);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po fe single ptn fail : not find cur policy", m_strLogicName.c_str());
+//				WriteLogE("[%s] set po fe single ptn fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
@@ -688,6 +840,27 @@ INT32	CLogicBase::SendPktToLink()
 			WriteLogN("[logic link] send sync link data [po_fe_single_ptn][%d]", t_ManagePoFeSinglePtn->Count());		
 			break;
 		}
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoOnPtn()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{
+		
 		case SS_POLICY_TYPE_IN_PTN_OP:
 		{		
 			PDB_PO_IN_PTN_OP pCurPolicy = (PDB_PO_IN_PTN_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_PTN_OP);
@@ -778,58 +951,117 @@ INT32	CLogicBase::SendPktToLink()
 			WriteLogN("[logic init] send sync link data [po_in_ptn_no][%d]", t_ManagePoInPtnNo->Count());	
 			break;
 		}
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		case SS_POLICY_TYPE_IN_AC_DOC:
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoOnRs()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{
+		case SS_POLICY_TYPE_IN_RS_OP:
 		{			
-			PDB_PO_IN_AC_DOC pCurPolicy = (PDB_PO_IN_AC_DOC)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_DOC);
+			PDB_PO_IN_RS_OP pCurPolicy = (PDB_PO_IN_RS_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_OP);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po in ac doc fail : not find cur policy", m_strLogicName.c_str());
+				WriteLogE("[%s] set po in rs op fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
-			t_ManagePoInAcDoc->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoInRsOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
 			SendData_Link(&tPktData, SendToken);
 			SendToken.Clear();
-			WriteLogN("[logic link] send sync link data [po_in_ac_doc][%d]", t_ManagePoInAcDoc->Count());						
+			WriteLogN("[logic link] send sync link data [po_in_rs_op][%d]", t_ManagePoInRsOp->Count());						
 			break;
 		}
-		case SS_POLICY_TYPE_IN_AC_SF:
+		case SS_POLICY_TYPE_IN_RS_BK:
 		{		
-			PDB_PO_IN_AC_SF pCurPolicy = (PDB_PO_IN_AC_SF)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_SF);
+			PDB_PO_IN_RS_BK pCurPolicy = (PDB_PO_IN_RS_BK)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_BK);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po in ac sf fail : not find cur policy", m_strLogicName.c_str());
+//				WriteLogE("[%s] set po in rs bk fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
-			t_ManagePoInAcSf->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoInRsBk->SetPkt(pCurPolicy->tDPH.nID, SendToken);
 			SendData_Link(&tPktData, SendToken);
 			SendToken.Clear();
-			WriteLogN("[logic link] send sync link data [po_in_ac_sf][%d]", t_ManagePoInAcSf->Count());					
+			WriteLogN("[logic link] send sync link data [po_in_rs_bk][%d]", t_ManagePoInRsBk->Count());					
 			break;
 		}
-		case SS_POLICY_TYPE_IN_AC_FILE:
+		case SS_POLICY_TYPE_IN_RS_NO:
 		{			
-			PDB_PO_IN_AC_FILE pCurPolicy = (PDB_PO_IN_AC_FILE)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_AC_FILE);
+			PDB_PO_IN_RS_NO pCurPolicy = (PDB_PO_IN_RS_NO)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_RS_NO);
 			if(!pCurPolicy)
 			{
-				WriteLogE("[%s] set po in ac file fail : not find cur policy", m_strLogicName.c_str());
+				WriteLogE("[%s] set po in rs no fail : not find cur policy", m_strLogicName.c_str());
 				break;
 			}
 
-			t_ManagePoInAcFile->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			t_ManagePoInRsNo->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
 			SendData_Link(&tPktData, SendToken);
 			SendToken.Clear();
-			WriteLogN("[logic link] send sync link data [po_in_ac_file][%d]", t_ManagePoInAcFile->Count());	
+			WriteLogN("[logic link] send sync link data [po_in_rs_no][%d]", t_ManagePoInRsNo->Count());	
 			break;
 		}
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoOnVuln()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{		
+		case SS_POLICY_TYPE_IN_VULN_AX:
+		{
+			PDB_PO_IN_VULN_AX pCurPolicy = (PDB_PO_IN_VULN_AX)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_AX);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in vuln ax fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInVulnAx->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+	//		SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_AX, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_vuln_ax][%d]", t_ManagePoInVulnAx->Count());
+			break;
+		}
+		case SS_POLICY_TYPE_IN_VULN_EDIT_APP:
+		{
+			PDB_PO_IN_VULN_EDIT_APP pCurPolicy = (PDB_PO_IN_VULN_EDIT_APP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_EDIT_APP);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in vuln edit app fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInVulnEditApp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+		//	SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_EDIT_APP, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_vuln_edit_app][%d]", t_ManagePoInVulnEditApp->Count());
+			break;
+		}
 		case SS_POLICY_TYPE_IN_VULN_OP:
 		{		
 			PDB_PO_IN_VULN_OP pCurPolicy = (PDB_PO_IN_VULN_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_OP);
@@ -840,9 +1072,26 @@ INT32	CLogicBase::SendPktToLink()
 			}
 
 			t_ManagePoInVulnOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
-			SendData_Link(&tPktData, SendToken);
+		//	SendData_Link(&tPktData, SendToken)
+			SendData_Link(0, G_TYPE_PO_IN_VULN_OP, G_CODE_COMMON_EDIT, SendToken);
 			SendToken.Clear();
 			WriteLogN("[logic init] send sync link data [po_in_vuln_op][%d]", t_ManagePoInVulnOp->Count());	
+			break;
+		}
+		case SS_POLICY_TYPE_IN_VULN_QNA:
+		{
+			PDB_PO_IN_VULN_QNA pCurPolicy = (PDB_PO_IN_VULN_QNA)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_QNA);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in vuln qna fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInVulnQna->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+		//	SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_QNA, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_vuln_qna][%d]", t_ManagePoInVulnQna->Count());
 			break;
 		}
 		case SS_POLICY_TYPE_IN_VULN_SCAN:
@@ -855,31 +1104,244 @@ INT32	CLogicBase::SendPktToLink()
 			}
 
 			t_ManagePoInVulnScan->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
-			SendData_Link(&tPktData, SendToken);
+		//	SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_SCAN, G_CODE_COMMON_EDIT, SendToken);
 			SendToken.Clear();
 			WriteLogN("[logic init] send sync link data [po_in_vuln_scan][%d]", t_ManagePoInVulnScan->Count());		
 			break;
 		}
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-	}
-	if(m_nPolicyType)		return 0;
-
-	switch(m_nPolicyUnitType)
-	{
-		case SS_POLICY_UNIT_TYPE_IN_PTN_SP_RULE:
+		case SS_POLICY_TYPE_IN_VULN_SECU_USB:
 		{
-			t_ManagePoInPtnSPRule->SetPkt(SendToken);
-			SendData_Link(G_TYPE_PO_IN_PTN_SP_RULE, G_CODE_COMMON_EDIT, SendToken);
+			PDB_PO_IN_VULN_SECU_USB pCurPolicy = (PDB_PO_IN_VULN_SECU_USB)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_SECU_USB);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in vuln secu usb fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInVulnSecuUsb->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+		//	SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_SECU_USB, G_CODE_COMMON_EDIT, SendToken);
 			SendToken.Clear();
-			WriteLogN("[logic init] send sync link data [po_in_ptn_sp_rule][%d]", t_ManagePoInPtnSPRule->Count());	
+			WriteLogN("[logic init] send sync link data [po_in_vuln_secu_usb][%d]", t_ManagePoInVulnSecuUsb->Count());
+			break;
+		}
+		case SS_POLICY_TYPE_IN_VULN_SW:
+		{
+			PDB_PO_IN_VULN_SW pCurPolicy = (PDB_PO_IN_VULN_SW)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_SW);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in vuln sw fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInVulnSw->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+		//	SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_SW, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_vuln_sw][%d]", t_ManagePoInVulnSw->Count());
+			break;
+		}
+		case SS_POLICY_TYPE_IN_VULN_PATCH_EXCEPTION:
+		{
+			PDB_PO_IN_VULN_PATCH_EXCEPTION pCurPolicy = (PDB_PO_IN_VULN_PATCH_EXCEPTION)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_IN_VULN_PATCH_EXCEPTION);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in vuln sw version fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInVulnPatchException->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+		//	SendData_Link(&tPktData, SendToken);
+			SendData_Link(0, G_TYPE_PO_IN_VULN_PATCH_EXCEPTION, G_CODE_COMMON_EDIT, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_vuln_patch_exception][%d]", t_ManagePoInVulnPatchException->Count());
+			break;
+		}
+		case SS_POLICY_TYPE_DV_OP:
+		{		
+			PDB_PO_IN_DEVO_OP pCurPolicy = (PDB_PO_IN_DEVO_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_OP);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in devo op fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInDevOOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_devo_op][%d]", t_ManagePoInDevOOp->Count());	
+			break;
+		}
+		case SS_POLICY_TYPE_DV_BL:
+		{		
+			PDB_PO_IN_DEVO_BL pCurPolicy = (PDB_PO_IN_DEVO_BL)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_BL);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in devo bl fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInDevOBL->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_devo_bl][%d]", t_ManagePoInDevOBL->Count());	
+			break;
+		}
+		case SS_POLICY_TYPE_DV_WL:
+		{		
+			PDB_PO_IN_DEVO_WL pCurPolicy = (PDB_PO_IN_DEVO_WL)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_WL);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in devo bl fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInDevOWL->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_devo_wl][%d]", t_ManagePoInDevOWL->Count());	
+			break;
+		}
+		case SS_POLICY_TYPE_DV_EX:
+		{		
+			PDB_PO_IN_DEVO_EX pCurPolicy = (PDB_PO_IN_DEVO_EX)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_EX);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in devo ex fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInDevOEx->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic init] send sync link data [po_in_devo_ex][%d]", t_ManagePoInDevOEx->Count());	
+			break;
+		}
+		case SS_POLICY_TYPE_DV_NOTIFY:
+		{		
+			PDB_PO_IN_DEVO_NOTIFY pCurPolicy = (PDB_PO_IN_DEVO_NOTIFY)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_DV_NOTIFY);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po in devo notify fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoInDevONotify->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_in_devo_Notify][%d]", t_ManagePoInDevONotify->Count());		
+			break;
+		}
+		default:
+		{
+			nProcess = 0;
 		}
 	}
-	return 0;
+	return nProcess;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32	CLogicBase::SendPktToLink_PoPm()
+{
+	PKT_DATA tPktData = *m_tPktData;
+	INT32 nProcess = 1;
+
+	switch(m_nPolicyType)
+	{
+		case SS_POLICY_TYPE_PM_OP:
+		{			
+			PDB_PO_PM_OP pCurPolicy = (PDB_PO_PM_OP)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_OP);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po pm op fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoPmOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_pm_op][%d]", t_ManagePoPmOp->Count());						
+			break;
+		}
+		case SS_POLICY_TYPE_PM_DM:
+		{			
+			{
+				PDB_PO_PM_DM pCurPolicy = (PDB_PO_PM_DM)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_DM);
+				if(!pCurPolicy)
+				{
+					WriteLogE("[%s] set po pm dm fail : not find cur policy", m_strLogicName.c_str());
+					break;
+				}
+
+				t_ManagePoPmDm->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+				SendData_Link(&tPktData, SendToken);
+				SendToken.Clear();
+				WriteLogN("[logic link] send sync link data [po_pm_dm][%d]", t_ManagePoPmDm->Count());						
+			}
+			{
+				t_LogicPtnPatch->SendPkt_Sync();
+			}
+			break;
+		}
+		case SS_POLICY_TYPE_PM_EX:
+		{			
+			{
+				PDB_PO_PM_EX pCurPolicy = (PDB_PO_PM_EX)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_EX);
+				if(!pCurPolicy)
+				{
+					WriteLogE("[%s] set po pm ex fail : not find cur policy", m_strLogicName.c_str());
+					break;
+				}
+
+				t_ManagePoPmEx->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+				SendData_Link(&tPktData, SendToken);
+				SendToken.Clear();
+				WriteLogN("[logic link] send sync link data [po_pm_ex][%d]", t_ManagePoPmEx->Count());						
+			}
+			{
+				t_LogicPtnPatch->SendPkt_Sync();
+			}
+			break;
+		}
+		case SS_POLICY_TYPE_PM_SCAN:
+		{			
+			PDB_PO_PM_SCAN pCurPolicy = (PDB_PO_PM_SCAN)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_SCAN);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po pm scan fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoPmScan->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_pm_scan][%d]", t_ManagePoPmScan->Count());						
+			break;
+		}
+		case SS_POLICY_TYPE_PM_NO:
+		{			
+			PDB_PO_PM_NO pCurPolicy = (PDB_PO_PM_NO)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_PM_NO);
+			if(!pCurPolicy)
+			{
+				WriteLogE("[%s] set po pm no fail : not find cur policy", m_strLogicName.c_str());
+				break;
+			}
+
+			t_ManagePoPmNo->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
+			SendData_Link(&tPktData, SendToken);
+			SendToken.Clear();
+			WriteLogN("[logic link] send sync link data [po_pm_no][%d]", t_ManagePoPmNo->Count());						
+			break;
+		}
+		default:
+		{
+			nProcess = 0;
+		}
+	}
+	return nProcess;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

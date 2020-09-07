@@ -38,6 +38,9 @@ private:
 	INT32		IsValidSchedule(DB_PO_POWER_UNIT* pUnit);
 	INT32		ApplyPowerUnit(DB_PO_POWER_UNIT* pUnit);
 
+private:
+	DWORD		m_dwWriteLogCount;
+
 public:
 	CLogicMgrPoPower();
     ~CLogicMgrPoPower();

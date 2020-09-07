@@ -22,10 +22,10 @@
 
 typedef struct _db_log_secu
 {
-    _db_log_secu()
-    {
-        _init();        
-    }
+	_db_log_secu()
+	{
+		_init();        
+	}
 
 	void _init()
 	{
@@ -40,6 +40,7 @@ typedef struct _db_log_secu
 		nNotifyID			= 0;
 
 		nHostID				= 0;
+		nUserID				= 0;
 		nPolicyType			= 0;
 		nOpType				= 0;
 		nRegSvrID			= 0;
@@ -54,7 +55,7 @@ typedef struct _db_log_secu
 		strObjectName		= "";
 		strObjectPathW		= L"";
 	}
-  
+
 	UINT32		nID;
 	UINT32		nUsedFlag;
 	UINT32		nRegDate;
@@ -66,6 +67,7 @@ typedef struct _db_log_secu
 	UINT32		nNotifyID;
 
 	UINT32		nHostID;
+	UINT32		nUserID;
 	UINT32		nPolicyType;
 	UINT32		nOpType;
 	UINT32		nRegSvrID;
@@ -78,7 +80,8 @@ typedef struct _db_log_secu
 	String		strSubjectName;
 	String		strObjectPath;
 	String		strObjectName;
-	StringW	strObjectPathW;
+	StringW		strObjectPathW;
+
 
 }DB_LOG_SECU, *PDB_LOG_SECU;
 

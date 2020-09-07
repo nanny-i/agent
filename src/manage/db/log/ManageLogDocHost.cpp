@@ -53,7 +53,7 @@ INT32		CManageLogDocHost::LoadDBMS()
 	begin = tDBLogDocHostList.begin();	end = tDBLogDocHostList.end();
 	for(begin; begin != end; begin++)
 	{		
-		if(t_ManageLogDoc->FindItem(begin->nLogID) == NULL)		continue;
+		if(t_ManageLogDoc && t_ManageLogDoc->FindItem(begin->nLogID) == NULL)		continue;
 		
 		AddItem(*begin);
 		AddKeyID(begin->nLogID, begin->nID);

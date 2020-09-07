@@ -74,7 +74,7 @@ INT32		CLogicLogDocDScan::AnalyzePkt_FromLink_Ext_Scan()
 		dldd.nRegDate = GetCurrentDateTimeInt();
 		if(SetER(t_ManageLogDocDScan->AddLogDocDScan(dldd)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] doc demand scan add fail : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			goto SEND_PKT;
 		}
@@ -92,6 +92,7 @@ INT32		CLogicLogDocDScan::AnalyzePkt_FromLink_Ext_Scan()
 			}
 
 			{
+				tMFOI.nEvtTime		= GetCurrentDateTimeInt();
 				tMFOI.nOpType		= SS_LOG_DOC_OP_TYPE_SCAN;
 				tMFOI.nNextOp		= G_CODE_COMMON_SCAN;
 				tMFOI.nNotiPg		= STATUS_USED_MODE_ON;

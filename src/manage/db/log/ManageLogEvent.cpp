@@ -43,9 +43,23 @@ CManageLogEvent::~CManageLogEvent()
 
 INT32		CManageLogEvent::LoadDBMS()
 {
+	UINT32 nLogMode = 0, nLogNum = 0;
+	{
+		PDB_ENV_LOG pdel = t_ManageEnvLog->FindItem(DEFAULT_ID);
+		if(pdel)
+		{
+			nLogMode = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadModeMap, SS_ENV_LOG_INDEX_EVENT);
+			nLogNum = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadNumMap, SS_ENV_LOG_INDEX_EVENT);
+			if(nLogMode == SS_ENV_LOG_LOAD_MODE_TYPE_DAY && nLogNum)
+			{
+				nLogNum = ((GetCurrentDateTimeInt() / 86400) - nLogNum) * 86400;
+			}
+		}
+	}
+
 	TListDBLogEvent tDBLogEventList;
 	TListDBLogEventItor begin, end;
-	if(SetER(t_DBMgrLogEvent->LoadExecute(&tDBLogEventList)))
+	if(SetER(t_DBMgrLogEvent->LoadDB(nLogMode, nLogNum, tDBLogEventList)))
     {
     	return g_nErrRtn;
     }
@@ -126,6 +140,90 @@ INT32					CManageLogEvent::GetInitPktList(UINT32 nAdminID, TListPVOID& tInitPktL
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+
+INT32			CManageLogEvent::SetPktSync(TListPVOID& tIDList)
+{
+	{
+		TMapDBLogEventItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if(ISSYNCSTEP(begin->second.nSyncSvrStep) || 
+				(begin->second.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))	continue;
+
+			tIDList.push_back(&(begin->second));
+		}
+
+		if(tIDList.empty())	return -1;
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32					CManageLogEvent::SetPktSyncMode(MemToken& SendToken, UINT32 nSyncMode)
+{
+	TListPVOID tSendList;
+
+	{
+		TMapDBLogEventItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if((begin->second.nSyncSvrMode && !(begin->second.nSyncSvrMode & nSyncMode)) ||
+				(begin->second.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_AGENT))	continue;
+
+			tSendList.push_back(&(begin->second));
+		}
+		if(tSendList.empty())	return -1;
+	}
+
+	SendToken.TokenAdd_32(tSendList.size());
+	{
+		TListPVOIDItor begin, end;
+		begin = tSendList.begin();	end = tSendList.end();
+		for(begin; begin != end; begin++)
+		{
+			SetPkt((PDB_LOG_EVENT)(*begin), SendToken);
+		}
+	}	
+	return tSendList.size();
+}
+//---------------------------------------------------------------------------
+
+INT32					CManageLogEvent::SetPktSync(MemToken& SendToken)
+{
+	TListPVOID tSendList;
+
+	{
+		TMapDBLogEventItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if(	ISSYNCSTEP(begin->second.nSyncSvrStep) || 
+				(begin->second.nSyncSvrMode & SS_LOG_EVENT_HOST_SYNC_MODE_SVR) == 0 ||
+				(begin->second.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))	continue;
+
+			tSendList.push_back(&(begin->second));
+		}
+		if(tSendList.empty())	return -1;
+	}
+
+	SendToken.TokenAdd_32(tSendList.size());
+	{
+		TListPVOIDItor begin, end;
+		begin = tSendList.begin();	end = tSendList.end();
+		for(begin; begin != end; begin++)
+		{
+			SetPkt((PDB_LOG_EVENT)(*begin), SendToken);
+		}
+	}	
+	return 0;
+}
 //---------------------------------------------------------------------------
 
 INT32					CManageLogEvent::SetPkt(MemToken& SendToken, UINT32 nAdminID)
@@ -163,6 +261,7 @@ INT32					CManageLogEvent::SetPkt(MemToken& SendToken)
 
 INT32					CManageLogEvent::SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken)
 {
+	String strEucData;
 	SendToken.TokenAdd_32(pdle->nID);
 	SendToken.TokenAdd_32(pdle->nRegDate);
 	SendToken.TokenAdd_32(pdle->nEvtTime);
@@ -171,21 +270,50 @@ INT32					CManageLogEvent::SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdle->nNotifyType);
 	SendToken.TokenAdd_32(pdle->nNotifyID);
 
+	SendToken.TokenAdd_32(pdle->nHostID);
+	SendToken.TokenAdd_32(pdle->nRegSvrID);
+	SendToken.TokenAdd_32(pdle->nSyncSvrStep);
+
 	SendToken.TokenAdd_32(pdle->nSubjectType);
 	SendToken.TokenAdd_32(pdle->nSubjectID);
-	SendToken.TokenAdd_String(pdle->strSubjectInfo);
+
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strSubjectInfo, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdle->strSubjectInfo);
 
 	SendToken.TokenAdd_32(pdle->nTargetType);
 	SendToken.TokenAdd_32(pdle->nTargetID);
-	SendToken.TokenAdd_String(pdle->strTargetInfo);
+
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strTargetInfo, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdle->strTargetInfo);
 
 	SendToken.TokenAdd_32(pdle->nObjectType);
 	SendToken.TokenAdd_32(pdle->nObjectCode);
 	SendToken.TokenAdd_32(pdle->nObjectID);
-	SendToken.TokenAdd_String(pdle->strObjectInfo);
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strObjectInfo, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdle->strObjectInfo);
 
 	SendToken.TokenAdd_32(pdle->nOperationType);
-	SendToken.TokenAdd_String(pdle->strEventDescr);
+
+	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strEventDescr, strEucData) == 0)
+	{
+		SendToken.TokenAdd_String(strEucData);
+	}
+	else
+		SendToken.TokenAdd_String(pdle->strEventDescr);
+
+	SendToken.TokenAdd_32(pdle->nUserID);
 
 	SendToken.TokenSet_Block();
 
@@ -195,6 +323,7 @@ INT32					CManageLogEvent::SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken)
 
 INT32					CManageLogEvent::GetPkt(MemToken& RecvToken, DB_LOG_EVENT& dle)
 {
+	String strUtcData;
 	if (!RecvToken.TokenDel_32(dle.nID))						goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nRegDate))					goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nEvtTime))					goto	INVALID_PKT;
@@ -203,21 +332,44 @@ INT32					CManageLogEvent::GetPkt(MemToken& RecvToken, DB_LOG_EVENT& dle)
 	if (!RecvToken.TokenDel_32(dle.nNotifyType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nNotifyID))					goto 	INVALID_PKT;
 
+	if (!RecvToken.TokenDel_32(dle.nHostID))					goto 	INVALID_PKT;
+	if (!RecvToken.TokenDel_32(dle.nRegSvrID))					goto 	INVALID_PKT;
+	if (!RecvToken.TokenDel_32(dle.nSyncSvrStep))				goto 	INVALID_PKT;
+
 	if (!RecvToken.TokenDel_32(dle.nSubjectType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nSubjectID))					goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strSubjectInfo) < 0)		goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strSubjectInfo, strUtcData) == 0)
+	{
+		dle.strSubjectInfo = strUtcData;
+	}
 
 	if (!RecvToken.TokenDel_32(dle.nTargetType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nTargetID))					goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strTargetInfo) < 0)		goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strTargetInfo, strUtcData) == 0)
+	{
+		dle.strTargetInfo = strUtcData;
+	}
 
 	if (!RecvToken.TokenDel_32(dle.nObjectType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nObjectCode))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nObjectID))					goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strObjectInfo) < 0)		goto	INVALID_PKT;
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strObjectInfo, strUtcData) == 0)
+	{
+		dle.strObjectInfo = strUtcData;
+	}
 
 	if (!RecvToken.TokenDel_32(dle.nOperationType))				goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strEventDescr) < 0)		goto	INVALID_PKT;
+
+	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strEventDescr, strUtcData) == 0)
+	{
+		dle.strEventDescr = strUtcData;
+	}
+
+	if (!RecvToken.TokenDel_32(dle.nUserID))					goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
 	return 0;

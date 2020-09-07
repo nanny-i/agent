@@ -135,8 +135,8 @@ INT32		CLogicMgrCtrlRemoteCtrl::ApplyRemotePolicy(PMEM_CTRL_REMOTE_CTRL pInfo)
 	t_ExecuteFileUtil->ExecuteFileByUser(tATI, tATMP);
 
 	{
-		InitDLEALL(m_nEvtOpType, m_nEvtSubType, m_nSessionID, m_nEvtTarType, 0, m_nEvtObjType, m_nEvtObjCode, 0, pInfo->strSvrAddress, m_strEvtDesc);
-		t_LogicLogEvent->SetLogEvent(m_tDLE);
+		InitDLE_OBJ(0, pInfo->strSvrAddress);
+		t_LogicMgrLogEvent->SetLogEvent(m_tDLE);
 	}
 	
 	return nRet;

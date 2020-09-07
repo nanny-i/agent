@@ -74,7 +74,7 @@ INT32		CLogicMgrPoFaBk::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if(SetER(t_ManagePoFaBk->ApplyPoFaBk(dpfb)))
 		{
-			SetDLEA_EC(g_nErrRtn);
+			SetDLEH_EC(g_nErrRtn);
 			WriteLogE("[%s] apply policy information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
@@ -83,8 +83,8 @@ INT32		CLogicMgrPoFaBk::AnalyzePkt_FromMgr_Edit_Ext()
 	{
 		if(dpfb.tDPH.nUsedMode == STATUS_USED_MODE_OFF)	
 		{
-			t_LogicMgrLogDoc->ChkDelBackupOp();
-			t_DocBackupUtil->RemoveBackupFilesByNonExistLog();
+			t_LogicMgrLogDoc->ChkDelBackupOp(t_EnvInfoOp->GetStopOpBySysOff());
+			t_DocBackupUtil->RemoveBackupFilesByNonExistLog(t_EnvInfoOp->GetStopOpBySysOff());
 		}
 	}
 
@@ -112,8 +112,10 @@ INT32		CLogicMgrPoFaBk::EndFindOrder(PMEM_FIND_ORDER_INFO pMFOI)
 		{
 			if(UINT16(pMFOI->nNextOp) == G_CODE_COMMON_DEL)
 			{
-				t_LogicMgrLogDoc->ChkDelBackupOp();
-				t_DocBackupUtil->RemoveBackupFilesByNonExistLog();
+				t_ManageDocDeleteInfo->UpdateDocDeleteInfo();
+				t_LogicDocDeleteInfo->SendPkt_DocDeleteInfo_Edit();
+				t_LogicMgrLogDoc->ChkDelBackupOp(t_EnvInfoOp->GetStopOpBySysOff());
+				t_DocBackupUtil->RemoveBackupFilesByNonExistLog(t_EnvInfoOp->GetStopOpBySysOff());
 			}
 			
 			break;

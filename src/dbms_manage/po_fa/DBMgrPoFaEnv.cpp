@@ -53,6 +53,7 @@ INT32			CDBMgrPoFaEnv::LoadDB(TListDBPoFaEnv& tDBPoFaEnvList)
     INT32 nIndex = 0;
 
     m_strQuery = SPrintf(DBMS_POLICY_QUERY_HDR_SELECT
+    					", sys_off_max_work_time"
 						" FROM po_fa_env WHERE used_flag=1;");
     if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -63,6 +64,8 @@ INT32			CDBMgrPoFaEnv::LoadDB(TListDBPoFaEnv& tDBPoFaEnvList)
 		DB_PO_HEADER& tDPH = dpfe.tDPH;
 
 		tDPH						= GetDBField_PoHDR(nIndex);
+
+		dpfe.nSysOffMaxWorkTime		= GetDBField_UInt(nIndex++);
 		
         tDBPoFaEnvList.push_back(dpfe);
         if(m_nLoadMaxID < UINT32(tDPH.nID))
@@ -81,9 +84,12 @@ INT32			CDBMgrPoFaEnv::InsertPoFaEnv(DB_PO_FA_ENV& dpfe)
 
 	m_strQuery = SPrintf("INSERT INTO po_fa_env("
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
+						", sys_off_max_work_time"
 						") VALUES (%s"
+						", %u"
 						");",
-                        GetPoHDRQuery_InsertValue(tDPH).c_str());
+                        GetPoHDRQuery_InsertValue(tDPH).c_str(),
+						dpfe.nSysOffMaxWorkTime);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -99,8 +105,10 @@ INT32			CDBMgrPoFaEnv::UpdatePoFaEnv(DB_PO_FA_ENV& dpfe)
 	DB_PO_HEADER& tDPH = dpfe.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_fa_env SET %s"
+						", sys_off_max_work_time=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(),
+						dpfe.nSysOffMaxWorkTime,
 						tDPH.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

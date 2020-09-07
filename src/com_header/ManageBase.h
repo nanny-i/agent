@@ -56,6 +56,9 @@ public:
 	CManageBase(void);
 	virtual ~CManageBase(void);
 
+public:
+	virtual INT32		Clear();
+
 public :
 	virtual INT32		AddItem(UINT32 nID, _T& data);
 	virtual INT32		AddItem(_T& data);
@@ -85,6 +88,7 @@ public:
 	virtual	UINT32		FindKeyID(UINT32 nKey);
 	virtual UINT32		IsExistKeyID(UINT32 nKey);
 	virtual _T*			FindKeyItem(UINT32 nKey);
+	virtual	UINT32		CountKeyID();
 	virtual	UINT32		GetKeyIDList(TListID& tIDList);
 	virtual	UINT32		ClearKeyID();
 	virtual	UINT32		ConvertKeyID(TListID& tKeyList, TListID& tIDList);
@@ -108,9 +112,24 @@ public:
 	virtual	UINT32		ClearKeyIDList();
 
 public:
+	virtual	UINT32		AddStrKeyIDList(String strKey, UINT32 nID);
+	virtual	UINT32		DelStrKeyIDList(String strKey);
+	virtual	UINT32		DelStrKeyIDList(String strKey, UINT32 nID);
+	virtual	UINT32		SetStrKeyIDList(String strKey, TListID& tIDList);
+	virtual	UINT32		GetStrKeyIDList(TListStr& tKeyList);
+	virtual	UINT32		GetStrKeyIDList(String strKey, TListID& tIDList);
+	virtual	UINT32		IsExistStrKeyIDList(String strKey);
+	virtual	UINT32		IsExistStrKeyIDList(String strKey, UINT32 nID);
+	virtual	UINT32		ClearStrKeyIDList();
+
+
+public:
+	virtual	UINT32		AddKeyIDMap(UINT32 nKey);
 	virtual	UINT32		AddKeyIDMap(UINT32 nKey, UINT32 nID);
 	virtual	UINT32		DelKeyIDMap(UINT32 nKey);
 	virtual	UINT32		DelKeyIDMap(UINT32 nKey, UINT32 nID);
+	virtual	UINT32		DelKeyIDMapByID(UINT32 nID);
+	virtual	UINT32		IsExistKeyIDMap(UINT32 nKey, UINT32 nID);
 	virtual	UINT32		GetKeyIDMap(UINT32 nKey, TMapID& tIDMap);
 	virtual	UINT32		GetKeyIDMap(UINT32 nKey, TMapID& tIDMap, UINT32 nLimited);
 	virtual	UINT32		ClearKeyIDMap();
@@ -142,6 +161,7 @@ public:
 	virtual	UINT32		DelKeySubIDMap(UINT32 nKey, UINT32 nSubKey);
 	virtual	UINT32		GetKeySubIDMap(UINT32 nKey, TMapID& tIDMap);
 	virtual	UINT32		GetKeySubIDMapSKey(UINT32 nKey, TListID& tSKeyList);
+	virtual	UINT32		GetKeySubIDMapKey(TListID& tKeyList);
 	virtual	UINT32		GetKeySubIDMapID(UINT32 nKey, TListID& tIDList);
 	virtual UINT32		FindKeySubIDMapID(UINT32 nKey, UINT32 nSubKey);
 	virtual _T*			FindKeySubIDMapItem(UINT32 nKey, UINT32 nSubKey);
@@ -156,6 +176,8 @@ public:
 	virtual	UINT32		GetPosKeySubIDMap(UINT32 nKey, UINT32 nSubKey, UINT32 nPos = 0);
 	virtual	UINT32		GetPosKeySubIDMap(TMapIDMap& tKeyIDMap, UINT32 nPos = 0);
 	virtual	UINT32		CountPosKeySubIDMap(UINT32 nKey, UINT32 nPos = 0);
+	virtual UINT32		FindPosKeySubIDMapID(UINT32 nKey, UINT32 nSubKey, UINT32 nPos = 0);
+	virtual _T*			FindPosKeySubIDMapItem(UINT32 nKey, UINT32 nSubKey, UINT32 nPos = 0);
 	virtual	UINT32		ClearPosKeySubIDMap(UINT32 nPos = 0);
 
 public:
@@ -168,12 +190,28 @@ public:
 	virtual	UINT32		GetPosStrKeySubIDMap(TMapStrMapID& tKeyStrMap, UINT32 nPos = 0);
 	virtual	UINT32		ClearPosStrKeySubIDMap(UINT32 nPos = 0);
 
+
+public:
+	virtual	UINT32		AddPosStrKeySubStrMapIDMap(String strKey, String strSubKey, UINT32 nID, UINT32 nPos = 0);
+	virtual	UINT32		DelPosStrKeySubStrMapIDMap(String strKey, UINT32 nPos = 0);
+	virtual	UINT32		DelPosStrKeySubStrMapIDMap(String strKey, String strSubKey, UINT32 nPos = 0);
+	virtual	UINT32		DelPosStrKeySubStrMapIDMap(String strKey, String strSubKey, UINT32 nID, UINT32 nPos = 0);
+
+	virtual	UINT32		GetPosStrKeySubStrMapIDMap(String strKey, TMapStrMapID& tSubKeyMap, UINT32 nPos = 0);
+	virtual	UINT32		GetPosStrKeySubStrMapIDMap(String strKey, TListStr& tSubKeyList, UINT32 nPos = 0);
+	virtual	UINT32		GetPosStrKeySubStrMapIDMap(String strKey, String strSubKey, TListID& tIDList, UINT32 nPos = 0);
+	virtual	UINT32		GetPosStrKeySubStrMapIDMap(stlMapStrMapStrMapID& tKeyStrMap, UINT32 nPos = 0);
+	virtual	_T*			FirstPosStrKeySubStrMapIDMapItem(String strKey, String strSubKey, UINT32 nPos = 0);
+	virtual	_T*			LastPosStrKeySubStrMapIDMapItem(String strKey, String strSubKey, UINT32 nPos = 0);
+	virtual	UINT32		ClearPosStrKeySubStrMapIDMap(UINT32 nPos = 0);
+
 public:
 	virtual	UINT32		AddKeyList(UINT32 nKey);
 	virtual	UINT32		DelKeyList(UINT32 nKey);
 	virtual	UINT32		ClearKeyList();
 	virtual	UINT32		LastKeyList();
 	virtual UINT32		GetKeyListCount();
+	virtual	UINT32		GetKeyList(TListID& tKeyList);
 
 public:
 	virtual _T&			GetData();
@@ -190,12 +228,15 @@ protected :
 	TMapID				m_tKeyMap;
 	TMapStrID			m_tStrKeyMap;
 	TMapIDList			m_tKeyListMap;
+    TMapStrList			m_tStrKeyListMap;
 	TMapIDMap			m_tKeyMapMap;
 	TMapIDMap			m_tKeySubIDMap;
 	TMapIDMapMap		m_tPosKeyMapMap;
 	TMapIDMapMap		m_tPosKeySubMapMap;
 	TMapIDMapStrID		m_tPosStrKeyMap;
 	TMapIDMapStrMapID	m_tPosStrKeySubMapMap;
+
+    stlMapIDMapStrMapStrMapID	m_tPosStrKeySubStrMapIDMap;
 
 	TListID				m_tKeyList;
 	map<DWORD, _T>		m_tDataMap;
@@ -204,9 +245,15 @@ protected:
 	list<_T>			m_tTempAddList;
 	list<_T>			m_tTempEditList;
 	list<UINT32>		m_tTempDelList;
+	map <UINT32, _T>	m_tEditMap;
+	typename list <UINT32>::iterator m_pTempDelListItorBegin;
+	typename list <UINT32>::iterator m_pTempDelListItorEnd;
 
 private:
 	pthread_mutex_t 	m_mutex;
+
+protected:
+	pthread_mutex_t			m_mutex_mgr;
 
 protected:
 	typename map <UINT32, _T>::iterator m_pMapItorFind;
@@ -272,6 +319,21 @@ public:
 	INT32				SetTempIDList(TListID& tIDList);
 	INT32				SetTempIDList(TMapID& tIDMap);
 
+public:
+	virtual INT32		AddEditData(_T& data);
+	virtual INT32		EditEditData(_T& data);
+	virtual INT32		DelEditData(UINT32 nID);
+	virtual _T*			FindEditData(UINT32 nID);
+	virtual INT32		ClearEditData();
+	virtual INT32		GetEditDataIDList(TListID& tIDList);
+
+private:
+	_T					m_tEditData;
+
+public:
+	virtual	INT32		SetEditData(_T& data);
+	virtual _T*			GetEditData();
+
 
 public:
 	UINT32		m_nRecvNum;
@@ -298,6 +360,7 @@ TEMPLATE	CManageBase<_T>::CManageBase(void)
 	m_nInitGlobalIter		= 0;
 	m_nInitGlobalKeyIter	= 0;
 	pthread_mutex_init(&m_mutex, NULL);
+    pthread_mutex_init(&m_mutex_mgr, NULL);
 	m_nAutoClear			= 1;
 	
 }
@@ -306,18 +369,31 @@ TEMPLATE	CManageBase<_T>::~CManageBase(void)
 {
 	if(m_nAutoClear)
 	{
-		ClearItem();
-
-		ClearStrKeyID();
-		ClearKeyIDList();
-		ClearKeyList();
-		ClearKeyIDMap();
-		ClearPosKeyIDMap_ALL();
-		ClearPosStrKeyID_ALL();
-		ClearKeySubIDMap();
-		pthread_mutex_destroy(&m_mutex);
-		m_nAutoClear = 0;
+		Clear();
 	}
+}
+
+TEMPLATE INT32		CManageBase<_T>::Clear()
+{
+	ClearItem();
+
+	ClearStrKeyID();
+	ClearStrKeyIDList();
+
+	ClearKeyID();
+	ClearKeyIDList();
+	ClearKeyIDMap();
+
+	ClearKeyList();
+	ClearKeySubIDMap();
+
+	ClearPosKeyIDMap_ALL();
+	ClearPosStrKeyID_ALL();
+
+	ClearPosKeySubIDMap();
+	ClearPosStrKeySubIDMap();
+
+	return 0;
 }
 
 TEMPLATE INT32		CManageBase<_T>::AddItem(UINT32 nID, _T& data)
@@ -720,6 +796,15 @@ TEMPLATE	UINT32		CManageBase<_T>::GetKeyIDList(TListID& tIDList)
 	return tIDList.size();
 }
 
+TEMPLATE	UINT32		CManageBase<_T>::CountKeyID()
+{
+	UINT32 dwSize = 0;
+	pthread_mutex_lock (&m_mutex);
+    dwSize = m_tKeyMap.size();
+    pthread_mutex_unlock (&m_mutex);
+	return dwSize;
+}
+
 TEMPLATE	UINT32		CManageBase<_T>::ClearKeyID()
 {
 	pthread_mutex_lock (&m_mutex);
@@ -944,6 +1029,158 @@ TEMPLATE	UINT32		CManageBase<_T>::ClearKeyIDList()
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+TEMPLATE	UINT32		CManageBase<_T>::AddStrKeyIDList(String strKey, UINT32 nID)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		TListID tIDList;
+		m_tStrKeyListMap[strKey] = tIDList;
+		find = m_tStrKeyListMap.find(strKey);
+	}
+
+	find->second.push_back(nID);
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::DelStrKeyIDList(String strKey)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find != m_tStrKeyListMap.end())
+	{
+		find->second.clear();
+		m_tStrKeyListMap.erase(strKey);
+	}	
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::DelStrKeyIDList(String strKey, UINT32 nID)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);
+		return 0;
+	}
+
+	RemoveListID(find->second, nID);
+
+	if(find->second.size() == 0)
+	{
+		m_tStrKeyListMap.erase(strKey);
+	}
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::SetStrKeyIDList(String strKey, TListID& tIDList)
+{
+	pthread_mutex_lock (&m_mutex);
+
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find == m_tStrKeyListMap.end())
+	{
+		m_tStrKeyListMap[strKey] = tIDList;
+		find = m_tStrKeyListMap.find(strKey);
+	}
+
+	find->second = tIDList;
+
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::GetStrKeyIDList(TListStr& tKeyList)
+{
+	pthread_mutex_lock (&m_mutex);
+
+	TMapStrListItor begin, end;
+	begin = m_tStrKeyListMap.begin();		end = m_tStrKeyListMap.end();
+	for(begin; begin != end; begin++)
+	{
+		tKeyList.push_back(begin->first);
+	}
+
+	pthread_mutex_unlock (&m_mutex);
+
+	return tKeyList.size();
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::GetStrKeyIDList(String strKey, TListID& tIDList)
+{
+	pthread_mutex_lock (&m_mutex);
+
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find != m_tStrKeyListMap.end())
+	{
+		tIDList = find->second;
+	}
+
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::IsExistStrKeyIDList(String strKey)
+{
+	INT32 nRtn = 0;
+	pthread_mutex_lock (&m_mutex);
+
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find != m_tStrKeyListMap.end())
+	{
+		nRtn = 1;
+	}
+	pthread_mutex_unlock (&m_mutex);
+	return nRtn;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::IsExistStrKeyIDList(String strKey, UINT32 nID)
+{
+	INT32 nRtn = 0;
+	pthread_mutex_lock (&m_mutex);
+
+	TMapStrListItor find = m_tStrKeyListMap.find(strKey);
+	if(find != m_tStrKeyListMap.end())
+	{
+		if(IsExistsIDFromList(find->second, nID))
+			nRtn = 1;
+	}
+	pthread_mutex_unlock (&m_mutex);
+	return nRtn;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::ClearStrKeyIDList()
+{
+	pthread_mutex_lock (&m_mutex);
+
+	m_tStrKeyListMap.clear();
+
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
+
+TEMPLATE	UINT32		CManageBase<_T>::AddKeyIDMap(UINT32 nKey)
+{
+	TMapIDMapItor find;
+	TMapID tIDMap;
+	pthread_mutex_lock (&m_mutex);
+
+	find = m_tKeyMapMap.find(nKey);
+	if(find == m_tKeyMapMap.end())
+	{
+		m_tKeyMapMap[nKey] = tIDMap;		
+	}
+
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+
 TEMPLATE	UINT32		CManageBase<_T>::AddKeyIDMap(UINT32 nKey, UINT32 nID)
 {
 	TMapIDMapItor find;
@@ -995,6 +1232,38 @@ TEMPLATE	UINT32		CManageBase<_T>::DelKeyIDMap(UINT32 nKey, UINT32 nID)
 
 	pthread_mutex_unlock (&m_mutex);	
 	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::DelKeyIDMapByID(UINT32 nID)
+{
+	TMapIDMapItor begin, end;
+	pthread_mutex_lock (&m_mutex);
+	begin = m_tKeyMapMap.begin();	end = m_tKeyMapMap.end();
+	for(begin; begin != end; begin++)
+	{
+		begin->second.erase(nID);
+	}
+	pthread_mutex_lock(&m_mutex);	
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::IsExistKeyIDMap(UINT32 nKey, UINT32 nID)
+{
+	UINT32 nRtn = 0;
+    TMapIDMapItor find;
+    TMapIDItor find_key;
+	pthread_mutex_lock (&m_mutex);
+
+	find = m_tKeyMapMap.find(nKey);
+	if(find != m_tKeyMapMap.end())
+	{
+		find_key = find->second.find(nID);
+		if(find_key != find->second.end())
+			nRtn = 1;
+	}
+
+	pthread_mutex_unlock (&m_mutex);	
+	return nRtn;
 }
 
 TEMPLATE	UINT32		CManageBase<_T>::GetKeyIDMap(UINT32 nKey, TMapID& tIDMap)
@@ -1431,6 +1700,20 @@ TEMPLATE	UINT32		CManageBase<_T>::GetKeySubIDMapSKey(UINT32 nKey, TListID& tSKey
 	return 0;
 }
 
+TEMPLATE	UINT32		CManageBase<_T>::GetKeySubIDMapKey(TListID& tKeyList)
+{
+	pthread_mutex_lock (&m_mutex);
+
+	TMapIDMapItor begin, end;
+	begin = m_tKeySubIDMap.begin();	end = m_tKeySubIDMap.end();
+	for(begin; begin != end; begin++)
+	{
+		tKeyList.push_back(begin->first);
+	}
+	pthread_mutex_unlock (&m_mutex);	
+	return 0;
+}
+
 TEMPLATE	UINT32		CManageBase<_T>::GetKeySubIDMapID(UINT32 nKey, TListID& tIDList)
 {
 	pthread_mutex_lock (&m_mutex);
@@ -1645,6 +1928,41 @@ TEMPLATE	UINT32		CManageBase<_T>::CountPosKeySubIDMap(UINT32 nKey, UINT32 nPos)
 	pthread_mutex_unlock (&m_mutex);	
 
 	return nRtn;
+}
+
+TEMPLATE	 UINT32		CManageBase<_T>::FindPosKeySubIDMapID(UINT32 nKey, UINT32 nSubKey, UINT32 nPos)
+{
+	INT32 nRtn = 0;
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapMapItor find = m_tPosKeySubMapMap.find(nPos);
+	if(find == m_tPosKeySubMapMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapIDMapItor find_key = find->second.find(nKey);
+	if(find_key == find->second.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapIDItor find_key_sub = find_key->second.find(nSubKey);
+	if(find_key_sub == find_key->second.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	nRtn = find_key_sub->second;
+	pthread_mutex_unlock (&m_mutex);	
+	return nRtn;
+}
+
+TEMPLATE	_T*			CManageBase<_T>::FindPosKeySubIDMapItem(UINT32 nKey, UINT32 nSubKey, UINT32 nPos)
+{
+	return FindItem(FindPosKeySubIDMapID(nKey, nSubKey, nPos));
 }
 
 TEMPLATE	UINT32		CManageBase<_T>::ClearPosKeySubIDMap(UINT32 nPos)
@@ -1888,6 +2206,324 @@ TEMPLATE	UINT32		CManageBase<_T>::GetPosStrKeySubIDMap(String strKey, UINT32 nSu
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+TEMPLATE	UINT32		CManageBase<_T>::AddPosStrKeySubStrMapIDMap(String strKey, String strSubKey, UINT32 nID, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		stlMapStrMapStrMapID tIDMapMap;
+		m_tPosStrKeySubStrMapIDMap.tMap[nPos] = tIDMapMap;
+
+		find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{		
+		TMapStrMapID tStrMapIDMap;
+		find->second.tMap[strKey] = tStrMapIDMap;
+		find_key = find->second.tMap.find(strKey);
+	}
+
+	TMapStrMapIDItor find_sub_key = find_key->second.find(strSubKey);
+	if(find_sub_key == find_key->second.end())
+	{		
+		TMapID tIDMap;
+		find_key->second[strSubKey] = tIDMap;
+		find_sub_key = find_key->second.find(strSubKey);
+	}
+
+	find_sub_key->second[nID] = 0;
+	pthread_mutex_unlock (&m_mutex);	
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::DelPosStrKeySubStrMapIDMap(String strKey, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	find_key->second.clear();
+	find->second.tMap.erase(strKey);
+	pthread_mutex_unlock (&m_mutex);	
+	return 0;
+}
+
+
+TEMPLATE	UINT32		CManageBase<_T>::DelPosStrKeySubStrMapIDMap(String strKey, String strSubKey, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	find_key->second.erase(strSubKey);
+	pthread_mutex_unlock (&m_mutex);	
+	return 0;
+}
+
+
+TEMPLATE	UINT32		CManageBase<_T>::DelPosStrKeySubStrMapIDMap(String strKey, String strSubKey, UINT32 nID, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapIDItor find_sub_key = find_key->second.find(strSubKey);
+	if(find_sub_key == find_key->second.end())
+	{		
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+
+	find_sub_key->second.erase(nID);
+	pthread_mutex_unlock (&m_mutex);	
+	return 0;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::GetPosStrKeySubStrMapIDMap(String strKey, TMapStrMapID& tSubKeyMap, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	tSubKeyMap = find_key->second;
+
+	pthread_mutex_unlock (&m_mutex);	
+
+	return tSubKeyMap.size();
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::GetPosStrKeySubStrMapIDMap(String strKey, TListStr& tSubKeyList, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);
+		return 0;
+	}
+
+	{
+		TMapStrMapIDItor begin, end;
+		begin = find_key->second.begin();	end = find_key->second.end();
+		for(begin; begin != end; begin++)
+		{
+			tSubKeyList.push_back(begin->first);
+		}
+	}
+	
+	pthread_mutex_unlock (&m_mutex);
+	return tSubKeyList.size();
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::GetPosStrKeySubStrMapIDMap(String strKey, String strSubKey, TListID& tIDList, UINT32 nPos)
+{
+	UINT32 nRtn = 0;
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapIDItor find_subkey = find_key->second.find(strSubKey);
+	if(find_subkey == find_key->second.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	AppandMapToList(find_subkey->second, tIDList);
+	nRtn = tIDList.size();
+
+	pthread_mutex_unlock (&m_mutex);	
+
+	return nRtn;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::GetPosStrKeySubStrMapIDMap(stlMapStrMapStrMapID& tKeyIDMap, UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);
+		return 0;
+	}
+
+	tKeyIDMap = find->second;
+	pthread_mutex_unlock (&m_mutex);
+	return tKeyIDMap.tMap.size();
+}
+
+TEMPLATE	_T*		CManageBase<_T>::FirstPosStrKeySubStrMapIDMapItem(String strKey, String strSubKey, UINT32 nPos)
+{
+	_T* pFind = NULL;
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapIDItor find_subkey = find_key->second.find(strSubKey);
+	if(find_subkey == find_key->second.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	{
+		TMapIDItor find_item = find_subkey->second.begin();
+		if(find_item != find_subkey->second.end())
+		{
+			pFind = FindItem(find_item->first);
+		}
+	}
+
+	pthread_mutex_unlock (&m_mutex);	
+
+	return pFind;
+}
+
+TEMPLATE	_T*		CManageBase<_T>::LastPosStrKeySubStrMapIDMapItem(String strKey, String strSubKey, UINT32 nPos)
+{
+	_T* pFind = NULL;
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapStrMapIDItor find_key = find->second.tMap.find(strKey);
+	if(find_key == find->second.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	TMapStrMapIDItor find_subkey = find_key->second.find(strSubKey);
+	if(find_subkey == find_key->second.end())
+	{
+		pthread_mutex_unlock (&m_mutex);	
+		return 0;
+	}
+
+	{
+		TMapIDRItor find_item = find_subkey->second.rbegin();
+		if(find_item != find_subkey->second.rend())
+		{
+			pFind = FindItem(find_item->first);
+		}
+	}
+
+	pthread_mutex_unlock (&m_mutex);	
+
+	return pFind;
+}
+
+TEMPLATE	UINT32		CManageBase<_T>::ClearPosStrKeySubStrMapIDMap(UINT32 nPos)
+{
+	pthread_mutex_lock (&m_mutex);
+	TMapIDMapStrMapStrMapIDItor find = m_tPosStrKeySubStrMapIDMap.tMap.find(nPos);
+	if(find == m_tPosStrKeySubStrMapIDMap.tMap.end())
+	{
+		pthread_mutex_unlock (&m_mutex);
+		return 0;
+	}
+
+	find->second.tMap.clear();
+	pthread_mutex_unlock (&m_mutex);
+	return 0;
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 TEMPLATE	UINT32		CManageBase<_T>::AddKeyList(UINT32 nKey)
 {
 	pthread_mutex_lock (&m_mutex);
@@ -1952,6 +2588,24 @@ TEMPLATE	UINT32		CManageBase<_T>::GetKeyListCount()
 
 	return nCnt;
 }
+//-----------------------------------------------------------------------------
+
+TEMPLATE	UINT32		CManageBase<_T>::GetKeyList(TListID& tKeyList)
+{
+	UINT32 dwSize = 0;
+	pthread_mutex_lock (&m_mutex);
+
+	TListIDItor	begin = m_tKeyList.begin();
+	TListIDItor	end = m_tKeyList.end();	
+
+	for(begin; begin != end; begin++)
+	{
+		tKeyList.push_back(*begin);
+	}
+	pthread_mutex_unlock (&m_mutex);
+	return tKeyList.size();
+}
+//-----------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -2227,12 +2881,10 @@ TEMPLATE	INT32				CManageBase<_T>::GetTempIDList(TListID& tIDList)
 	UINT32 nRtn = 0;
 	pthread_mutex_lock (&m_mutex);
 
-	map <unsigned int, unsigned int>::iterator begin, end;
-	begin = m_tTempIDMap.begin();	end = m_tTempIDMap.end();
-
-	for (; begin != end; begin++)
+	m_pKeyItorBegin = m_tTempIDMap.begin();	m_pKeyItorEnd = m_tTempIDMap.end();
+	for (; m_pKeyItorBegin != m_pKeyItorEnd; m_pKeyItorBegin++)
 	{			
-		tIDList.push_back(begin->first);
+		tIDList.push_back(m_pKeyItorBegin->first);
 	}
 	nRtn = (UINT32)tIDList.size();
 
@@ -2246,13 +2898,10 @@ TEMPLATE	INT32				CManageBase<_T>::SetTempIDList(TListID& tIDList)
 	UINT32 nRtn = 0;
 	pthread_mutex_lock (&m_mutex);
 	m_tTempIDMap.clear();
-
-	list <unsigned int>::iterator begin, end;
-	begin = tIDList.begin();	end = tIDList.end();
-
-	for (; begin != end; begin++)
+	m_pTempDelListItorBegin = tIDList.begin();	m_pTempDelListItorEnd = tIDList.end();
+	for (; m_pTempDelListItorBegin != m_pTempDelListItorEnd; m_pTempDelListItorBegin++)
 	{			
-		m_tTempIDMap[*begin] = 0;
+		m_tTempIDMap[*m_pTempDelListItorBegin] = 0;
 	}
 	nRtn = (UINT32)m_tTempIDMap.size();
 
@@ -2266,18 +2915,86 @@ TEMPLATE	INT32				CManageBase<_T>::SetTempIDList(TMapID& tIDMap)
 	UINT32 nRtn = 0;
 	pthread_mutex_lock (&m_mutex);
 	m_tTempIDMap.clear();
-
-	map <unsigned int, unsigned int>::iterator begin, end;
-	begin = tIDMap.begin();	end = tIDMap.end();
-
-	for (; begin != end; begin++)
+	m_pKeyItorBegin = tIDMap.begin();	m_pKeyItorEnd = tIDMap.end();
+	for (; m_pKeyItorBegin != m_pKeyItorEnd; m_pKeyItorBegin++)
 	{			
-		m_tTempIDMap[begin->first] = 0;
+		m_tTempIDMap[m_pKeyItorBegin->first] = 0;
 	}
 	nRtn = (UINT32)m_tTempIDMap.size();
-
 	pthread_mutex_unlock (&m_mutex);
 	return nRtn;
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+TEMPLATE	INT32		CManageBase<_T>::AddEditData(_T& data)
+{
+	m_tEditMap[data.nID] = data;
+	return 0;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 INT32		CManageBase<_T>::EditEditData(_T& data)
+{
+	m_tEditMap[data.nID] = data;
+	return 0;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 INT32		CManageBase<_T>::DelEditData(UINT32 nID)
+{
+	m_tEditMap.erase(nID);
+	return 0;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 _T*		CManageBase<_T>::FindEditData(UINT32 nID)
+{
+	_T* pFind = NULL;
+	pthread_mutex_lock (&m_mutex);
+	m_pMapItorFind = m_tEditMap.find(nID);
+	if (m_pMapItorFind != m_tEditMap.end())
+	{
+		pFind = &(m_pMapItorFind->second);
+	}
+	pthread_mutex_unlock (&m_mutex);
+	return pFind;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 INT32		CManageBase<_T>::ClearEditData()
+{
+	m_tEditMap.clear();
+	return 0;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 INT32		CManageBase<_T>::GetEditDataIDList(TListID& tIDList)
+{
+	INT32 nSize = 0;
+	pthread_mutex_lock (&m_mutex);
+	m_pMapItorBegin = m_tEditMap.begin();	m_pMapItorEnd = m_tEditMap.end();
+	for(m_pMapItorBegin; m_pMapItorBegin != m_pMapItorEnd; m_pMapItorBegin++)
+	{
+		tIDList.push_back(m_pMapItorBegin->first);
+	}
+	nSize = tIDList.size();
+	pthread_mutex_unlock (&m_mutex);
+	return nSize;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 INT32		CManageBase<_T>::SetEditData(_T& data)
+{
+	m_tEditData = data;
+	return 0;
+}
+//-----------------------------------------------------------------------------
+
+TEMPLATE	 _T*		CManageBase<_T>::GetEditData()
+{
+	return &m_tEditData;
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

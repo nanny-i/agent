@@ -54,7 +54,7 @@ INT32		CManagePoInVulnScanUnitPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -110,7 +110,7 @@ INT32					CManagePoInVulnScanUnitPkg::AddPoInVulnScanUnitPkg(DB_PO_IN_VULN_SCAN_
     }
 
 	AddItem(data.tDPH.nID, data);
-	AddKeyIDList(&data);
+	AddKeyIDListPkg(&data);
 
     return 0;
 }
@@ -142,7 +142,7 @@ INT32					CManagePoInVulnScanUnitPkg::DelPoInVulnScanUnitPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdata);
+	DelKeyIDListPkg(pdata);
     DeleteItem(nID);
     return 0;
 }

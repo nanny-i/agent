@@ -43,9 +43,23 @@ CManageLogDeployFile::~CManageLogDeployFile()
 
 INT32		CManageLogDeployFile::LoadDBMS()
 {
+	UINT32 nLogMode = 0, nLogNum = 0;
+	{
+		PDB_ENV_LOG pdel = t_ManageEnvLog->FindItem(DEFAULT_ID);
+		if(pdel)
+		{
+			nLogMode = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadModeMap, SS_ENV_LOG_INDEX_DEPLOY_FILE);
+			nLogNum = t_ManageEnvLog->GetLogValue(pdel->tAgtLoadNumMap, SS_ENV_LOG_INDEX_DEPLOY_FILE);
+			if(nLogMode == SS_ENV_LOG_LOAD_MODE_TYPE_DAY && nLogNum)
+			{
+				nLogNum = ((GetCurrentDateTimeInt() / 86400) - nLogNum) * 86400;
+			}
+		}
+	}
+
 	TListDBLogDeployFile tDBLogDeployFileList;
 	TListDBLogDeployFileItor begin, end;
-	if(SetER(t_DBMgrLogDeployFile->LoadExecute(&tDBLogDeployFileList)))
+	if(SetER(t_DBMgrLogDeployFile->LoadDB(nLogMode, nLogNum, tDBLogDeployFileList)))
     {
     	return g_nErrRtn;
     }
@@ -141,6 +155,30 @@ PDB_LOG_DEPLOY_FILE		CManageLogDeployFile::FindItemByDFInfo(DB_LOG_DEPLOY_FILE&	
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
+INT32			CManageLogDeployFile::SetPktSync(TListPVOID& tIDList)
+{
+	{
+		TMapDBLogDeployFileItor begin, end;
+		begin = m_tMap.begin();	end = m_tMap.end();
+		for(begin; begin != end; begin++)
+		{
+			if(ISSYNCSTEP(begin->second.nSyncSvrStep) || 
+				(begin->second.nSkipTarget & SS_ENV_LOG_OPTION_FLAGE_SKIP_SAVE_SERVER))	continue;
+
+			tIDList.push_back(&(begin->second));
+		}
+
+		if(tIDList.empty())	return -1;
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
 INT32					CManageLogDeployFile::SetPkt(MemToken& SendToken)
 {
 	TListPVOID tSendList;
@@ -207,6 +245,8 @@ INT32					CManageLogDeployFile::SetPkt(PDB_LOG_DEPLOY_FILE pdldf, MemToken& Send
 	SendToken.TokenAdd_32(pdldf->nEndTime);
 	SendToken.TokenAdd_32(pdldf->nEndReason);
 
+	SendToken.TokenAdd_32(pdldf->nUserID);
+
 	SendToken.TokenSet_Block();
 
     return 0;
@@ -232,6 +272,8 @@ INT32					CManageLogDeployFile::GetPkt(MemToken& RecvToken, DB_LOG_DEPLOY_FILE& 
 
 	if (!RecvToken.TokenDel_32(dldf.nEndTime))					goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dldf.nEndReason))				goto 	INVALID_PKT;
+
+	if (!RecvToken.TokenDel_32(dldf.nUserID))					goto	INVALID_PKT;
 	
 	RecvToken.TokenSkip_Block();
 	return 0;

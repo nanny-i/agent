@@ -5,10 +5,9 @@ CPPFILES = editconf.cpp
 OBJ = $(CPPFILES:.cpp=.o)
 
 all:
-	rm -f $(OBJ)
-	rm -f editconf
 	$(CC) $(CFLAGS) -c $(CPPFILES)
 	make build
+
 clean:
 	rm -f $(OBJ)
 	rm -f editconf

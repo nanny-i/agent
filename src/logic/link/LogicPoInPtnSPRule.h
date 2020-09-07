@@ -32,6 +32,7 @@ private:
 	INT32		AnalyzePkt_FromLink_Del_Ext();
 
 private:
+	INT32		ChkAutoConfirm(PDB_PO_IN_PTN_SP_RULE pdata);
 
 public:
 	CLogicPoInPtnSPRule();

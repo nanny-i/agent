@@ -59,6 +59,7 @@
 #include 	"com_header_remove_log_dll.h"
 #include 	"com_header_comp_dll.h"
 #include 	"com_header_weng_dll.h"
+#include 	"com_header_pms_dll.h"
 
 ///////////////////////////////////////////////////////////////////////
 #include	"com_define.h"
@@ -113,6 +114,7 @@
 #include	"DateTime.h"
 #include	"StlUtil.h"
 #include	"TokenString.h"
+#include	"MatchFilterUtil.h"
 
 #include	"DBMgrBase.h"
 #include	"DBMgr_Header.h"
@@ -147,29 +149,6 @@
 ///////////////////////////////////////////////////////////////////////
 
 #include	"Manage_Header.h"
-
-#include 	"ManagePoInRegSvc.h"
-#include	"ManagePoInRegSvcUnit.h"
-#include	"ManagePoInRegSvcPkg.h"
-#include	"ManagePoInRegSvcObjUnit.h"
-#include	"ManagePoInRegSvcSubUnit.h"
-#include	"ManagePoInRegSvcUnitObjPkg.h"
-#include	"ManagePoInRegSvcUnitSubPkg.h"
-#include	"ManagePoInRegSW.h"
-#include	"ManagePoInRegSWPkg.h"
-#include	"ManagePoInRegSWUnit.h"
-#include	"ManagePoInRegSWObjUnit.h"
-#include	"ManagePoInRegSWSubUnit.h"
-#include	"ManagePoInRegSWUnitObjPkg.h"
-#include	"ManagePoInRegSWUnitSubPkg.h"
-#include	"ManagePoInRegSys.h"
-#include	"ManagePoInRegSysPkg.h"
-#include	"ManagePoInRegSysUnit.h"
-#include	"ManagePoInRegVuln.h"
-#include	"ManagePoInRegVulnPkg.h"
-#include	"ManagePoInRegVulnUnit.h"
-
-
 
 
 #include	"LogicBase.h"

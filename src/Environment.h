@@ -86,7 +86,7 @@ public:
 	INT32		SetReg_HostRegTime(UINT32 nTime);
 	INT32		SetReg_BootChkTime(UINT32 nTime);
 	INT32		GetReg_LastOffInfo();
-	INT32		SetReg_LastOffInfo(ASI_BOOT_TYPE eBootType);
+	INT32		SetReg_LastOffInfo(ASI_BOOT_TYPE eBootType, UINT32 nLastOffTime = 0);
 	INT32		SetReg_HostKey(String strHostKey);
 	INT32		SetReg_RmKey(String strRmKey);
 	INT32		SetReg_LgnSvrInfoListMode(UINT32 nMode);
@@ -94,6 +94,9 @@ public:
 	INT32		SetReg_EnableServiceOpt(UINT32 nMode);
 	INT32		SetReg_LastOffHookInfo(UINT32 nMode = 1);
 
+	INT32		SetReg_ShutdownOption(UINT32 nMode = 1);
+	INT32		SetReg_AllowBlockingAppsAtShutdownByThread(UINT32 nMode = 1);
+	INT32		SetReg_AllowBlockingAppsAtShutdown(UINT32 nMode = 1);
 public:
 	INT32		GetReg_LocalEnv_TSProtectMode();
 	INT32		SetReg_LocalEnv_TSProtectMode(UINT32 nMode);
@@ -104,6 +107,8 @@ public:
 public:
 	String		GetReg_DbgEnv_DLLPath();
 	UINT32		GetReg_DbgEnv_SysBoot();
+	UINT32		GetReg_DbgEnv_SkipPM();
+	UINT32		GetReg_DbgEnv_SkipPMApplyEnv();
 	INT32		SetReg_TimeStamp(INT64 nTimeStamp);
 
 public:

@@ -73,9 +73,22 @@ INT32		CLogicMgrEnvLicense::AnalyzePkt_FromMgr_Edit_Ext()
 
 	if( t_ManageEnvLicense->GetPkt(RecvToken, del))	return SetHdrAndRtn(AZPKT_CB_RTN_PKT_INVALID);
 	
+	{
+		m_tChgPkgMap.clear();
+
+		UINT64 nPkgRight = 0;
+		nPkgRight = t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NPMS, 0, 0);
+		nPkgRight += t_ManageEnvLicense->IsValidRight(&del, SS_PACKAGE_TYPE_NPMS, 0, 0);
+		m_tChgPkgMap[SS_PACKAGE_TYPE_NPMS] = nPkgRight;
+
+		nPkgRight = t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_VULN_OP, 0);
+		nPkgRight += t_ManageEnvLicense->IsValidRight(&del, SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_VULN_OP, 0);
+		m_tChgPkgMap[SS_PACKAGE_TYPE_NOMS] = nPkgRight;
+	}
+	
 	if(t_ManageEnvLicense->ApplyEnvLicense(del))
 	{
-		SetDLEA_EC(g_nErrRtn);
+		SetDLEH_EC(g_nErrRtn);
 		WriteLogE("[%s] apply env information : [%d]", m_strLogicName.c_str(), g_nErrRtn);			
 		return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 	}
@@ -88,6 +101,53 @@ INT32		CLogicMgrEnvLicense::AnalyzePkt_FromMgr_Edit_Ext()
 
 INT32		CLogicMgrEnvLicense::ApplyPolicy()
 {	
+	if(IsChangePackage(SS_PACKAGE_TYPE_NPMS))
+	{
+		if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NPMS, 0, 0))
+		{
+			do 
+			{
+				if(t_LogicMgrPoPmOp->CheckRunEnv())			break;			
+				if(t_LogicMgrPtnPatch->InitPtnPatch())		break;
+
+				t_LogicMgrHostPatch->ScanPatchList();		
+			} while (FALSE);		
+
+			{
+				t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_PM_SCAN);	
+				t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_PM_ROLLBACK);	
+				t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_PM_MON_RM_PATCH);	
+			}
+		}
+		else
+		{
+			t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_POLICY_APPLY_PM_SCAN);	
+			t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_POLICY_APPLY_PM_ROLLBACK);	
+			t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_POLICY_APPLY_PM_MON_RM_PATCH);	
+		}
+	}
+
+	if(IsChangePackage(SS_PACKAGE_TYPE_NOMS))
+	{
+		if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_VULN_OP, 0))
+		{
+			do 
+			{
+				if(t_LogicMgrPoInVulnOp->CheckRunEnv())		break;			
+				if(t_LogicMgrPtnVuln->InitPtnVuln())		break;
+
+			} while (FALSE);	
+			
+			t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_READY_IN_DEPLOY);
+			t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_IN_VULN_SCAN);	
+		}
+		else
+		{
+			t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_POLICY_READY_IN_DEPLOY);	
+			t_ThreadTimer->t_TimerUtil.DisableTimer(TIMER_ID_POLICY_APPLY_IN_VULN_SCAN);	
+		}
+	}
+	
 	return 0;
 }
 //---------------------------------------------------------------------------
@@ -99,4 +159,14 @@ INT32		CLogicMgrEnvLicense::OnTimer_Logic()
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+
+INT32		CLogicMgrEnvLicense::IsChangePackage(UINT64 nPkgRight)
+{
+	TMapID64Itor find = m_tChgPkgMap.find(nPkgRight);
+	if(find == m_tChgPkgMap.end())	return 0;
+	
+	if(find->second != 1)		return 0;
+	return 1;
+}
 //---------------------------------------------------------------------------

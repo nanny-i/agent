@@ -35,6 +35,11 @@
 #define STATUS_USED_MODE_WARN			2
 
 //--------------------------------------------------------------------
+//match filter check type
+#define SS_MATCH_FILTER_CHK_TYPE_AND	0
+#define SS_MATCH_FILTER_CHK_TYPE_OR		1
+
+//--------------------------------------------------------------------
 //status
 #define STATUS_MODE_OFF					0
 #define STATUS_MODE_ON					1
@@ -53,26 +58,27 @@
 
 //--------------------------------------------------------------------
 //schedule period type
-#define SCHEDULE_PERIOD_TYPE_AUTO			0
-#define SCHEDULE_PERIOD_TYPE_BOOT			1
-#define SCHEDULE_PERIOD_TYPE_LOGIN			2
-#define SCHEDULE_PERIOD_TYPE_LOGOFF			3
-#define SCHEDULE_PERIOD_TYPE_SHUTDOWN		4
-#define SCHEDULE_PERIOD_TYPE_POWERSAVING	5
-#define SCHEDULE_PERIOD_TYPE_SHUTDOWN_EXT	6
-#define SCHEDULE_PERIOD_TYPE_ONCE			10
-#define SCHEDULE_PERIOD_TYPE_MIN			11
-#define SCHEDULE_PERIOD_TYPE_HOUR			12
-#define SCHEDULE_PERIOD_TYPE_DAY			13
-#define SCHEDULE_PERIOD_TYPE_WEEK			14
-#define SCHEDULE_PERIOD_TYPE_MONTH			15
-#define SCHEDULE_PERIOD_TYPE_DEMAND			20
-#define SCHEDULE_PERIOD_TYPE_FIX_HOUR		30
-#define SCHEDULE_PERIOD_TYPE_FIX_DAY		31
+#define SCHEDULE_PERIOD_TYPE_AUTO				0
+#define SCHEDULE_PERIOD_TYPE_BOOT				1
+#define SCHEDULE_PERIOD_TYPE_LOGIN				2
+#define SCHEDULE_PERIOD_TYPE_LOGOFF				3
+#define SCHEDULE_PERIOD_TYPE_SHUTDOWN			4
+#define SCHEDULE_PERIOD_TYPE_POWERSAVE_WAKE		5
+#define SCHEDULE_PERIOD_TYPE_SHUTDOWN_EXT		6
+#define SCHEDULE_PERIOD_TYPE_ONCE				10
+#define SCHEDULE_PERIOD_TYPE_MIN				11
+#define SCHEDULE_PERIOD_TYPE_HOUR				12
+#define SCHEDULE_PERIOD_TYPE_DAY				13
+#define SCHEDULE_PERIOD_TYPE_WEEK				14
+#define SCHEDULE_PERIOD_TYPE_MONTH				15
+#define SCHEDULE_PERIOD_TYPE_DEMAND				20
+#define SCHEDULE_PERIOD_TYPE_FIX_HOUR			30
+#define SCHEDULE_PERIOD_TYPE_FIX_DAY			31
 
-#define SCHEDULE_PERIOD_TYPE_WEEK_EXT		45
-#define SCHEDULE_PERIOD_TYPE_MONTH_EXT		46
+#define SCHEDULE_PERIOD_TYPE_WEEK_EXT			45
+#define SCHEDULE_PERIOD_TYPE_MONTH_EXT			46
 
+#define SCHEDULE_PERIOD_TYPE_MON_WEEK_DOW_EXT	50
 //--------------------------------------------------------------------
 //
 #define MPI_PO_VULN_RESULT_TYPE_NONE				0x00000000
@@ -84,6 +90,18 @@
 #define FILE_CHK_TYPE_CREATE_DT				0	// 생성 시간 기준
 #define FILE_CHK_TYPE_MODIFY_DT				1	// 수정 시간 기준
 #define FILE_CHK_TYPE_ACCESS_DT				2	// 접근 시간 기준
+
+//--------------------------------------------------------------------
+
+#define INJECT_FLAG_NONE				0x00000000
+#define INJECT_FLAG_SHUTDOWN_FA_OP		0x00000001
+#define INJECT_FLAG_SHUTDOWN_FA_CLEAR	0x00000002
+
+#define INJECT_FLAG_BOOT_FA_OP			0x00000004
+#define INJECT_FLAG_BOOT_FA_CLEAR		0x00000008
+
+#define INJECT_FLAG_SHUTDOWN			(INJECT_FLAG_SHUTDOWN_FA_OP | INJECT_FLAG_SHUTDOWN_FA_CLEAR)
+#define INJECT_FLAG_BOOT				(INJECT_FLAG_BOOT_FA_OP | INJECT_FLAG_BOOT_FA_CLEAR)
 
 //--------------------------------------------------------------------
 

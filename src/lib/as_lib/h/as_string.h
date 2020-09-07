@@ -20,6 +20,9 @@
 #ifndef _AS_STRING_H_
 #define _AS_STRING_H_
 
+#define CHARSET_EUCKR	"euc-kr"
+#define CHARSET_UTF8	"utf-8"
+
 extern char *strndup(char *str, int len);
 extern int strlcat(char *dst, char *src, int siz);
 extern void replace_char_in_str(char *str, char s, char d);
@@ -30,6 +33,7 @@ extern String SPrintf(const char* fmt,...);
 extern StringW	WPrintf(const wchar_t* fmt,...);
 extern int count_rule_data(char *pString, char cDelimiter, int *pnCount);
 extern String _strlwr(const char *str);
+extern String _strupr(const char *str);
 extern LPTSTR FormatString(LPTSTR lpBuf, LPTSTR fmt,...);
 extern void ReverseLPTSTR(LPTSTR lpInput);
 extern String ConvertAnsiString(StringW strInputW);
@@ -50,9 +54,8 @@ extern String QueryToMem(String& strValue);
 extern String MemToQuery(String strValue);
 extern String PathUnixToWin(String& strValue);
 extern String PathWinToUnix(String strValue);
-
-
-
+extern INT32 ConvertCharset(char *pSrcCharSet, char *pDstCharSet, char *pSrcData, int nSrcLen, char *pDstData, int nDstLen);
+extern INT32 ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String &strSrcData, String &strDstData);
 
 #endif /* _AS_STRING_H_ */
 

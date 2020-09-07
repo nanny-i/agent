@@ -275,17 +275,139 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 	U64_SCHEDULE tIS, tISExt;
 	INT32 nRtn = 0;
 	UINT32 nCurTime = GetCurrentDateTimeInt();
-	INT32 nChkHour = 0;
-	INT32 nChkMin = 0;
+	INT32 nChkHour = 0, nSchHour = 0;
+	INT32 nChkMin = 0, nSchMin = 0;
 	INT32 nWeek = 0;
 	INT32 nDay = 0;
+	INT32 nScanGap = 0;
 	tIS.all = nSchInfo;
 	tISExt.all = nSchInfo;
 	switch(tIS.U8.type)
 	{
-		case SCHEDULE_PERIOD_TYPE_WEEK_EXT:
+		case SCHEDULE_PERIOD_TYPE_BOOT:
+		{			
+			if(difftime(nCurTime, nLastChkTime) >= TIMER_INTERVAL_TIME_SYS_BOOT)
+			{
+				UINT32 nBootTime = uptime();
+				if(nBootTime < TIMER_INTERVAL_TIME_MIN*2 && t_EnvInfoOp->m_nMgrSvrAuthStatus != CLIENT_CON_STATUS_CONNECTED)
+					break;
+
+				if(tIS.U8.min)
+				{
+					nSchMin = tIS.U8.min + 2;
+					if((nBootTime < UINT32(nSchMin * TIMER_INTERVAL_TIME_MIN)))
+					{
+						nRtn = 1;
+						if(szLog)
+						{
+							sprintf_ext(nLogLen, szLog, "[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), nBootTime, tIS.U8.min);
+						}
+						else
+						{
+							WriteLogN("[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), nBootTime, tIS.U8.min);
+						}
+					}
+				}
+				else
+				{
+					if(nBootTime < TIMER_INTERVAL_TIME_MIN*5)
+						nRtn = 1;
+				}				
+				if(nRtn)
+					nLastChkTime = nCurTime;
+			}
+			break;
+		}
+		case SCHEDULE_PERIOD_TYPE_FIX_HOUR:		
+			{
+				INT32 nLastFixTime = (nLastChkTime / 3600) * 3600;
+				INT32 nCurMin = (nCurTime % TIMER_INTERVAL_TIME_HOUR) / 60;
+				nChkHour = ((nCurTime - nLastFixTime) / TIMER_INTERVAL_TIME_HOUR);
+				nSchHour = tIS.U8.hour;
+				if(!nCurMin && nChkHour >= nSchHour)
+				{
+					nRtn = 1;
+					nLastChkTime = (nCurTime / 3600) * 3600;
+				}
+				break;
+			}
+
+		case SCHEDULE_PERIOD_TYPE_DAY:
 		{
-			nWeek = GetDayOfWeek(nCurTime);
+			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
+			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
+
+			nSchHour = tIS.U8.hour;
+			nSchMin = tIS.U8.min;
+			nScanGap = nCurTime - nLastChkTime;
+
+			if(nChkHour == nSchHour && nChkMin == nSchMin && (nScanGap >= (TIMER_INTERVAL_TIME_HOUR * 24)))
+			{
+				nRtn = 1;
+				nLastChkTime = nCurTime;//nLastChkTime = ((nCurTime / TIMER_INTERVAL_TIME_HOUR) * TIMER_INTERVAL_TIME_HOUR);
+			}
+			break;
+		}
+		case SCHEDULE_PERIOD_TYPE_FIX_DAY:
+		{
+			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
+			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
+
+			nSchHour = tIS.U8.hour;
+			nSchMin = tIS.U8.min;
+			nScanGap = nCurTime - nLastChkTime;
+			if(nChkHour == nSchHour && nChkMin == nSchMin && (nScanGap >= TIMER_INTERVAL_TIME_MIN))
+			{
+				nRtn = 1;
+				nLastChkTime = nCurTime;
+			}
+			break;
+		}
+		case SCHEDULE_PERIOD_TYPE_WEEK:
+		{
+			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
+			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
+			nWeek = GetDayOfWeek(nCurTime, 1);
+
+			if(nWeek != tIS.U8.value)
+				break;
+
+			nSchHour = tIS.U8.hour;
+			nSchMin = tIS.U8.min;
+			nScanGap = nCurTime - nLastChkTime;
+
+			if(nChkHour == nSchHour && nChkMin == nSchMin && (nScanGap >= (TIMER_INTERVAL_TIME_HOUR * 24)))
+			{
+				nRtn = 1;
+				nLastChkTime = nCurTime;
+			}
+			break;
+		}
+		case SCHEDULE_PERIOD_TYPE_MONTH:
+		{
+			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
+			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
+			nDay = GetDayOfMonth(nCurTime, 1);
+
+			if(nDay != tIS.U8.value)
+				break;
+
+			nSchHour = tIS.U8.hour;
+			nSchMin = tIS.U8.min;
+			nScanGap = nCurTime - nLastChkTime;
+
+			if(nChkHour == nSchHour && nChkMin == nSchMin && (nScanGap >= (TIMER_INTERVAL_TIME_HOUR * 24)))
+			{
+				nRtn = 1;
+				nLastChkTime = nCurTime;
+			}
+			break;
+		}
+
+		case SCHEDULE_PERIOD_TYPE_WEEK_EXT: 
+		{
+			INT32 nWeek = GetDayOfWeek(nCurTime, 1);
+
 			if(nWeek != tIS.U8.value)
 				break;
 
@@ -296,9 +418,11 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 			nRtn = 1;
 			break;
 		}
+
 		case SCHEDULE_PERIOD_TYPE_MONTH_EXT:
 		{
-			nDay = GetDayOfMonth(nCurTime);
+			INT32 nDay = GetDayOfMonth(nCurTime, 1);
+
 			if(nDay != tIS.U8.value)
 				break;
 
@@ -309,35 +433,9 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 			nRtn = 1;
 			break;
 		}
-		case SCHEDULE_PERIOD_TYPE_AUTO:			nRtn = 1;		break;
-		case SCHEDULE_PERIOD_TYPE_BOOT:
-		{			
-			if(difftime(nCurTime, nLastChkTime) >= TIMER_INTERVAL_TIME_SYS_BOOT)
-			{
-				if(tIS.U8.min)
-				{
-					if((nLastChkTime < t_EnvInfo->m_nBootChkTime) && 
-						((nCurTime - t_EnvInfo->m_nBootChkTime) > UINT32(tIS.U8.min * TIMER_INTERVAL_TIME_MIN)))
-					{
-						nRtn = 1;
-						if(szLog)
-						{
-							sprintf_ext(nLogLen, szLog, "[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), t_EnvInfo->m_nBootChkTime, tIS.U8.min);
-						}
-						else
-						{
-							WriteLogN("[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), t_EnvInfo->m_nBootChkTime, tIS.U8.min);
-						}
-					}
-				}
-				else
-				{
-					if(nLastChkTime < t_EnvInfo->m_nBootChkTime)
-						nRtn = t_EnvInfoOp->IsSysBootTime();
-				}				
-				if(nRtn)
-					nLastChkTime = nCurTime;
-			}
+		case SCHEDULE_PERIOD_TYPE_AUTO:
+		{
+			nRtn = 1;
 			break;
 		}
 		case SCHEDULE_PERIOD_TYPE_LOGIN:
@@ -406,9 +504,9 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 			}
 			break;
 		}
-		case SCHEDULE_PERIOD_TYPE_POWERSAVING:
+		case SCHEDULE_PERIOD_TYPE_POWERSAVE_WAKE:
 		{
-			if (t_EnvInfo->m_nLastOffType == ASI_BOOT_TYPE_POWERSAVING)
+			if (t_EnvInfo->m_nLastOffType == ASI_BOOT_TYPE_POWERSAVING && t_EnvInfo->m_nLastOffTime > nLastChkTime)
 			{
 				nRtn = 1;	
 				nLastChkTime = nCurTime;
@@ -436,7 +534,8 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 		case SCHEDULE_PERIOD_TYPE_MIN:		
 		{
 			nChkMin = ((nCurTime - nLastChkTime) / TIMER_INTERVAL_TIME_MIN);
-			if(nChkMin >= tIS.U8.min)
+			nSchMin = tIS.U8.min;
+			if(nChkMin >= nSchMin)
 			{
 				nRtn = 1;
 				nLastChkTime = nCurTime;
@@ -446,77 +545,37 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 		case SCHEDULE_PERIOD_TYPE_HOUR:		
 		{
 			nChkHour = ((nCurTime - nLastChkTime) / TIMER_INTERVAL_TIME_HOUR);
-			if(nChkHour >= tIS.U8.hour)
+			nSchHour = tIS.U8.hour;
+			if(nChkHour >= nSchHour)
 			{
 				nRtn = 1;
 				nLastChkTime = nCurTime;
 			}
 			break;
 		}
-		case SCHEDULE_PERIOD_TYPE_DAY:
+		case SCHEDULE_PERIOD_TYPE_MON_WEEK_DOW_EXT:
 		{
-			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
-			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
-			if(nChkHour == tIS.U8.hour && nChkMin == tIS.U8.min && ((nCurTime - nLastChkTime) >= (TIMER_INTERVAL_TIME_HOUR * 24)))
+			INT32 nWeekCnt = GetWeekCntToday(tISExt.U8.ext_value);
+			if(nWeekCnt != tIS.U8.value)
 			{
-				nRtn = 1;
-				nLastChkTime = nCurTime;//nLastChkTime = ((nCurTime / TIMER_INTERVAL_TIME_HOUR) * TIMER_INTERVAL_TIME_HOUR);
+				break;
 			}
-			break;
-		}
-		case SCHEDULE_PERIOD_TYPE_WEEK:
-		{
-			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
-			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
-			nWeek = GetDayOfWeek(nCurTime);
 
-			if(nWeek != tIS.U8.value)
+			INT32 nWeek = GetDayOfWeek(nCurTime, 1);
+			if(nWeek != tIS.U8.hour)
+			{
+				break;
+			}
+
+			U64_SCHEDULE tISSub;
+			
+			tISSub.U8.type = tIS.U8.ext_type;
+			tISSub.U8.min = tIS.U8.ext_min;
+
+			if(IsValidSchedule(tISSub.all, nLastChkTime, szLog, nLogLen) == 0)
 				break;
 
-			if(nChkHour == tIS.U8.hour && nChkMin == tIS.U8.min && ((nCurTime - nLastChkTime) >= (TIMER_INTERVAL_TIME_HOUR * 24)))
-			{
-					nRtn = 1;
-				nLastChkTime = nCurTime;
-			}
-			break;
-		}
-		case SCHEDULE_PERIOD_TYPE_MONTH:
-		{
-			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
-			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
-			nDay = GetDayOfMonth(nCurTime);
-
-			if(nDay != tIS.U8.value)
-				break;
-
-			if(nChkHour == tIS.U8.hour && nChkMin == tIS.U8.min && ((nCurTime - nLastChkTime) >= (TIMER_INTERVAL_TIME_HOUR * 24)))
-			{
-				nRtn = 1;
-				nLastChkTime = nCurTime;
-			}
-			break;
-		}
-		case SCHEDULE_PERIOD_TYPE_FIX_HOUR:		
-		{
-			INT32 nLastFixTime = (nLastChkTime / 3600) * 3600;
-			INT32 nCurMin = (nCurTime % TIMER_INTERVAL_TIME_HOUR) / 60;
-			nChkHour = ((nCurTime - nLastFixTime) / TIMER_INTERVAL_TIME_HOUR);
-			if(!nCurMin && nChkHour >= tIS.U8.hour)
-			{
-				nRtn = 1;
-				nLastChkTime = (nCurTime / 3600) * 3600;
-			}
-			break;
-		}
-		case SCHEDULE_PERIOD_TYPE_FIX_DAY:
-		{
-			nChkHour = ((nCurTime % TIMER_INTERVAL_TIME_DAY) / TIMER_INTERVAL_TIME_HOUR);
-			nChkMin = ((nCurTime % TIMER_INTERVAL_TIME_HOUR) / TIMER_INTERVAL_TIME_MIN);
-			if(nChkHour == tIS.U8.hour && nChkMin == tIS.U8.min && ((nCurTime - nLastChkTime) >= (TIMER_INTERVAL_TIME_MIN)))
-			{
-				nRtn = 1;
-				nLastChkTime = nCurTime;
-			}
+			nRtn = 1;
 			break;
 		}
 	}
@@ -550,7 +609,7 @@ INT32	CLogicBase::IsValidSchedule(UINT32 nType, UINT64 nStart, UINT64 nEnd)
 		}
 		case SCHEDULE_PERIOD_TYPE_WEEK:
 		{
-			INT32 nWeek = GetDayOfWeek(nCurTime);
+			INT32 nWeek = GetDayOfWeek(nCurTime, 1);
 			if(tISStart.U8.value < tISEnd.U8.value)
 			{
 				if(tISStart.U8.value <= nWeek && nWeek <= tISEnd.U8.value)
@@ -570,7 +629,7 @@ INT32	CLogicBase::IsValidSchedule(UINT32 nType, UINT64 nStart, UINT64 nEnd)
 		}
 		case SCHEDULE_PERIOD_TYPE_MONTH:
 		{
-			INT32 nDay = GetDayOfDay(nCurTime);
+			INT32 nDay = GetDayOfDay(nCurTime, 1);
 			if(tISStart.U8.value < tISEnd.U8.value)
 			{
 				if(tISStart.U8.value <= nDay && nDay <= tISEnd.U8.value)

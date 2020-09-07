@@ -54,6 +54,7 @@ typedef struct _db_user
 	String				strCoEMail;
 	String				strCoPhone;
 	String				strUserHPhone;
+    String				strSrcGroupName;
 
 	String				strDescr;
 

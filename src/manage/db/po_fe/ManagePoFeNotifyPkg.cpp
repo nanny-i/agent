@@ -54,7 +54,7 @@ INT32		CManagePoFeNotifyPkg::LoadDBMS()
     for(begin; begin != end; begin++)
     {
 		AddItem(begin->tDPH.nID, *begin);
-		AddKeyIDList(&(*begin));
+		AddKeyIDListPkg(&(*begin));
     }
     return 0;
 }
@@ -69,7 +69,7 @@ INT32					CManagePoFeNotifyPkg::InitPkg()
 		PDB_PO_FE_NOTIFY pdpfn = t_ManagePoFeNotify->FindItem(begin->second.tDPH.nPolicyID);
 		if(!pdpfn)
 		{
-			WriteLogE("not find po_fe_notify_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+//			WriteLogE("not find po_fe_notify_pkg information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -107,7 +107,7 @@ INT32					CManagePoFeNotifyPkg::AddPoFeNotifyPkg(DB_PO_FE_NOTIFY_PKG&	dpfnp)
     }
 
 	AddItem(dpfnp.tDPH.nID, dpfnp);
-	AddKeyIDList(&dpfnp);
+	AddKeyIDListPkg(&dpfnp);
 
     return 0;
 }
@@ -139,7 +139,7 @@ INT32					CManagePoFeNotifyPkg::DelPoFeNotifyPkg(UINT32 nID)
     	return g_nErrRtn;
     }
 
-	DelKeyIDList(pdpfnp);
+	DelKeyIDListPkg(pdpfnp);
     DeleteItem(nID);
     return 0;
 }

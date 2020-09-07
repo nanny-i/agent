@@ -34,6 +34,9 @@ public:
 	void		SetLogDeployFile(DB_LOG_DEPLOY_FILE& dldf);
 
 public:
+	void		SendPkt_Sync(INT32 nOnceMaxNum = 1000);
+
+public:
 	CLogicMgrLogDeployFile();
     ~CLogicMgrLogDeployFile();
 };

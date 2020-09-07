@@ -142,31 +142,7 @@ INT32		CLogicMgrCtrlHostRes::AnalyzePkt_FromMgr_Ext_HostResInfo()
 		}
 	}
 
-	TListDeviceInfo tDviList;
-	if(nResType & HOST_RESINFO_DEVICE)
-	{
-		t_DevInfoDLLUtil->GetDeviceInfo(tDviList);
-		SendToken.TokenAdd_32(tDviList.size());
-		if(tDviList.size() > 0)
-		{
-			TListDeviceInfoItor begin, end;
-			begin = tDviList.begin();	end = tDviList.end();
-			for(begin; begin != end; begin++)
-			{
-				SendToken.TokenAdd_String(begin->strClassName);
-				SendToken.TokenAdd_String(begin->strDeviceName);
-				SendToken.TokenAdd_String(begin->strGUID);
-				SendToken.TokenAdd_String(begin->strDeviceInstanceID);
-				SendToken.TokenAdd_String(begin->strPaDeviceInstanceID);
-				SendToken.TokenAdd_32(begin->nUsed);
-				SendToken.TokenAdd_32(begin->nIconIndex);
-
-				SendToken.TokenSet_Block();    
-			}
-		}
-	}
-
-	SendData(G_TYPE_CTL_RESINFO, m_nPktCode, SendToken);
+	SendData_Mgr(G_TYPE_CTL_RESINFO, m_nPktCode, SendToken);
 	SendToken.Clear();
 	m_nHostID = 0;
 

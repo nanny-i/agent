@@ -250,6 +250,24 @@ INT32		CMainDlg::CreateSubClass()
 			nRetVal = -22;
 			break;
 		}
+
+		t_ManageDevOInfo			= new CManageDevOInfo();
+		if(t_ManageDevOInfo == NULL)
+		{
+			nRetVal = -23;
+			break;
+		}
+//		t_ManagePMSWork				= new CManagePMSWork();
+		t_ManageLinkEnv				= new CManageLinkEnv();
+		if(t_ManageLinkEnv == NULL)
+		{
+			nRetVal = -23;
+			break;
+		}
+//		t_ManagePatchFile			= new CManagePatchFile();
+//		t_ManageVulnFileProtect		= new CManageVulnFileProtect();
+//		t_ManageVulnRegProtect		= new CManageVulnRegProtect();
+
 		t_ManageBaseUtil = new CManageBaseUtil();
 		if(t_ManageBaseUtil == NULL)
 		{
@@ -446,9 +464,23 @@ INT32		CMainDlg::CreateSubClass()
 			nRetVal = -86;
 			break;
 		}
-		
-		t_LogicMgrHostKey = new CLogicMgrHostKey();
+
+		t_LogicMgrHostKey			= new CLogicMgrHostKey();
 		if(t_LogicMgrHostKey == NULL)
+		{
+			nRetVal = -86;
+			break;
+		}
+
+		t_LogicMgrHostPatch			= new CLogicMgrHostPatch();
+		if(t_LogicMgrHostPatch == NULL)
+		{
+			nRetVal = -87;
+			break;
+		}
+
+		t_LogicMgrHostVulnRst		= new CLogicMgrHostVulnRst();
+		if(t_LogicMgrHostVulnRst == NULL)
 		{
 			nRetVal = -87;
 			break;
@@ -479,20 +511,6 @@ INT32		CMainDlg::CreateSubClass()
 		if(t_LogicMgrSiteVulnScan == NULL)
 		{
 			nRetVal = -91;
-			break;
-		}
-
-		t_LogicMgrSiteVulnRepair = new CLogicMgrSiteVulnRepair();
-		if(t_LogicMgrSiteVulnRepair == NULL)
-		{
-			nRetVal = -92;
-			break;
-		}
-
-		t_LogicMgrSiteVulnLock = new CLogicMgrSiteVulnLock();
-		if(t_LogicMgrSiteVulnLock == NULL)
-		{
-			nRetVal = -93;
 			break;
 		}
 
@@ -545,6 +563,13 @@ INT32		CMainDlg::CreateSubClass()
 			break;
 		}
 		
+		t_LogicMgrEnvSocket			= new CLogicMgrEnvSocket();
+		if(t_LogicMgrEnvSocket == NULL)
+		{
+			nRetVal = -99;
+			break;
+		}
+
 		t_LogicMgrPoHostRmInfo = new CLogicMgrPoHostRmInfo();
 		if(t_LogicMgrPoHostRmInfo == NULL)
 		{
@@ -567,6 +592,13 @@ INT32		CMainDlg::CreateSubClass()
 		}
 
 		t_LogicMgrPoSvrInfoUdt = new CLogicMgrPoSvrInfoUdt();
+		if(t_LogicMgrPoSvrInfoUdt == NULL)
+		{
+			nRetVal = -103;
+			break;
+		}
+
+		t_LogicMgrPoHostNotify		= new CLogicMgrPoHostNotify();
 		if(t_LogicMgrPoSvrInfoUdt == NULL)
 		{
 			nRetVal = -103;
@@ -664,6 +696,13 @@ INT32		CMainDlg::CreateSubClass()
 			break;
 		}
 
+		t_LogicMgrPoFaDelFileAfterBoot = new CLogicMgrPoFaDelFileAfterBoot();
+		if(t_LogicMgrPoFaDelFileAfterBoot == NULL)
+		{
+			nRetVal = -156;
+			break;
+		}
+		
 		t_LogicMgrPoFePtnOp	= new CLogicMgrPoFePtnOp();
 		if(t_LogicMgrPoFePtnOp == NULL)
 		{
@@ -768,28 +807,25 @@ INT32		CMainDlg::CreateSubClass()
 			nRetVal = -131;
 			break;
 		}
-		
-		t_LogicMgrPoInAcDoc	= new CLogicMgrPoInAcDoc();
-		if(t_LogicMgrPoInAcDoc == NULL)
+
+		t_LogicMgrPoInVulnAx		= new CLogicMgrPoInVulnAx();
+		if(t_LogicMgrPoInVulnAx == NULL)
 		{
 			nRetVal = -132;
 			break;
 		}
-
-		t_LogicMgrPoInAcSf = new CLogicMgrPoInAcSf();
-		if(t_LogicMgrPoInAcSf == NULL)
+		t_LogicMgrPoInVulnEditApp	= new CLogicMgrPoInVulnEditApp();
+		if(t_LogicMgrPoInVulnEditApp == NULL)
 		{
 			nRetVal = -133;
 			break;
 		}
-
-		t_LogicMgrPoInAcFile = new CLogicMgrPoInAcFile();
-		if(t_LogicMgrPoInAcFile == NULL)
+		t_LogicMgrPoInVulnQna		= new CLogicMgrPoInVulnQna();
+		if(t_LogicMgrPoInVulnQna == NULL)
 		{
 			nRetVal = -134;
 			break;
 		}
-
 		t_LogicMgrPoInVulnOp = new CLogicMgrPoInVulnOp();
 		if(t_LogicMgrPoInVulnOp == NULL)
 		{
@@ -797,8 +833,137 @@ INT32		CMainDlg::CreateSubClass()
 			break;
 		}
 
+
 		t_LogicMgrPoInVulnScan = new CLogicMgrPoInVulnScan();
 		if(t_LogicMgrPoInVulnScan == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInVulnSecuUsb	= new CLogicMgrPoInVulnSecuUsb();
+		if(t_LogicMgrPoInVulnSecuUsb == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInVulnSw		= new CLogicMgrPoInVulnSw();
+		if(t_LogicMgrPoInVulnSw == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInVulnPatchException = new CLogicMgrPoInVulnPatchException();
+		if(t_LogicMgrPoInVulnPatchException == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInRsOp			= new CLogicMgrPoInRsOp();
+		if(t_LogicMgrPoInRsOp == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInRsBk			= new CLogicMgrPoInRsBk();
+		if(t_LogicMgrPoInRsBk == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInRsNo			= new CLogicMgrPoInRsNo();
+		if(t_LogicMgrPoInRsNo == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInDevOOp		= new CLogicMgrPoInDevOOp();
+		if(t_LogicMgrPoInDevOOp == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInDevOBL		= new CLogicMgrPoInDevOBL();
+		if(t_LogicMgrPoInDevOBL == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInDevOWL		= new CLogicMgrPoInDevOWL();
+		if(t_LogicMgrPoInDevOWL == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoInDevOEx		= new CLogicMgrPoInDevOEx();
+		if(t_LogicMgrPoInDevOEx == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		t_LogicMgrPoInDevOInfo		= new CLogicMgrPoInDevOInfo();
+		if(t_LogicMgrPoInDevOInfo == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		t_LogicMgrPoInDevONotify	= new CLogicMgrPoInDevONotify();
+		if(t_LogicMgrPoInDevONotify == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		
+		t_LogicMgrPoDvLo			= new CLogicMgrPoDvLo();
+
+		if(t_LogicMgrPoDvLo == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoPmOp			= new CLogicMgrPoPmOp();
+		if(t_LogicMgrPoPmOp == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+
+		t_LogicMgrPoPmDm			= new CLogicMgrPoPmDm();
+		if(t_LogicMgrPoPmDm == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		t_LogicMgrPoPmScan			= new CLogicMgrPoPmScan();
+		if(t_LogicMgrPoPmScan == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		t_LogicMgrPoPmEx			= new CLogicMgrPoPmEx();
+		if(t_LogicMgrPoPmEx == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		t_LogicMgrPoPmNo			= new CLogicMgrPoPmNo();
+		if(t_LogicMgrPoPmNo == NULL)
+		{
+			nRetVal = -136;
+			break;
+		}
+		t_LogicMgrLogEvent			= new CLogicMgrLogEvent();
+		if(t_LogicMgrLogEvent == NULL)
 		{
 			nRetVal = -136;
 			break;
@@ -825,13 +990,34 @@ INT32		CMainDlg::CreateSubClass()
 			break;
 		}
 
-		t_LogicMgrLogStatus	= new CLogicMgrLogStatus();
-		if(t_LogicMgrLogStatus == NULL)
+		t_LogicMgrLogPatch			= new CLogicMgrLogPatch();
+		if(t_LogicMgrLogPatch == NULL)
 		{
 			nRetVal = -140;
 			break;
 		}
 
+		t_LogicMgrLogDevice			= new CLogicMgrLogDevice();
+		if(t_LogicMgrLogDevice == NULL)
+		{
+			nRetVal = -140;
+			break;
+		}
+
+		t_LogicMgrLogRs				= new CLogicMgrLogRs();
+		if(t_LogicMgrLogRs == NULL)
+		{
+			nRetVal = -140;
+			break;
+		}
+
+
+		t_LogicMgrLogRsBk			= new CLogicMgrLogRsBk();
+		if(t_LogicMgrLogRsBk == NULL)
+		{
+			nRetVal = -140;
+			break;
+		}
 		t_LogicMgrCtrlRemoteCtrl = new CLogicMgrCtrlRemoteCtrl();
 		if(t_LogicMgrCtrlRemoteCtrl == NULL)
 		{
@@ -874,6 +1060,20 @@ INT32		CMainDlg::CreateSubClass()
 			break;
 		}
 
+		t_LogicMgrPtnPatch			= new CLogicMgrPtnPatch();
+		if(t_LogicMgrPtnPatch == NULL)
+		{
+			nRetVal = -145;
+			break;
+		}
+
+		t_LogicMgrPtnVuln			= new CLogicMgrPtnVuln();
+		if(t_LogicMgrPtnVuln == NULL)
+		{
+			nRetVal = -145;
+			break;
+		}
+
 		t_LogicAuth	= new CLogicAuth();
 		if(t_LogicAuth == NULL)
 		{
@@ -897,6 +1097,20 @@ INT32		CMainDlg::CreateSubClass()
 
 		t_LogicLogDocDScan = new CLogicLogDocDScan();
 		if(t_LogicLogDocDScan == NULL)
+		{
+			nRetVal = -154;
+			break;
+		}
+
+		t_LogicDocDeleteInfo		= new CLogicDocDeleteInfo();
+		if(t_LogicDocDeleteInfo == NULL)
+		{
+			nRetVal = -154;
+			break;
+		}
+
+		t_LogicCtrlVuln				= new CLogicCtrlVuln();
+		if(t_LogicCtrlVuln == NULL)
 		{
 			nRetVal = -154;
 			break;
@@ -1118,10 +1332,16 @@ INT32		CMainDlg::InitTimerID()
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_CHECK_CHANGE_NET_DRIVE,		TIMER_INTERVAL_TIME_SEC*10, NULL, 1, 0);
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_CHECK_CHANGE_FIX_DRIVE,		TIMER_INTERVAL_TIME_SEC*1, NULL, 1, 0);
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_CHECK_CHANGE_LOGIN_USER,		TIMER_INTERVAL_TIME_SEC*10, NULL, 1, 0);
+
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_EPS,			TIMER_INTERVAL_TIME_SEC*1, NULL, 1, 0);
+	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_HOST_NOTIFY,		TIMER_INTERVAL_TIME_MIN*1, NULL, 1, 1);
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_WINDOWS_EVENT_HANDLER,		TIMER_INTERVAL_TIME_MIN, NULL, 1, 0);
+
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_TS_PROTECT_MODE,			TIMER_INTERVAL_TIME_MIN*1, NULL, 1, 1);
+
 	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_DP_FILE_EXCUTE_END,		TIMER_INTERVAL_TIME_SEC*10, NULL, 1, 0);
+
+	t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_SEND_KEEP_ALIVE,			TIMER_INTERVAL_TIME_MIN*1, NULL, 1, 0);
 
 
 	{		
@@ -1132,15 +1352,32 @@ INT32		CMainDlg::InitTimerID()
 	}
 
 	{
-		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_FA_CLEAR,		TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
-		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_FA_OP_CLEAR,	TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
-		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_POWER,		TIMER_INTERVAL_TIME_MIN*1,	NULL, 1, 0);
-		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_IN_PTN_OP,	TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_FA_CLEAR,			TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_FA_OP_CLEAR,		TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_POWER,			TIMER_INTERVAL_TIME_MIN*1,	NULL, 1, 0);
+		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_IN_PTN_OP,		TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_IN_PTN_SP_RULE,	TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+//		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_IN_RS_BK,			TIMER_INTERVAL_TIME_HOUR*1,	NULL, 1, 0);
+//		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_PM_SCAN,			TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+//		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_PM_ROLLBACK,		TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+//		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_PM_MON_RM_PATCH,	TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+//		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_APPLY_IN_VULN_SCAN,		TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
 
+//		t_ThreadTimer->t_TimerUtil.AddTimer(TIMER_ID_POLICY_READY_IN_DEPLOY,		TIMER_INTERVAL_TIME_SEC*1,	NULL, 1, 0);
+
+	}
+
+	{
+//		t_ThreadSubTimer->t_TimerUtil.SetNotifyWnd(GetSafeHwnd(), WM_GLOBAL_TIMER_EVT_SUB);
+//		t_ThreadSubTimer->t_TimerUtil.AddTimer(TIMER_ID_SYS_OFF_OPERATION_CHK_WORK_TIME,		TIMER_INTERVAL_TIME_MIN*1, (OnTimerType)SubOnTimerType, 1, 0);
+//		t_ThreadSubTimer->t_TimerUtil.AddTimer(TIMER_ID_SYS_OFF_OPERATION_END_CHK_WORK_TIME,	TIMER_INTERVAL_TIME_SEC*1, (OnTimerType)SubOnTimerType, 1, 0);
+
+//		t_ThreadSubTimer->t_TimerUtil.AddTimer(TIMER_ID_CHK_EXIST_INTERVAL,						TIMER_INTERVAL_TIME_MIN*1, (OnTimerType)SubOnTimerType, 1, 1, -1, 1);
 	}
 
 	return 0;
 }
+
 //--------------------------------------------------------------------
 
 INT32		CMainDlg::StartSubClass()
@@ -1294,8 +1531,41 @@ INT32		CMainDlg::PreStartTimer()
 	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_FA_CLEAR);
 	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_FA_OP_CLEAR);		
 	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_POWER);	
-	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_IN_PTN_OP);	
-	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_CHECK_CHANGE_NET_DRIVE);
+	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_IN_PTN_OP);
+//	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_IN_PTN_SP_RULE);
+//	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_IN_RS_BK);
+
+/*
+	if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NPMS, 0, 0))
+	{
+		t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_PM_SCAN);	
+		t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_PM_ROLLBACK);	
+		t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_PM_MON_RM_PATCH);	
+		WriteLogN("[%s] enable npms operation timer..", __FUNCTION__);
+	}
+*/
+/*
+	if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_VULN_OP, 0))
+	{
+		t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_READY_IN_DEPLOY);	
+		t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_POLICY_APPLY_IN_VULN_SCAN);	
+		WriteLogN("[%s] enable noms vuln op operation timer..", __FUNCTION__);
+	}
+*/
+/*
+	if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_PTN_BL, 0))
+	{
+		t_LogicMgrPoInPtnBL->LoadPtn();
+	}
+*/
+/*
+	if(t_ManageEnvLicense->IsValidRight(SS_PACKAGE_TYPE_NOMS, SS_POLICY_TYPE_IN_PTN_WL, 0))
+	{
+		t_LogicMgrPoInPtnWL->LoadPtn();
+	}
+*/
+
+//	t_ThreadTimer->t_TimerUtil.EnableTimer(TIMER_ID_CHECK_CHANGE_NET_DRIVE);
 
 	return 0;
 }
@@ -1363,8 +1633,17 @@ INT32		CMainDlg::StopSubClass()
 		WriteLogN("stop [po_in_scan] thread result : [%d]", g_nErrRtn);
 		
 		t_ThreadChkHkNoti->SetContinue(0);
+/*
+		SetER(StopThread_Common(t_ThreadPoInRsBk));
+		WriteLogN("stop [po_in_rs_bk] thread result : [%d]", g_nErrRtn);
+*/
+
 		SetER(StopThread_Common(t_ThreadChkHkNoti));
 		WriteLogN("stop [chk_hk_noti] thread result : [%d]", g_nErrRtn);
+/*
+		SetER(StopThread_Common(t_ThreadExecute));
+		WriteLogN("stop [execute] thread result : [%d]", g_nErrRtn);
+*/
 	}
 
 	return 0;
@@ -1377,6 +1656,11 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicLgnAuth);
 		SAFE_DELETE(t_LogicUdtAuth);
 		SAFE_DELETE(t_LogicMgrAuth);
+	}
+
+	{
+		SAFE_DELETE(t_LogicMgrPtnPatch);
+		SAFE_DELETE(t_LogicMgrPtnVuln);
 	}
 
 	{
@@ -1396,6 +1680,7 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicMgrEnvSelfProtectAgt);
 		SAFE_DELETE(t_LogicMgrEnvSOrgLink);
 		SAFE_DELETE(t_LogicMgrEnvTrustSubject);
+		SAFE_DELETE(t_LogicMgrEnvSocket);
 	}
 
 	{
@@ -1409,6 +1694,7 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicMgrPoHostRun);
 		SAFE_DELETE(t_LogicMgrPoSvrInfoLgn);
 		SAFE_DELETE(t_LogicMgrPoSvrInfoUdt);
+		SAFE_DELETE(t_LogicMgrPoHostNotify);
 
 		SAFE_DELETE(t_LogicMgrPoSch);
 
@@ -1421,6 +1707,7 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicMgrPoFaProc);
 		SAFE_DELETE(t_LogicMgrPoFaBk);
 		SAFE_DELETE(t_LogicMgrPoFaNotify);
+		SAFE_DELETE(t_LogicMgrPoFaDelFileAfterBoot);
 
 		SAFE_DELETE(t_LogicMgrPoFePtnOp);
 		SAFE_DELETE(t_LogicMgrPoFePtnLo);
@@ -1439,22 +1726,45 @@ INT32		CMainDlg::DeleteSubClass()
 			SAFE_DELETE(t_LogicMgrPoInPtnSP);
 			SAFE_DELETE(t_LogicMgrPoInPtnSPRule);
 			SAFE_DELETE(t_LogicMgrPoInPtnNo);
-			
-			SAFE_DELETE(t_LogicMgrPoInAcDoc);
-			SAFE_DELETE(t_LogicMgrPoInAcSf);
-			SAFE_DELETE(t_LogicMgrPoInAcFile);
-
+						
+			SAFE_DELETE(t_LogicMgrPoInVulnAx);
+			SAFE_DELETE(t_LogicMgrPoInVulnEditApp);
 			SAFE_DELETE(t_LogicMgrPoInVulnOp);
+			SAFE_DELETE(t_LogicMgrPoInVulnQna);
 			SAFE_DELETE(t_LogicMgrPoInVulnScan);
+			SAFE_DELETE(t_LogicMgrPoInVulnSecuUsb);
+			SAFE_DELETE(t_LogicMgrPoInVulnSw);
+			SAFE_DELETE(t_LogicMgrPoInVulnPatchException);
+
+			SAFE_DELETE(t_LogicMgrPoInRsOp);
+			SAFE_DELETE(t_LogicMgrPoInRsBk);
+			SAFE_DELETE(t_LogicMgrPoInRsNo);
+			
+			SAFE_DELETE(t_LogicMgrPoInDevOOp);
+			SAFE_DELETE(t_LogicMgrPoInDevOBL);
+			SAFE_DELETE(t_LogicMgrPoInDevOWL);
+			SAFE_DELETE(t_LogicMgrPoInDevOEx);
+			SAFE_DELETE(t_LogicMgrPoInDevOInfo);
+			SAFE_DELETE(t_LogicMgrPoInDevONotify);
+			SAFE_DELETE(t_LogicMgrPoDvLo);
 		}
 
+		SAFE_DELETE(t_LogicMgrPoPmOp);
+		SAFE_DELETE(t_LogicMgrPoPmDm);
+		SAFE_DELETE(t_LogicMgrPoPmScan);
+		SAFE_DELETE(t_LogicMgrPoPmEx);
+		SAFE_DELETE(t_LogicMgrPoPmNo);
 	}
 
 	{
+		SAFE_DELETE(t_LogicMgrLogEvent);
 		SAFE_DELETE(t_LogicMgrLogDeployFile);
 		SAFE_DELETE(t_LogicMgrLogDoc);
 		SAFE_DELETE(t_LogicMgrLogSecu);
-		SAFE_DELETE(t_LogicMgrLogStatus);
+		SAFE_DELETE(t_LogicMgrLogPatch);
+		SAFE_DELETE(t_LogicMgrLogDevice);
+		SAFE_DELETE(t_LogicMgrLogRs);
+		SAFE_DELETE(t_LogicMgrLogRsBk);
 
 		SAFE_DELETE(t_LogicMgrHost);
 		SAFE_DELETE(t_LogicMgrHostSys);
@@ -1462,6 +1772,8 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicMgrHostSw);
 		SAFE_DELETE(t_LogicMgrHostStatusPo);
 		SAFE_DELETE(t_LogicMgrHostKey);
+		SAFE_DELETE(t_LogicMgrHostPatch);
+		SAFE_DELETE(t_LogicMgrHostVulnRst);
 
 		SAFE_DELETE(t_LogicMgrUser);
 
@@ -1471,8 +1783,6 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicMgrSiteFile);
 		SAFE_DELETE(t_LogicMgrSiteVuln);
 		SAFE_DELETE(t_LogicMgrSiteVulnScan);
-		SAFE_DELETE(t_LogicMgrSiteVulnRepair);
-		SAFE_DELETE(t_LogicMgrSiteVulnLock);
 	}
 
 	{
@@ -1480,6 +1790,9 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicInitLink);
 		SAFE_DELETE(t_LogicLogEvent);
 		SAFE_DELETE(t_LogicLogDocDScan);
+		SAFE_DELETE(t_LogicDocDeleteInfo);
+
+		SAFE_DELETE(t_LogicCtrlVuln);
 	}
 
 	{
@@ -1502,6 +1815,7 @@ INT32		CMainDlg::DeleteSubClass()
 
 		SAFE_DELETE(t_ManageEnvPolicy);		
 		SAFE_DELETE(t_ManageLinkLicense);
+		SAFE_DELETE(t_ManageEnvLocal);
 	}
 
 	{
@@ -1514,12 +1828,23 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_ThreadPoInPtnScan);
 		SAFE_DELETE(t_ThreadChkHkNoti);
 		SAFE_DELETE(t_ThreadEvtMon);
+
+//		SAFE_DELETE(t_ThreadPoInRsBk);		//TRACE("delete thread [%s]\n", "InRsBk");
+//		SAFE_DELETE(t_ThreadExecute);		//TRACE("delete thread [%s]\n", "Execute");
+
+
 	}
 
 	{
 		SAFE_DELETE(t_ManageFileDown);
 		SAFE_DELETE(t_ManageLogicTimer);
 //		SAFE_DELETE(t_ManageDeviceMedia);
+		SAFE_DELETE(t_ManageDevOInfo);
+//		SAFE_DELETE(t_ManagePMSWork);
+		SAFE_DELETE(t_ManageLinkEnv);
+//		SAFE_DELETE(t_ManagePatchFile);
+//		SAFE_DELETE(t_ManageVulnFileProtect);
+//		SAFE_DELETE(t_ManageVulnRegProtect);
 	}
 
 	{

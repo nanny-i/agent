@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2020-2025 ASHINi corp. 
- * 
- * This library is free software; you can redistribute it and/or 
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
- * version 2.1 of the License, or (at your option) any later version. 
- * 
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * Lesser General Public License for more details. 
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this library; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
- * 
+ * Copyright (C) 2020-2025 ASHINi corp.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  */
 
 
@@ -26,7 +26,7 @@
 #define RT_MANIFEST 24
 #define APP_MANIFEST 1
 */
-                            
+
 /////////////////////////////////////////////////////////////////////////
 //WM define header
 #include "com_define_wm.h"
@@ -49,6 +49,9 @@
 //Common status event define header
 #include "com_define_status_event.h"
 
+//locale define
+#include "com_define_locale.h"
+
 //web server define
 #include "com_define_web_svr.h"
 
@@ -60,19 +63,28 @@
 
 #include "com_define_dbms.h"
 #include "com_define_dbms_query.h"
-//#include "com_define_dbf.h"
+
 #include "com_define_host_auth.h"
 #include "com_define_pw_mon.h"
 
+#include "com_define_pos_key_id.h"
 
 #include "com_define_socket_thread.h"
 
 #include "com_define_find_order_info.h"
 #include "com_define_task_schedule_info.h"
 
+#include "com_define_dn_file.h"
+
+#include "com_define_ss_common.h"
+
+#include "com_define_ptn_fb.h"
+
+#include "com_define_executecomobj_thread.h"
+
 /////////////////////////////////////////////////////////////////////////
 // Number Define
-#define	RTN_ERROR_NON_LINK_LIBRARY					-10000 
+#define	RTN_ERROR_NON_LINK_LIBRARY					-10000
 #define DEFAULT_AGENT_GUI_SESSIONKEY				0x3F3D2A37
 
 

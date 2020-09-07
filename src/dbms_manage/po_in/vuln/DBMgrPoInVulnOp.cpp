@@ -53,6 +53,8 @@ INT32			CDBMgrPoInVulnOp::LoadDB(TListDBPoInVulnOp& tDBPoInVulnOpList)
     INT32 nIndex = 0;
 
     m_strQuery = SPrintf(DBMS_POLICY_QUERY_HDR_SELECT
+						", ptn_file_sv_name, ptn_version, ptn_file_name, ptn_file_hash"
+						", ptn_dn_file_type, ptn_dn_file_name, ptn_dn_file_hash"
 						" FROM po_in_vuln_op WHERE used_flag=1;");
     if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -64,6 +66,15 @@ INT32			CDBMgrPoInVulnOp::LoadDB(TListDBPoInVulnOp& tDBPoInVulnOpList)
 
 		tDPH					= GetDBField_PoHDR(nIndex);
 		
+		data.tDPIVOPF.strPtnFileSvName			= GetDBField_String(nIndex++);
+		data.tDPIVOPF.strPtnVersion				= GetDBField_String(nIndex++);
+		data.tDPIVOPF.strPtnFileName			= GetDBField_String(nIndex++);
+		data.tDPIVOPF.strPtnFileHash			= GetDBField_String(nIndex++);
+
+		data.tDPIVOPF.nPtnDnFileType			= GetDBField_UInt(nIndex++);
+		data.tDPIVOPF.strPtnDnFileName			= GetDBField_String(nIndex++);
+		data.tDPIVOPF.strPtnDnFileHash			= GetDBField_String(nIndex++);
+
         tDBPoInVulnOpList.push_back(data);
         if(m_nLoadMaxID < UINT32(tDPH.nID))
 			m_nLoadMaxID = tDPH.nID;
@@ -81,8 +92,15 @@ INT32			CDBMgrPoInVulnOp::InsertPoInVulnOp(DB_PO_IN_VULN_OP& data)
 
 	m_strQuery = SPrintf("INSERT INTO po_in_vuln_op("
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
-						") VALUES (%s);",
-                        GetPoHDRQuery_InsertValue(tDPH).c_str());
+						", ptn_file_sv_name, ptn_version, ptn_file_name, ptn_file_hash"
+						", ptn_dn_file_type, ptn_dn_file_name, ptn_dn_file_hash"
+						") VALUES (%s"
+						", '%s', '%s', '%s', '%s'"
+						", %u, '%s', '%s'"
+						");",
+                        GetPoHDRQuery_InsertValue(tDPH).c_str(),
+						data.tDPIVOPF.strPtnFileSvName.c_str(), data.tDPIVOPF.strPtnVersion.c_str(), data.tDPIVOPF.strPtnFileName.c_str(), data.tDPIVOPF.strPtnFileHash.c_str(),
+						data.tDPIVOPF.nPtnDnFileType, data.tDPIVOPF.strPtnDnFileName.c_str(), data.tDPIVOPF.strPtnDnFileHash.c_str());
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -98,8 +116,12 @@ INT32			CDBMgrPoInVulnOp::UpdatePoInVulnOp(DB_PO_IN_VULN_OP& data)
 	DB_PO_HEADER& tDPH = data.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_in_vuln_op SET %s"
+						", ptn_file_sv_name='%s', ptn_version='%s', ptn_file_name='%s', ptn_file_hash='%s'"
+						", ptn_dn_file_type=%u, ptn_dn_file_name='%s', ptn_dn_file_hash='%s'"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(),
+						data.tDPIVOPF.strPtnFileSvName.c_str(), data.tDPIVOPF.strPtnVersion.c_str(), data.tDPIVOPF.strPtnFileName.c_str(), data.tDPIVOPF.strPtnFileHash.c_str(),
+						data.tDPIVOPF.nPtnDnFileType, data.tDPIVOPF.strPtnDnFileName.c_str(), data.tDPIVOPF.strPtnDnFileHash.c_str(),
 						tDPH.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

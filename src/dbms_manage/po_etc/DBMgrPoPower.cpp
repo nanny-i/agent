@@ -53,6 +53,7 @@ INT32			CDBMgrPoPower::LoadDB(TListDBPoPower& tDBPoPowerList)
     INT32 nIndex = 0;
 
     m_strQuery = SPrintf(DBMS_POLICY_QUERY_HDR_SELECT
+						", fastboot_ctrl"
 						" FROM po_power WHERE used_flag=1;");
     if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_SELECT_FAIL;
@@ -63,6 +64,8 @@ INT32			CDBMgrPoPower::LoadDB(TListDBPoPower& tDBPoPowerList)
 		DB_PO_HEADER& tDPH = dpp.tDPH;
 
 		tDPH						= GetDBField_PoHDR(nIndex);
+
+		dpp.nFastBoot				= GetDBField_UInt(nIndex++);
 		
         tDBPoPowerList.push_back(dpp);
         if(m_nLoadMaxID < UINT32(tDPH.nID))
@@ -81,9 +84,11 @@ INT32			CDBMgrPoPower::InsertPoPower(DB_PO_POWER& dpp)
 
 	m_strQuery = SPrintf("INSERT INTO po_power("
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
-						") VALUES (%s"
-						");",
-                        GetPoHDRQuery_InsertValue(tDPH).c_str());
+						", fastboot_ctrl"
+						") VALUES (%s"						
+						", %u);",
+						GetPoHDRQuery_InsertValue(tDPH).c_str(),
+						dpp.nFastBoot);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
@@ -99,8 +104,10 @@ INT32			CDBMgrPoPower::UpdatePoPower(DB_PO_POWER& dpp)
 	DB_PO_HEADER& tDPH = dpp.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_power SET %s"
+						", fastboot_ctrl=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(),
+                        dpp.nFastBoot,
 						tDPH.nID);
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))

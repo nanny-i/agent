@@ -40,6 +40,7 @@ public:
 
 public:
 	String					GetName(UINT32 nID);    
+	UINT32					GetNextLocalID();
 
 public:
 	INT32					SetPkt(MemToken& SendToken);
@@ -47,6 +48,7 @@ public:
 	INT32					SetPkt(PDB_PO_IN_PTN_SP_RULE pdata, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_PO_IN_PTN_SP_RULE& data);
 
+	INT32					SetPktSync(TListPVOID& tIDList);
 public:
 	CManagePoInPtnSPRule();
     ~CManagePoInPtnSPRule();
