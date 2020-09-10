@@ -502,34 +502,7 @@ String		PathWinToUnix(String strValue)
 	return strValue;
 }
 
-INT32 ConvertCharsetToEucKr(char *pSrcCharSet, char *pDstCharSet, char *pSrcData, int nSrcLen, char *pDstData, int nDstLen)
-{
-	iconv_t it;
-	INT32 nRetVal = 0;
-	size_t nSrcStrLen = 0;
-	size_t nDstStrLen = 0;
-	if(pSrcCharSet == NULL || pDstCharSet == NULL || pSrcData == NULL || nSrcLen < 1 || pDstData == NULL || nDstLen < 1)
-		return -1;
-
-	it = iconv_open(pDstCharSet, pSrcCharSet);
-	if (it == (iconv_t)(-1))
-	{
-		return -2;
-	}
-
-	nSrcStrLen = (size_t)nSrcLen;
-	nDstStrLen = (size_t)nDstLen;
-
-	size_t cc = iconv(it, &pSrcData, &nSrcStrLen, &pDstData, &nDstStrLen);
-	if (cc == (size_t)(-1))
-	{
-		nRetVal = -3;
-	}
-	iconv_close(it);
-	return nRetVal;
-}
-
-INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String &strSrcData, String &strDstData)
+INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String strSrcData, String &strDstData)
 {
 	iconv_t it;
 	INT32 nRetVal = 0;
@@ -539,7 +512,7 @@ INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String &strSrc
 	char *pDst = NULL;
 
 	size_t nSrcStrLen = (size_t)strSrcData.length();
-	size_t nDstStrLen = nSrcStrLen+1;
+	size_t nDstStrLen = nSrcStrLen*4+1;
 
 	if(pSrcCharSet == NULL || pDstCharSet == NULL || nSrcStrLen < 1)
 		return -1;
@@ -547,7 +520,9 @@ INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String &strSrc
 	it = iconv_open(pDstCharSet, pSrcCharSet);
 	if (it == (iconv_t)(-1))
 	{
-		return -2;
+		nRetVal = errno;
+		nRetVal -= 1000;
+		return nRetVal;
 	}
 
 	do{
@@ -574,8 +549,9 @@ INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String &strSrc
 
 		if(iconv(it, &pSrc, &nSrcStrLen, &pDst, &nDstStrLen) == (size_t)(-1))
 		{
+			nRetVal = errno;
 			iconv_close(it);
-			nRetVal = -5;
+			nRetVal -= -2000;
 			break;
 		}
 		iconv_close(it);

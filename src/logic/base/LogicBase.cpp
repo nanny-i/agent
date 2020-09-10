@@ -285,7 +285,7 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 	switch(tIS.U8.type)
 	{
 		case SCHEDULE_PERIOD_TYPE_BOOT:
-		{			
+		{
 			if(difftime(nCurTime, nLastChkTime) >= TIMER_INTERVAL_TIME_SYS_BOOT)
 			{
 				UINT32 nBootTime = uptime();
@@ -310,9 +310,9 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 				}
 				else
 				{
-					if(nBootTime < TIMER_INTERVAL_TIME_MIN*5)
+					if(nBootTime < TIMER_INTERVAL_TIME_MIN*6)
 						nRtn = 1;
-				}				
+				}
 				if(nRtn)
 					nLastChkTime = nCurTime;
 			}

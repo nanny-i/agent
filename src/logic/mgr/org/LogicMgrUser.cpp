@@ -116,8 +116,6 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Edit_Ext()
 			WriteLogE("[%s] apply user information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
-
-		WriteLogN("[%s] edit user info ", m_strLogicName.c_str());
 	}
 
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);
@@ -142,8 +140,6 @@ INT32		CLogicMgrUser::AnalyzePkt_FromMgr_Del_Ext()
 			WriteLogE("[%s] delete user information : [%d]", m_strLogicName.c_str(), g_nErrRtn);
 			return SetHdrAndRtn(AZPKT_CB_RTN_DBMS_FAIL);
 		}
-
-		WriteLogN("[%s] del user info ", m_strLogicName.c_str());
 	}
 
 	return SetHdrAndRtn(AZPKT_CB_RTN_SUCCESS);

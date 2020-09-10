@@ -344,20 +344,90 @@ BOOL MemToken::TokenAdd_64(INT64 pSrc)
 		return FALSE;
 	return TRUE;
 }
+
+INT32  MemToken::Conver_Euckr(char *pSrcData, int nSrcLen, char **ppDstData)
+{
+	iconv_t it;
+	INT32 nRetVal = 0;
+	char *pDstData = NULL;
+	char *pSrc = NULL;
+	char *pDst = NULL;
+
+	size_t nSrcStrLen = (size_t)nSrcLen;
+	size_t nDstStrLen = nSrcLen*2+3;
+
+	if(pSrcData == NULL || ppDstData == NULL || nSrcStrLen < 1)
+		return -1;
+
+	it = iconv_open(CHARSET_EUCKR, CHARSET_UTF8);
+	if (it == (iconv_t)(-1))
+	{
+		return -2;
+	}
+
+	do{
+		pDstData = (char *)malloc(nDstStrLen + 1);
+		if(pDstData == NULL)
+		{
+			nRetVal = -4;
+			break;
+		}
+		memset(pDstData, 0, nDstStrLen + 1);
+
+		pSrc = pSrcData;
+		pDst = pDstData;
+
+		if(iconv(it, &pSrc, &nSrcStrLen, &pDst, &nDstStrLen) == (size_t)(-1))
+		{
+			nRetVal = -5;
+			break;
+		}
+
+		nRetVal = 0;
+	}while(FALSE);
+
+	iconv_close(it);
+
+	if(nRetVal == 0)
+	{
+		*ppDstData = pDstData;
+	}
+	else
+	{
+		safe_free(pDstData);
+	}
+	return nRetVal;
+}
+
 //-----------------------------------------------------------------------------------
 
-BOOL MemToken::TokenAdd_String(String pSrc)
+BOOL MemToken::TokenAdd_String(String strSrc)
 {
+	char *pDstData = NULL;
+	INT32 nRetVal = 0;
+	INT32 nLen = 0;
+	String strDstSrc;
 	if(!_TokenAddType(MEMTOKEN_TYPE_STRING))
 		return FALSE;
-	
-	INT32 len = pSrc.length() ;
-	if( !TokenAdd_32( len ) )
-		return FALSE ;
+	strDstSrc = strSrc;
 
-	if( !_TokenAdd( (PVOID)pSrc.c_str(), len) )
-		return FALSE ;
+	nLen = strDstSrc.length();
+	if(nLen > 0)
+	{
+		nRetVal = Conver_Euckr((char *)strDstSrc.c_str(), nLen, &pDstData);
+		if(nRetVal == 0 && pDstData != NULL)
+		{
+			strDstSrc = SPrintf(pDstData);
+			safe_free(pDstData);
+		}
+	}
 
+	nLen = strDstSrc.length();
+	if( !TokenAdd_32( nLen ) )
+		return FALSE;
+
+	if( !_TokenAdd( (PVOID)strDstSrc.c_str(), nLen) )
+		return FALSE;
 	return TRUE ;
 }
 //-----------------------------------------------------------------------------------
@@ -580,7 +650,63 @@ BOOL MemToken::TokenDel_64(INT64& pSrc)
 		return FALSE;
 	return TRUE;
 }
+
 //-----------------------------------------------------------------------------------
+
+INT32  MemToken::Conver_Utf8(char *pSrcData, int nSrcLen, char **ppDstData)
+{
+	iconv_t it;
+	INT32 nRetVal = 0;
+	char *pDstData = NULL;
+	char *pSrc = NULL;
+	char *pDst = NULL;
+
+	size_t nSrcStrLen = (size_t)nSrcLen;
+	size_t nDstStrLen = nSrcLen*4+1;
+
+	if(pSrcData == NULL || ppDstData == NULL || nSrcStrLen < 1)
+		return -1;
+
+	it = iconv_open(CHARSET_UTF8, CHARSET_EUCKR);
+	if (it == (iconv_t)(-1))
+	{
+		return -2;
+	}
+
+	do{
+		pDstData = (char *)malloc(nDstStrLen + 1);
+		if(pDstData == NULL)
+		{
+			nRetVal = -4;
+			break;
+		}
+		memset(pDstData, 0, nDstStrLen + 1);
+
+		pSrc = pSrcData;
+		pDst = pDstData;
+
+		if(iconv(it, &pSrc, &nSrcStrLen, &pDst, &nDstStrLen) == (size_t)(-1))
+		{
+			nRetVal = -5;
+			break;
+		}
+
+		nRetVal = 0;
+	}while(FALSE);
+
+	iconv_close(it);
+
+	if(nRetVal == 0)
+	{
+		*ppDstData = pDstData;
+	}
+	else
+	{
+		safe_free(pDstData);
+	}
+	return nRetVal;
+}
+
 
 BOOL MemToken::TokenDel_64(UINT64& pSrc)
 {
@@ -593,30 +719,53 @@ BOOL MemToken::TokenDel_64(UINT64& pSrc)
 }
 //-----------------------------------------------------------------------------------
 
-INT32 MemToken::TokenDel_String(String& pSrc)
+INT32 MemToken::TokenDel_String(String& strSrc)
 {
+	INT32 nLen = 0;
+	INT32 nRetVal = 0;
+	char* pszBuf = NULL;
+	char* pszUtfBuf = NULL;
 	if(!_IsTokenType(MEMTOKEN_TYPE_STRING))
-		return FALSE;
+		return 0;
 
-	INT32 len = 0;
-	if( !TokenDel_32( len ) )
-		return -1 ;
+	do{
+		if( !TokenDel_32( nLen ) )
+		{
+			nRetVal = -1;
+			break;
+		}
 
-	char* pszBuf = (char*)malloc(len + 1);
-	if(!pszBuf)		return -1;
+		pszBuf = (char*)malloc(nLen + 1);
+		if(pszBuf == NULL)
+		{
+			nRetVal = -2;
+			break;
+		}
 
-	memset(pszBuf, 0, len+1);
+		memset(pszBuf, 0, nLen+1);
 
-	if( !_TokenDel( (PVOID)pszBuf, len) )
-	{
-		free(pszBuf);
-		return -1 ;
-	}
+		if( !_TokenDel( (PVOID)pszBuf, nLen) )
+		{
+			nRetVal = -3;
+			break;
+		}
 
-	pSrc = String(pszBuf);
-	free(pszBuf);
+		nRetVal = Conver_Utf8(pszBuf, nLen, &pszUtfBuf);
+		if(nRetVal == 0 && pszUtfBuf != NULL)
+		{
+			strSrc = String(pszUtfBuf);
+			safe_free(pszUtfBuf);
+		}
+		else
+		{
+			strSrc = String(pszBuf);
+		}
+		nRetVal = nLen;
+	}while(FALSE);
 
-	return len ;
+	safe_free(pszBuf);
+
+	return nRetVal;
 }
 //-----------------------------------------------------------------------------------
 
@@ -857,6 +1006,7 @@ BOOL	MemToken::TokenAdd_DPH(DB_PO_HEADER& tDPH)
 	TokenAdd_32(tDPH.nSeqNo);
 	TokenAdd_String(tDPH.strName);
 	TokenAdd_String(tDPH.strDescr);
+
 	TokenAdd_32(tDPH.nAdminID);
 	TokenAdd_32(tDPH.nSubAdminLock);
 	TokenAdd_32(tDPH.nTargetLock);

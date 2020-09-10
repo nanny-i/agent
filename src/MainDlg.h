@@ -41,7 +41,8 @@ public:
 	DWORD		OnThreadLog(UINT32 nLogType, PDB_SITE_FILE pDsfSrc);
 	DWORD 		OnThreadEnd(UINT32 nEndType, PDB_PO_FE_PTN_LO pDPFPO);
 	DWORD		OnThreadWorkEnd(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI);
-	DWORD		OnThreadWorkProgress(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI);
+	DWORD		OnThreadPoFaClearEnd(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI);
+	DWORD		OnThreadPoFaClearProgress(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI);
 	DWORD		OnSockEvtCltLgn(PPKT_DATA pPktData);
 	DWORD		OnSockEvtCltMgr(PPKT_DATA pPktData);
 	DWORD		OnSockEvtCltUdt(PPKT_DATA pPktData);

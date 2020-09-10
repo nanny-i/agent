@@ -198,7 +198,7 @@ String			MapIDToStr_Str(TMapIDStr& tIDMapStr, CHAR chCellTok, CHAR chBlockTok)
 	for(begin; begin != end; begin++)
 	{
 		String strCell;
-		strCell = SPrintf("%u%c%s%c", begin->first, chCellTok, begin->second, chBlockTok);
+		strCell = SPrintf("%u%c%s%c", begin->first, chCellTok, begin->second.c_str(), chBlockTok);
 		strValue += strCell;
 	}
 	return strValue;

@@ -291,7 +291,6 @@ INT32					CManageLogDoc::SetPkt(MemToken& SendToken)
 
 INT32					CManageLogDoc::SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken)
 {
-	String strEucData;
 	SendToken.TokenAdd_32(pdld->nID);
 	SendToken.TokenAdd_32(pdld->nRegDate);
 	SendToken.TokenAdd_32(pdld->nEvtTime);
@@ -312,32 +311,11 @@ INT32					CManageLogDoc::SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdld->nBackupTime);
 
 	SendToken.TokenAdd_String(pdld->strSubjectPath);
-
 	SendToken.TokenAdd_String(pdld->strSubjectName);
-
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdld->strObjectPath, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdld->strObjectPath);
-
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdld->strObjectName, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdld->strObjectName);
-
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdld->strBkFileName, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdld->strBkFileName);
-
+	SendToken.TokenAdd_String(pdld->strObjectPath);
+	SendToken.TokenAdd_String(pdld->strObjectName);
+	SendToken.TokenAdd_String(pdld->strBkFileName);
 	SendToken.TokenAdd_StringW(pdld->strObjectPathW);
-
 	SendToken.TokenAdd_32(pdld->nUserID);
 
 	SendToken.TokenSet_Block();
@@ -348,7 +326,6 @@ INT32					CManageLogDoc::SetPkt(PDB_LOG_DOC pdld, MemToken& SendToken)
 
 INT32					CManageLogDoc::GetPkt(MemToken& RecvToken, DB_LOG_DOC& dld)
 {
-	String strUtfData;
 	if (!RecvToken.TokenDel_32(dld.nID))						goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dld.nRegDate))					goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dld.nEvtTime))					goto	INVALID_PKT;
@@ -373,20 +350,8 @@ INT32					CManageLogDoc::GetPkt(MemToken& RecvToken, DB_LOG_DOC& dld)
 	if ( RecvToken.TokenDel_String(dld.strSubjectName) < 0)		goto	INVALID_PKT;
 
 	if ( RecvToken.TokenDel_String(dld.strObjectPath) < 0)		goto	INVALID_PKT;
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dld.strObjectPath, strUtfData) == 0)
-	{
-		dld.strObjectPath = strUtfData;
-	}
 	if ( RecvToken.TokenDel_String(dld.strObjectName) < 0)		goto	INVALID_PKT;
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dld.strObjectName, strUtfData) == 0)
-	{
-		dld.strObjectName = strUtfData;
-	}
 	if ( RecvToken.TokenDel_String(dld.strBkFileName) < 0)		goto	INVALID_PKT;
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dld.strBkFileName, strUtfData) == 0)
-	{
-		dld.strBkFileName = strUtfData;
-	}
 	if ( RecvToken.TokenDel_StringW(dld.strObjectPathW) < 0)	goto	INVALID_PKT;
 
 	if (!RecvToken.TokenDel_32(dld.nUserID))					goto	INVALID_PKT;

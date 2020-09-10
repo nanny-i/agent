@@ -70,8 +70,7 @@ INT32 CFileDeleteUtil::ZeroFile(LPCSTR szPath, DWORD dwOverwriteCount)
 	ddwFileSize = (ssize_t)fStat.st_size;
 	if(ddwFileSize < 1)
 	{
-		WriteLogE("[%s] fail to get stat %s (%d)", m_strUtilName.c_str(), szPath, errno);
-		return -3;
+		return 0;
 	}
 
 	nFd = open(szPath, O_WRONLY);

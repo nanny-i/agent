@@ -346,7 +346,7 @@ void *CDownLoadUtil::DownloadFileThread(LPVOID lParam)
 		}
 
 		INT32 nChangeResult = tDownLoadUtil->ChgDLSvrType(pafi);
-		WriteLogN("change download svr type result : %d", nChangeResult);
+//		WriteLogN("change download svr type result : %d", nChangeResult);
 		
         switch(nChangeResult)
 		{
@@ -480,7 +480,7 @@ INT32 CDownLoadUtil::ChgDLSvrType(PASI_FDL_INFO pafi)
         
 	pafi->nDLSvrType = nCurChkDLSvrType;
 		
-    WriteLogN("Change download svr type (%d) : id[%d],type[%d],id[%d],ref[%d]", pafi->nDLSvrType, pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt);
+//    WriteLogN("Change download svr type (%d) : id[%d],type[%d],id[%d],ref[%d]", pafi->nDLSvrType, pafi->nID, pafi->nItemType, pafi->nItemID, pafi->nRefCnt);
 	return (nCurChkDLSvrType == ASIFDL_DL_SVR_TYPE_UNKNOWN ? 2 : 1);
 }
 //--------------------------------------------------------------------

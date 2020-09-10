@@ -536,6 +536,49 @@ int read_suse_release(char *acOsName, int nMaxLen, UINT64 *pddwOsID, UINT32 *pdw
 	return 0;
 }
 
+
+int read_lsb_release_file(UINT64 *pddwOsID)
+{
+	FILE* fp = NULL;
+	char acFirst[MAX_QHBUFF] = {0,};
+	int nLen = 0;
+	char* pEnd = NULL;
+
+	if(pddwOsID == NULL)
+		return -1;
+
+	fp = fopen("/etc/lsb-release", "r");
+	if(fp == NULL)
+		return -2;
+
+	fgets(acFirst, MAX_QHBUFF-1, fp);
+	nLen = (int)strlen(acFirst);
+	fclose(fp);
+
+	if(nLen < 1 || nLen > MAX_QHBUFF - 1)
+		return -3;
+
+	if(acFirst[nLen-1] == '\n')
+		acFirst[nLen-1] = '\0';
+
+	pEnd = strchr(acFirst, '=');
+	if(pEnd == NULL || pEnd == acFirst)
+	{
+		return -4;
+	}
+	pEnd++;
+	if(pEnd[0] == 0)
+	{
+		return -5;
+	}
+	if(_stricmp(pEnd, LINUX_GOOROOM_NAME))
+	{
+		return -6;
+	}
+	*pddwOsID = ASI_LINUX_SYSTEM_ID_GOOROOM;
+	return 0;
+}
+
 int read_lsb_release(char *acOsName, int nMaxLen, UINT64 *pddwOsID, UINT32 *pdwOsType)
 {
 	FILE* pPipe = NULL;
@@ -602,9 +645,18 @@ int read_lsb_release(char *acOsName, int nMaxLen, UINT64 *pddwOsID, UINT32 *pdwO
 	{
 		*pddwOsID = ASI_LINUX_SYSTEM_ID_UBUNTU;
 	}
+	else if(!_stricmp(pDescr, LINUX_TMAXOS_NAME))
+	{
+		*pddwOsID = ASI_LINUX_SYSTEM_ID_TMAXOS;
+	}
+	else if(!_stricmp(pDescr, LINUX_HAMONIKR_NAME))
+	{
+		*pddwOsID = ASI_LINUX_SYSTEM_ID_HAMONIKR;
+	}
 	else
 	{
-		*pddwOsID = ASI_LINUX_SYSTEM_ID_DEBIAN;
+		if(read_lsb_release_file(pddwOsID) != 0)
+			*pddwOsID = ASI_LINUX_SYSTEM_ID_DEBIAN;
 	}
 	*pdwOsType = ASI_SYSTEM_TYPE_WORKSTATION;
 
