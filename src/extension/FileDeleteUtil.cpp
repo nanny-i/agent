@@ -139,6 +139,7 @@ INT32 CFileDeleteUtil::SecureDeleteFile(LPCSTR szPath, UINT32 nDelMethod, DWORD 
 {
 	CFileUtil fu;
 	DWORD dwFileSize = 0;
+	INT32 nRetVal = 0;
 	if (!szPath || !szPath[0])
 	{
 		WriteLogE("[%s] invalid input data", m_strUtilName.c_str());
@@ -149,8 +150,9 @@ INT32 CFileDeleteUtil::SecureDeleteFile(LPCSTR szPath, UINT32 nDelMethod, DWORD 
 	{
 		if(unlink(szPath) == -1)
 		{
-			WriteLogE("[%s] fail to delete %s (%d)", m_strUtilName.c_str(), szPath, errno);
-			return -2;
+			WriteLogN("[%s] fail to delete %s (%d) and delete file after restart", m_strUtilName.c_str(), szPath, errno);
+			if(t_LogicMgrPoFaDelFileAfterBoot)
+				t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(szPath);
 		}
 		return 0;
 	}
@@ -165,9 +167,9 @@ INT32 CFileDeleteUtil::SecureDeleteFile(LPCSTR szPath, UINT32 nDelMethod, DWORD 
 			{
 				if(unlink(szPath) == -1)
 				{
-					WriteLogE("[%s] fail to delete %s (%d)", m_strUtilName.c_str(), szPath, errno);
-			
-					return -3;
+					WriteLogN("[%s] fail to delete %s (%d) and delete file after restart", m_strUtilName.c_str(), szPath, errno);
+					if(t_LogicMgrPoFaDelFileAfterBoot)
+						t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(szPath);
 				}
 				return 0;
 			}
@@ -177,29 +179,51 @@ INT32 CFileDeleteUtil::SecureDeleteFile(LPCSTR szPath, UINT32 nDelMethod, DWORD 
 
 	if (fu.FileExists(szPath) == FALSE)
 	{
-		WriteLogE("[%s] fail to find file (%s)", m_strUtilName.c_str(), szPath);
-		return -4;
+		return 0;
 	}
 
 	if (nDelMethod == 0)
 	{
-		if(ZeroFile(szPath, dwOverwriteCount) != 0)
-			return -5;
+		nRetVal = ZeroFile(szPath, dwOverwriteCount);
+		if(nRetVal == 0)
+		{
+			WriteLogN("[%s] success to write to %s by %lu times zero fill", m_strUtilName.c_str(), szPath, dwOverwriteCount);
+		}
+		else
+		{
+			WriteLogE("[%s] fail to write to %s by %lu times zero fill (%d)", m_strUtilName.c_str(), szPath, dwOverwriteCount, nRetVal);
+		}
+		if(unlink(szPath) == -1)
+		{
+			WriteLogN("[%s] fail to delete %s (%d) and delete file after restart", m_strUtilName.c_str(), szPath, errno);
+			if(t_LogicMgrPoFaDelFileAfterBoot)
+				t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(szPath);
+		}
+
 	}
 	else if (nDelMethod == 1)
 	{
-		if(t_WipeUtil == NULL)
+		if(t_WipeUtil != NULL)
 		{
-			WriteLogE("[%s] invalid wipe util address", m_strUtilName.c_str());
-			return -5;
+			nRetVal = t_WipeUtil->WipeFilesA((char *)szPath, (INT32)dwOverwriteCount);
+			if(nRetVal == 0)
+			{
+				WriteLogN("[%s] success to write to %s by %lu times fast wipe", m_strUtilName.c_str(), szPath, dwOverwriteCount);
+			}
+			else
+			{
+				WriteLogE("[%s] fail to write to %s by %lu times fast wipe (%d)", m_strUtilName.c_str(), szPath, dwOverwriteCount, nRetVal);
+			}
 		}
-		t_WipeUtil->WipeFilesA((char *)szPath, (INT32)dwOverwriteCount);
 	}
 	else
 	{
-		WriteLogE("[%s] invalid delete method [%d].", m_strUtilName.c_str(), nDelMethod);
-		return -6;
+		if(unlink(szPath) == -1)
+		{
+			WriteLogN("[%s] fail to delete %s (%d) and delete file after restart", m_strUtilName.c_str(), szPath, errno);
+			if(t_LogicMgrPoFaDelFileAfterBoot)
+				t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(szPath);
+		}
 	}
-
 	return 0;
 }

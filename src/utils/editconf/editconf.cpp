@@ -299,22 +299,17 @@ INT32 GetDeletePasswdMode()
 		return 15;
 	}
 
-	do{
-		rc = sqlite3_prepare_v2(pConn, acSqlQuery, -1, &pStatement, NULL);
-		if (rc != SQLITE_OK || pStatement == NULL)
-		{
-			printf("fail to prepare sqlite3 (%s) (%d)\n", acSqlQuery, errno);
-			nRetVal = 16;
-			break;
-		}
+	rc = sqlite3_prepare_v2(pConn, acSqlQuery, -1, &pStatement, NULL);
+	if (rc != SQLITE_OK || pStatement == NULL)
+	{
+		printf("fail to prepare sqlite3 (%s) (%d)\n", acSqlQuery, errno);
+		sqlite3_close(pConn);
+		return 16;
+	}
 
-		rc = sqlite3_step (pStatement);
-		if (rc == SQLITE_DONE)
-		{
-			nRetVal = 0;
-			break;
-		}
-
+	nRetVal = 0;
+	while(sqlite3_step (pStatement) == SQLITE_ROW)
+	{
 		nCols = sqlite3_column_count(pStatement);
 		if(nCols != 2)
 		{
@@ -332,12 +327,6 @@ INT32 GetDeletePasswdMode()
 		}
 
 		nUsedFlag = sqlite3_column_int(pStatement, 0);
-		if(nUsedFlag != 1)
-		{
-			nRetVal = 0;
-			break;
-		}
-
 		rc = sqlite3_column_type(pStatement, 1);
 		if(rc != SQLITE_INTEGER)
 		{
@@ -347,13 +336,11 @@ INT32 GetDeletePasswdMode()
 		}
 
 		nUsedMode = sqlite3_column_int(pStatement, 1);
-		if(nUsedMode != 1)
+		if(nUsedFlag == 1 && nUsedMode == 1)
 		{
-			nRetVal = 0;
+			nRetVal = 1;
 			break;
 		}
-
-		nRetVal = 1;
 	}while(FALSE);
 
 	if(pStatement != NULL)
@@ -373,10 +360,11 @@ INT32 CheckDeletePasswd(char* pDeletePasswd)
 	sqlite3 *pConn = NULL;
 	sqlite3_stmt *pStatement = NULL;
 	INT32 nUsedFlag = 0;
+	INT32 nUsedMode = 0;
 	String strRootPath;
 	char acDbPath[MAX_PATH] = {0,};
 	DBMS_ACCOUNT_INFO stDbInfo;
-	char acSqlQuery[256] = "select rm_pw from po_host_rm_info;";
+	char acSqlQuery[256] = "select used_flag, used_mode, rm_pw from po_host_rm_info;";
 	char acPasswd[MAX_PASSWD] = {0,};
 
 	if(pDeletePasswd == NULL || pDeletePasswd[0] == 0)
@@ -399,39 +387,51 @@ INT32 CheckDeletePasswd(char* pDeletePasswd)
 
 	snprintf(acDbPath, MAX_PATH-1, "%s/%s/db/%s.db", (char *)strRootPath.c_str(), NANNY_AGENT_DIR, (char *)stDbInfo.strDB.c_str());
 
-	rc = sqlite3_open_v2((char *)acDbPath, &pConn, SQLITE_OPEN_READONLY, NULL);
+	rc = sqlite3_open_v2(acDbPath, &pConn, SQLITE_OPEN_READONLY, NULL);
 	if (rc != 0 || pConn == NULL)
 	{
 		printf("fail to open sqlite3 (%s) (%d)\n", acDbPath, errno);
+		return 15;
+	}
+
+	rc = sqlite3_prepare_v2(pConn, acSqlQuery, -1, &pStatement, NULL);
+	if (rc != SQLITE_OK || pStatement == NULL)
+	{
+		printf("fail to prepare sqlite3 (%s) (%d)\n", acSqlQuery, errno);
+		sqlite3_close(pConn);
 		return 16;
 	}
 
-	do{
-		rc = sqlite3_prepare_v2(pConn, acSqlQuery, -1, &pStatement, NULL);
-		if (rc != SQLITE_OK || pStatement == NULL)
-		{
-			printf("fail to prepare sqlite3 (%s) (%d)\n", acSqlQuery, errno);
-			nRetVal = 17;
-			break;
-		}
-
-		rc = sqlite3_step (pStatement);
-		if (rc == SQLITE_DONE)
-		{
-			printf("fail to step sqlite3 (%s) (%d)\n", acSqlQuery, errno);
-			nRetVal = 18;
-			break;
-		}
-
+	nRetVal = 22;
+	while(sqlite3_step (pStatement) == SQLITE_ROW)
+	{
 		nCols = sqlite3_column_count(pStatement);
-		if(nCols != 1)
+		if(nCols != 3)
 		{
+			nRetVal = 17;
 			printf("invalid column count (%d)\n", nCols);
-			nRetVal = 19;
 			break;
 		}
 
 		rc = sqlite3_column_type(pStatement, 0);
+		if(rc != SQLITE_INTEGER)
+		{
+			nRetVal = 18;
+			printf("invalid column type (%d)\n", rc);
+			break;
+		}
+
+		nUsedFlag = sqlite3_column_int(pStatement, 0);
+		rc = sqlite3_column_type(pStatement, 1);
+		if(rc != SQLITE_INTEGER)
+		{
+			printf("invalid column type (%d)\n", rc);
+			nRetVal = 19;
+			break;
+		}
+
+		nUsedMode = sqlite3_column_int(pStatement, 1);
+		rc = sqlite3_column_type(pStatement, 2);
 		if(rc != SQLITE_TEXT)
 		{
 			printf("invalid column type (%d)\n", rc);
@@ -439,20 +439,16 @@ INT32 CheckDeletePasswd(char* pDeletePasswd)
 			break;
 		}
 
-		strncpy(acPasswd, (char*)sqlite3_column_text(pStatement, 0), MAX_PASSWD-1);
-		if(acPasswd[0] == 0)
+		nRetVal = 1;
+		if(nUsedFlag == 1 && nUsedMode == 1)
 		{
-			printf("invalid passwd\n");
-			nRetVal = 21;
-			break;
+			strncpy(acPasswd, (char*)sqlite3_column_text(pStatement, 2), MAX_PASSWD-1);
+			if(acPasswd[0] != 0 && !_stricmp(acPasswd, pDeletePasswd))
+			{
+				nRetVal = 0;
+				break;
+			}
 		}
-
-		if(_stricmp(acPasswd, pDeletePasswd))
-		{
-			nRetVal = 1;
-			break;
-		}
-		nRetVal = 0;
 	}while(FALSE);
 
 	if(pStatement != NULL)
