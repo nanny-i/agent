@@ -78,6 +78,8 @@ public :
 	BOOL TokenDel_16(UINT16 &aDest) ;
     BOOL TokenDel_32(UINT32 &aDest) ;
 	BOOL TokenDel_64(UINT64 &aDest) ;
+	INT32 Conver_Euckr(char *pSrcData, int nSrcLen, char **ppDstData);
+	INT32 Conver_Utf8(char *pSrcData, int nSrcLen, char **ppDstData);
 	INT32 TokenDel_String(String& pSrc);
 	INT32 TokenDel_StringW(StringW& pSrc);
 	INT32 TokenDel_char(LPSTR pSrc, INT32 nLen);

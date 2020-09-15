@@ -24,7 +24,7 @@
 
 //---------------------------------------------------------------------------
 
-CDBMgrLogDoc*		t_DBMgrLogDoc;
+CDBMgrLogDoc*		t_DBMgrLogDoc = NULL;
 
 //---------------------------------------------------------------------------
 
@@ -94,7 +94,6 @@ INT32			CDBMgrLogDoc::LoadDB(TListDBLogDoc& tDBLogDocList)
 		dld.strSubjectName			= GetDBField_String(nIndex++);
 		dld.strObjectPath			= GetDBField_String(nIndex++);
 		dld.strObjectName			= GetDBField_String(nIndex++);
-//		dld.strObjectPathW 			= ConvertWideString(dld.strObjectName);
 		dld.strBkFileName			= GetDBField_String(nIndex++);
 
 		dld.nFileCrTime				= GetDBField_Int(nIndex++);
@@ -150,7 +149,7 @@ INT32			CDBMgrLogDoc::InsertLogDoc(DB_LOG_DOC& dld)
 									dld.nHostID, dld.nUserID, dld.nPolicyType, dld.nOpType, 
 									dld.nRegSvrID, dld.nSyncSvrStep,
 									dld.nRemoveTime, dld.nBackupType, dld.nBackupTime, 
-									strSubjectPath.c_str(), strSubJectName.c_str(), strObjectPath.c_str(), strObjectName.c_str(), strObjectPath.c_str(),
+									strSubjectPath.c_str(), strSubJectName.c_str(), strObjectPath.c_str(), strObjectName.c_str(),
 									strBkFileName.c_str(), dld.nFileCrTime, dld.nFileMdTime, dld.nFileAcTime);
 
 	
@@ -196,7 +195,7 @@ INT32			CDBMgrLogDoc::UpdateLogDoc(DB_LOG_DOC& dld)
 						dld.nHostID, dld.nUserID, dld.nPolicyType, dld.nOpType, 
 						dld.nRegSvrID, dld.nSyncSvrStep,
 						dld.nRemoveTime, dld.nBackupType, dld.nBackupTime, 
-						strSubjectPath.c_str(), strSubjectName.c_str(), strObjectPath.c_str(), strObjectName.c_str(), strObjectPath.c_str(), 
+						strSubjectPath.c_str(), strSubjectName.c_str(), strObjectPath.c_str(), strObjectName.c_str(),
 						strBkFileName.c_str(), dld.nFileCrTime, dld.nFileMdTime, dld.nFileAcTime,
 						dld.nID);
 
@@ -320,7 +319,6 @@ INT32			CDBMgrLogDoc::LoadDB(UINT32 nLogMode, UINT32 nLogNum, TListDBLogDoc& tDB
 		dld.strSubjectName			= GetDBField_String(nIndex++);
 		dld.strObjectPath			= GetDBField_String(nIndex++);
 		dld.strObjectName			= GetDBField_String(nIndex++);
-//		dld.strObjectPathW 			= ConvertWideString(dld.strObjectName);
 		dld.strBkFileName			= GetDBField_String(nIndex++);
 
 		dld.nFileCrTime				= GetDBField_Int(nIndex++);

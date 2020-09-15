@@ -145,6 +145,9 @@ typedef uint64_t ULONGLONG;
 typedef string String;
 typedef wstring StringW;
 
+#define CHARSET_EUCKR	"euc-kr//TRANSLIT//IGNORE"
+#define CHARSET_UTF8	"utf-8//TRANSLIT//IGNORE"
+
 #define	OUT
 #define	IN
 

@@ -137,7 +137,8 @@ INT32					CManageLogRsBk::DelLogRsBk(UINT32 nID)
 
 INT32					CManageLogRsBk::ApplyLogRsBk(DB_LOG_RS_BK&	data)
 {
-	if(FindItem(data.nID))		return EditLogRsBk(data);
+	if(FindItem(data.nID))
+		return EditLogRsBk(data);
 	
 	return AddLogRsBk(data);
 }

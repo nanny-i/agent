@@ -537,7 +537,7 @@ DWORD CMainDlg::OnThreadWorkEnd(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI)
 {
 	if(pMFOI == NULL)
 	{
-		WriteLogE("invalid input data at onthreadworkend");
+		WriteLogE("invalid input data at on thread work end");
 		return 1;
 	}
 	t_ManageEvtMon.AddEvtMon(5, nEndWorkType, __FUNCTION__);
@@ -552,11 +552,33 @@ DWORD CMainDlg::OnThreadWorkEnd(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI)
 }
 //--------------------------------------------------------------------
 
-DWORD CMainDlg::OnThreadWorkProgress(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI)
+DWORD CMainDlg::OnThreadPoFaClearEnd(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI)
 {
 	if(pMFOI == NULL)
 	{
-		WriteLogE("invalid input data at onthreadworkprogress");
+		WriteLogE("invalid input data at on thread fa clear end");
+		return 1;
+	}
+	t_ManageEvtMon.AddEvtMon(5, nEndWorkType, __FUNCTION__);
+
+	switch(nEndWorkType)
+	{
+		case G_TYPE_PO_FA_CLEAR_UNIT:	
+		{
+			t_LogicMgrPoFaClear->EndFindOrder(pMFOI);
+			t_LogicMgrPoFaBk->EndFindOrder(pMFOI);			
+			break;
+		}
+	}
+	t_ManageEvtMon.DelEvtMon(__FUNCTION__);
+	return 0;
+}
+
+DWORD CMainDlg::OnThreadPoFaClearProgress(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI)
+{
+	if(pMFOI == NULL)
+	{
+		WriteLogE("invalid input data at on thread fa clear process");
 		return 1;
 	}
 	
@@ -564,7 +586,11 @@ DWORD CMainDlg::OnThreadWorkProgress(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO p
 
 	switch(nEndWorkType)
 	{
-		case G_TYPE_PO_FA_CLEAR_UNIT:	t_LogicMgrPoFaClear->PgFindOrder(pMFOI);		break;
+		case G_TYPE_PO_FA_CLEAR_UNIT:
+		{
+			t_LogicMgrPoFaClear->PgFindOrder(pMFOI);
+			break;
+		}
 	}
 	t_ManageEvtMon.DelEvtMon(__FUNCTION__);
 	return 0;
@@ -586,7 +612,7 @@ DWORD CMainDlg::OnFileDown(WPARAM wParam, LPARAM lParam)
 			PASI_FDL_INFO pafi = t_ManageFileDown->FindItem((UINT32)lParam);
 			if(pafi)
 			{
-				WriteLogN("file download status : [%d][%d]:[%d][%s]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName);
+//				WriteLogN("file download status : [%d][%d]:[%d][%s]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName);
 				pafi->nFileStatus = wParam;
 			}
 			else
@@ -600,11 +626,11 @@ DWORD CMainDlg::OnFileDown(WPARAM wParam, LPARAM lParam)
 			PASI_FDL_INFO pafi = t_ManageFileDown->FindItem((UINT32)lParam);
 			if(pafi)
 			{
-				WriteLogN("file download status : [%d][%d]:[%d][%s]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName);
+//				WriteLogN("file download status : [%d][%d]:[%d][%s]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName);
 			}
 			else
 			{
-				WriteLogN("not find file download info : [%d][%d]", lParam, wParam);
+				WriteLogE("not find file download info : [%d][%d]", lParam, wParam);
 				break;
 			}
 
@@ -624,7 +650,7 @@ DWORD CMainDlg::OnFileDown(WPARAM wParam, LPARAM lParam)
 				else
 				{
 					pafi->nFileStatus = ASIFDL_DL_RST_STATUS_TYPE_SUCCESS_END;
-					WriteLogN("file download status : [%d][%d]:[%d][%s][%d/%d]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName, LOSYNCSTEP(pafi->nItemPkg), HISYNCSTEP(pafi->nItemPkg));
+//					WriteLogN("file download status : [%d][%d]:[%d][%s][%d/%d]", pafi->nID, wParam, pafi->nItemType, pafi->szFileName, LOSYNCSTEP(pafi->nItemPkg), HISYNCSTEP(pafi->nItemPkg));
 				}
 			}
 			break;

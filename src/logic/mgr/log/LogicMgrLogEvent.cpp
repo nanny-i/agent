@@ -161,20 +161,6 @@ void		CLogicMgrLogEvent::SetLogEvent(TListDBLogEvent& tDELNList)
 
 void		CLogicMgrLogEvent::SetLogEvent(DB_LOG_EVENT& dle)
 {
-	//if(!ISSYNCSTEP(dle.nSyncSvrStep))
-	{
-		if(dle.strSubjectInfo.find("%") == string::npos && dle.strTargetInfo.find("%") == string::npos &&
-			dle.strObjectInfo.find("%") == string::npos && dle.strEventDescr.find("%") == string::npos )
-		{
-			WriteLogN("[logic log event] remain evt log to file : op[%d]:s[%d:%d][%s]:t[%d:%d][%s]:o[%d:%d][%d:%s]:[%s]", 
-				dle.nOperationType, 
-				dle.nSubjectType, dle.nSubjectID, dle.strSubjectInfo.c_str(), 
-				dle.nTargetType, dle.nTargetID, dle.strTargetInfo.c_str(), 
-				dle.nObjectType, dle.nObjectCode, dle.nObjectID, dle.strObjectInfo.c_str(),
-				dle.strEventDescr.c_str());
-		}
-	}
-
 	{
 		if(dle.tDescIDStrMap.size())
 		{

@@ -183,7 +183,7 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 		WriteLogA("[%s] find file work end : [%d][%d:%d]", m_strThreadName.c_str(), pMFOI->nID, tAFFR.nFileWorkedNum, tAFFR.nFileTotalNum);
 		if(pMainDlg != NULL)
 		{
-			pMainDlg->OnThreadWorkEnd(G_TYPE_PO_FA_CLEAR_UNIT, pMFOI);
+			pMainDlg->OnThreadPoFaClearEnd(G_TYPE_PO_FA_CLEAR_UNIT, pMFOI);
 		}
 		return -1;
 	}
@@ -198,7 +198,7 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 
 		if(pMainDlg != NULL)
 		{
-			pMainDlg->OnThreadWorkProgress(G_TYPE_PO_FA_CLEAR_UNIT, &tMFOI);
+			pMainDlg->OnThreadPoFaClearProgress(G_TYPE_PO_FA_CLEAR_UNIT, &tMFOI);
 		}
 	}
 

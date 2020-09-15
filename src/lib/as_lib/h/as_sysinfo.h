@@ -21,7 +21,11 @@
 #define _AS_SYSINFO_H_
 
 #define SYS_DMI_PATH		"/sys/class/dmi/id/"
-#define LINUX_UBUNTU_NAME 	"Ubuntu"
+
+#define LINUX_UBUNTU_NAME 		"Ubuntu"
+#define LINUX_TMAXOS_NAME 		"TmaxOS"
+#define LINUX_GOOROOM_NAME		"Gooroom"
+#define LINUX_HAMONIKR_NAME 	"HamoniKR"
 
 
 #define PATH_MAX_PARTS   	32

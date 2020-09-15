@@ -45,7 +45,7 @@ INT32		CManagePoInRsBk::LoadDBMS()
 {
 	TListDBPoInRsBk tDBPoInRsBkList;
     TListDBPoInRsBkItor begin, end;
-/*
+
 	if(SetER(t_DBMgrPoInRsBk->LoadExecute(&tDBPoInRsBkList)))
     {
     	return g_nErrRtn;
@@ -56,7 +56,6 @@ INT32		CManagePoInRsBk::LoadDBMS()
     {
     	AddItem(begin->tDPH.nID, *begin);
     }
-*/
     return 0;
 }
 //---------------------------------------------------------------------------

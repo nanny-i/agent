@@ -46,7 +46,7 @@ int CASISQLiteQuery::Open(char *pcDBName)
 
 	for(i=0; i<10; i++)
 	{
-		rc = sqlite3_open(pcDBName, &m_pSqlite);
+		rc = sqlite3_open_v2(pcDBName, &m_pSqlite, SQLITE_OPEN_READONLY, NULL);
 		if(rc == SQLITE_BUSY)
 		{
 			usleep(100000);

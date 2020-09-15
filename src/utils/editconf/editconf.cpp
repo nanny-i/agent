@@ -19,10 +19,11 @@
 
 #include "stdafx.h"
 #include "com_struct.h"
-
+#include "sqlite3.h"
 #include <iostream>
 #include <map>
 #include <dlfcn.h>
+
 
 using namespace std;
 
@@ -90,18 +91,18 @@ int SetNannyAgentRoot(String strPath)
 	if(strPath.length() == 0)
 	{
 		printf("invalid root path\n");
-		return 3;
+		return 13;
 	}
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_LOCAL_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{
 		printf("fail to create key : %s\n", acLogMsg);
-		return 4;
+		return 14;
 	}
 	if(RegSetValueEx(hSubKey,  "root_path", 0, REG_SZ, (PBYTE)strPath.c_str(), strPath.length()+1) != 0)
 	{
 		printf("fail to set value key : %s\n", acLogMsg);
 		RegCloseKey(hSubKey);
-		return 5;
+		return 15;
 	}
 	RegCloseKey(hSubKey);
 	return 0;
@@ -118,13 +119,13 @@ int SetDBAccount(char* pszDBName, char* pszID)
 	if(pszDBName == NULL || pszID == NULL)
 	{
 		printf("invalid input data\n");
-		return 3;
+		return 13;
 	}
 
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_DB_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{
 		printf("fail to create key : %s\n", acLogMsg);
-		return 4;
+		return 14;
 	}
 
 	do{
@@ -132,13 +133,13 @@ int SetDBAccount(char* pszDBName, char* pszID)
 		if(nLengh < 1)
 		{
 			printf("invalid db name (%d)\n", nLengh);
-			nRetVal = 5;
+			nRetVal = 15;
 			break;
 		}
 		if(RegSetValueEx(hSubKey, "main_db_name", 0, REG_SZ, (PBYTE)pszDBName, nLengh+1, acLogMsg) != 0)
 		{
 			printf("fail to set value main_db_name : %s\n", acLogMsg);
-			nRetVal = 6;
+			nRetVal = 16;
 			break;
 		}
 
@@ -146,14 +147,14 @@ int SetDBAccount(char* pszDBName, char* pszID)
 		if(nLengh < 1)
 		{
 			printf("invalid db id (%d)\n", nLengh);
-			nRetVal = 7;
+			nRetVal = 17;
 			break;
 		}
 
 		if(RegSetValueEx(hSubKey,  "main_db_account_id", 0, REG_SZ, (PBYTE)pszID, nLengh+1, acLogMsg) != 0)
 		{
 			printf("fail to set value main_db_account_id : %s\n", acLogMsg);
-			nRetVal = 8;
+			nRetVal = 18;
 			break;
 		}
 		nRetVal = 0;
@@ -217,15 +218,13 @@ int SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 	if(pcLgnSvrIp == NULL || pcLgnSvrPort == NULL)
 	{
 		printf("fail to set logon server info : invalid input data\n", acLogMsg);
-		return 3;
+		return 13;
 	}
-
-
 		
 	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE, STR_REG_DEFAULT_SVC_CON_PATH, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hSubKey, &dwDisp, acLogMsg) != 0)
 	{
 		printf("fail to create key : %s\n", acLogMsg);
-		return 4;
+		return 14;
 	}
 
 	do{
@@ -233,21 +232,21 @@ int SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 		if(dwIpAddr == (UINT32)INADDR_NONE)
 		{
 			printf("invalid ip address : %s\n", pcLgnSvrIp);
-			nRetVal = 5;
+			nRetVal = 15;
 			break;
 		}
 
 		if(is_valid_num(pcLgnSvrPort) != 0)
 		{
 			printf("invalid port : %s\n", pcLgnSvrPort);
-			nRetVal = 6;
+			nRetVal = 16;
 			break;
 		}
 		nPort = atoi(pcLgnSvrPort);
 		if(nPort < 1 || nPort > 65535)
 		{
 			printf("invalid port range : %d\n", nPort);
-			nRetVal = 7;
+			nRetVal = 17;
 			break;
 		}
 			
@@ -256,7 +255,7 @@ int SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 		if(RegSetValueEx(hSubKey,  "lgn_svr_list", 0, REG_SZ, (PBYTE)strLgnSvrInfo.c_str(), strLgnSvrInfo.length()+1, acLogMsg) != 0)
 		{
 			printf("fail to set value lgn_svr_list : %s\n", acLogMsg);
-			nRetVal = 8;
+			nRetVal = 18;
 			break;
 		}
 		nRetVal = 0;
@@ -265,11 +264,206 @@ int SetLogonServer(char* pcLgnSvrIp, char* pcLgnSvrPort)
 	return nRetVal;
 }
 
+INT32 GetDeletePasswdMode()
+{
+	INT32 rc = 0;
+	INT32 nRetVal = 0;
+	INT32 nCols = 0;
+	sqlite3 *pConn = NULL;
+	sqlite3_stmt *pStatement = NULL;
+	INT32 nUsedFlag = 0;
+	INT32 nUsedMode = 0;
+	String strRootPath;
+	char acDbPath[MAX_PATH] = {0,};
+	DBMS_ACCOUNT_INFO stDbInfo;
+	char acSqlQuery[256] = "select used_flag, used_mode from po_host_rm_info;";
+
+	if(GetDBInfo(stDbInfo) == FALSE)
+	{
+		printf("fail to get db info\n");
+		return 13;
+	}
+
+	if(GetNannyAgentRoot(strRootPath) == FALSE)
+	{
+		printf("fail to get nanny agent root\n");
+		return 14;
+	}
+	
+	snprintf(acDbPath, MAX_PATH-1, "%s/%s/db/%s.db", (char *)strRootPath.c_str(), NANNY_AGENT_DIR, (char *)stDbInfo.strDB.c_str());
+
+	rc = sqlite3_open_v2(acDbPath, &pConn, SQLITE_OPEN_READONLY, NULL);
+	if (rc != 0 || pConn == NULL)
+	{
+		printf("fail to open sqlite3 (%s) (%d)\n", acDbPath, errno);
+		return 15;
+	}
+
+	rc = sqlite3_prepare_v2(pConn, acSqlQuery, -1, &pStatement, NULL);
+	if (rc != SQLITE_OK || pStatement == NULL)
+	{
+		printf("fail to prepare sqlite3 (%s) (%d)\n", acSqlQuery, errno);
+		sqlite3_close(pConn);
+		return 16;
+	}
+
+	nRetVal = 0;
+	while(sqlite3_step (pStatement) == SQLITE_ROW)
+	{
+		nCols = sqlite3_column_count(pStatement);
+		if(nCols != 2)
+		{
+			nRetVal = 17;
+			printf("invalid column count (%d)\n", nCols);
+			break;
+		}
+
+		rc = sqlite3_column_type(pStatement, 0);
+		if(rc != SQLITE_INTEGER)
+		{
+			nRetVal = 18;
+			printf("invalid column type (%d)\n", rc);
+			break;
+		}
+
+		nUsedFlag = sqlite3_column_int(pStatement, 0);
+		rc = sqlite3_column_type(pStatement, 1);
+		if(rc != SQLITE_INTEGER)
+		{
+			printf("invalid column type (%d)\n", rc);
+			nRetVal = 19;
+			break;
+		}
+
+		nUsedMode = sqlite3_column_int(pStatement, 1);
+		if(nUsedFlag == 1 && nUsedMode == 1)
+		{
+			nRetVal = 1;
+			break;
+		}
+	}while(FALSE);
+
+	if(pStatement != NULL)
+		sqlite3_finalize(pStatement);
+	if(pConn != NULL)
+		sqlite3_close(pConn);
+
+	return nRetVal;
+
+}
+
+
+INT32 CheckDeletePasswd(char* pDeletePasswd)
+{
+	INT32 rc, nRetVal = 0;
+	INT32 nCols = 0;
+	sqlite3 *pConn = NULL;
+	sqlite3_stmt *pStatement = NULL;
+	INT32 nUsedFlag = 0;
+	INT32 nUsedMode = 0;
+	String strRootPath;
+	char acDbPath[MAX_PATH] = {0,};
+	DBMS_ACCOUNT_INFO stDbInfo;
+	char acSqlQuery[256] = "select used_flag, used_mode, rm_pw from po_host_rm_info;";
+	char acPasswd[MAX_PASSWD] = {0,};
+
+	if(pDeletePasswd == NULL || pDeletePasswd[0] == 0)
+	{
+		printf("invalid input data\n");
+		return 13;
+	}
+
+	if(GetDBInfo(stDbInfo) == FALSE)
+	{
+		printf("fail to get db info\n");
+		return 14;
+	}
+
+	if(GetNannyAgentRoot(strRootPath) == FALSE)
+	{
+		printf("fail to get nanny agent root\n");
+		return 15;
+	}
+
+	snprintf(acDbPath, MAX_PATH-1, "%s/%s/db/%s.db", (char *)strRootPath.c_str(), NANNY_AGENT_DIR, (char *)stDbInfo.strDB.c_str());
+
+	rc = sqlite3_open_v2(acDbPath, &pConn, SQLITE_OPEN_READONLY, NULL);
+	if (rc != 0 || pConn == NULL)
+	{
+		printf("fail to open sqlite3 (%s) (%d)\n", acDbPath, errno);
+		return 15;
+	}
+
+	rc = sqlite3_prepare_v2(pConn, acSqlQuery, -1, &pStatement, NULL);
+	if (rc != SQLITE_OK || pStatement == NULL)
+	{
+		printf("fail to prepare sqlite3 (%s) (%d)\n", acSqlQuery, errno);
+		sqlite3_close(pConn);
+		return 16;
+	}
+
+	nRetVal = 22;
+	while(sqlite3_step (pStatement) == SQLITE_ROW)
+	{
+		nCols = sqlite3_column_count(pStatement);
+		if(nCols != 3)
+		{
+			nRetVal = 17;
+			printf("invalid column count (%d)\n", nCols);
+			break;
+		}
+
+		rc = sqlite3_column_type(pStatement, 0);
+		if(rc != SQLITE_INTEGER)
+		{
+			nRetVal = 18;
+			printf("invalid column type (%d)\n", rc);
+			break;
+		}
+
+		nUsedFlag = sqlite3_column_int(pStatement, 0);
+		rc = sqlite3_column_type(pStatement, 1);
+		if(rc != SQLITE_INTEGER)
+		{
+			printf("invalid column type (%d)\n", rc);
+			nRetVal = 19;
+			break;
+		}
+
+		nUsedMode = sqlite3_column_int(pStatement, 1);
+		rc = sqlite3_column_type(pStatement, 2);
+		if(rc != SQLITE_TEXT)
+		{
+			printf("invalid column type (%d)\n", rc);
+			nRetVal = 20;
+			break;
+		}
+
+		nRetVal = 1;
+		if(nUsedFlag == 1 && nUsedMode == 1)
+		{
+			strncpy(acPasswd, (char*)sqlite3_column_text(pStatement, 2), MAX_PASSWD-1);
+			if(acPasswd[0] != 0 && !_stricmp(acPasswd, pDeletePasswd))
+			{
+				nRetVal = 0;
+				break;
+			}
+		}
+	}while(FALSE);
+
+	if(pStatement != NULL)
+		sqlite3_finalize(pStatement);
+	if(pConn != NULL)
+		sqlite3_close(pConn);
+
+	return nRetVal;
+
+}
 
 //-----------------------------------------------------------------------------------------------------------
 int ProcessArgs(int argc, char* argv[])
 {
-	int nRetVal = 1;
+	int nRetVal = 101;
 	BOOL bValidArgs = FALSE;
 
 	if(strcmp(argv[1], "-rp") == 0) // root path setting
@@ -290,10 +484,34 @@ int ProcessArgs(int argc, char* argv[])
 	}
 	else if(strcmp(argv[1], "-li") == 0) // logon server setting
 	{
-		if(argc >= 3)
+		if(argc >= 4)
 		{   
 			bValidArgs = TRUE;
 			nRetVal = SetLogonServer(argv[2], argv[3]); // ip, port
+		}
+	}
+	else if(strcmp(argv[1], "-gm") == 0) // get passwd mode
+	{
+		if(argc >= 2)
+		{   
+			bValidArgs = TRUE;
+			nRetVal = GetDeletePasswdMode();
+			if(nRetVal == 0)
+				printf("disable delete passwd mode\n");
+			else if(nRetVal == 1)
+				printf("enable delete passwd mode\n");
+		}
+	}
+	else if(strcmp(argv[1], "-cp") == 0) // check passwd
+	{
+		if(argc >= 3)
+		{   
+			bValidArgs = TRUE;
+			nRetVal = CheckDeletePasswd(argv[2]);
+			if(nRetVal == 0)
+				printf("match delete passwd\n");
+			else if(nRetVal == 1)
+				printf("mismatch delete passwd\n");
 		}
 	}
 	if(bValidArgs == FALSE)
@@ -301,7 +519,9 @@ int ProcessArgs(int argc, char* argv[])
 		printf("usage1: -rp [agent root path]\n");
 		printf("usage2: -db [database name] [admin id]\n");
 		printf("usage3: -li [logon server ip] [logon server port]\n");
-		return 2;
+		printf("usage4: -gm\n");
+		printf("usage5: -cp [delete passwd]\n");
+		return 102;
 	}
 
 	return nRetVal;

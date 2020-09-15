@@ -318,11 +318,13 @@ INT32		CCompSecuUtil::CompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 			nRetVal = -5;
 			break;
 		}
+/*
 		if(dwSize == 0)
 		{
 			nRetVal = -6;
 			break;
 		}
+*/
 		if(dwMode == 0)
 		{
 			dwMode = 0666;
@@ -343,11 +345,14 @@ INT32		CCompSecuUtil::CompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 			nRetVal -= 100;
 			break;
 		}
-		nRetVal = CompFileToFile(nSrcFd, nTarFd, tACS.pSeedKey);
-		if(nRetVal != 0)
+		if(dwSize > 0)
 		{
-			nRetVal -= 200;
-			break;
+			nRetVal = CompFileToFile(nSrcFd, nTarFd, tACS.pSeedKey);
+			if(nRetVal != 0)
+			{
+				nRetVal -= 200;
+				break;
+			}
 		}
 		nRetVal = 0;
 	}while(FALSE);
@@ -401,7 +406,7 @@ INT32		CCompSecuUtil::DecompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 		return nRetVal;
 	}
 
-	if(tACSFH.nTokenSize == 0 || tACSFH.nFileSize == 0)
+	if(tACSFH.nTokenSize == 0)
 	{
 		close(nSrcFd);
 		return -4;
@@ -436,21 +441,23 @@ INT32		CCompSecuUtil::DecompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 		return -6;
 	}
 	
-	dwLoopNum = (DWORD)(tACSFH.nFileSize / tACSFH.nTokenSize);
-	dwRemainNum = (DWORD)(tACSFH.nFileSize % tACSFH.nTokenSize);
-	if(dwRemainNum)
-		dwLoopNum += 1;
-
-	while(dwLoopNum--)
+	if(tACSFH.nFileSize > 0)
 	{
-		nRetVal = DecompFileToFileToken(nSrcFd, nTarFd, tACS.pSeedKey);
-		if(nRetVal != 0)
+		dwLoopNum = (DWORD)(tACSFH.nFileSize / tACSFH.nTokenSize);
+		dwRemainNum = (DWORD)(tACSFH.nFileSize % tACSFH.nTokenSize);
+		if(dwRemainNum)
+			dwLoopNum += 1;
+
+		while(dwLoopNum--)
 		{
-			nRetVal -= 200;
-			break;
+			nRetVal = DecompFileToFileToken(nSrcFd, nTarFd, tACS.pSeedKey);
+			if(nRetVal != 0)
+			{
+				nRetVal -= 200;
+				break;
+			}
 		}
-	}
-	
+	}	
 	close(nSrcFd);
 	close(nTarFd);
 	if(nRetVal != 0)
@@ -592,6 +599,9 @@ INT32		CCompSecuUtil::CompFileToFile(INT32 nSrcFd, INT32 nTarFd, PBYTE pEncKey)
 	{
 		return -2;
 	}
+
+	if(dwSize == 0)
+		return 0;
 
 	dwLoopCnt = dwSize / ASI_COMP_SECU_TOKEN_SIZE;
 	dwRemainSize = dwSize % ASI_COMP_SECU_TOKEN_SIZE;

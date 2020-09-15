@@ -428,7 +428,23 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 
 	{
 		strScanExPath = strReqScanExPath;
+
+		if(((pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_DEFAULT_PATH) == 0) &&
+			(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_ALL_PATH) == 0)
+		{
+			{
+				strScanExPath = SPrintf("<WINDOWS>\\*");
+				ConvertEnvPathToLocalPath("<PROGRAM_FILES>\\*", strScanExPath);
+
+				ConvertEnvPathToLocalPath("<WINDOWS.OLD>\\*", strScanExPath);
+				ConvertEnvPathToLocalPath("<$WINDOWS.~BT>\\*", strScanExPath);
+				ConvertEnvPathToLocalPath("<$WINDOWS.BT>\\*", strScanExPath);
+				ConvertEnvPathToLocalPath("<$WINDOWS.~WS>\\*", strScanExPath);
+			}
+		}
 	}
+
+
 
 	{
 		switch(pdpfcu->nFilePtnType)

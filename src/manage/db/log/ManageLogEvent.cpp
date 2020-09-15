@@ -261,7 +261,6 @@ INT32					CManageLogEvent::SetPkt(MemToken& SendToken)
 
 INT32					CManageLogEvent::SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken)
 {
-	String strEucData;
 	SendToken.TokenAdd_32(pdle->nID);
 	SendToken.TokenAdd_32(pdle->nRegDate);
 	SendToken.TokenAdd_32(pdle->nEvtTime);
@@ -277,41 +276,21 @@ INT32					CManageLogEvent::SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken)
 	SendToken.TokenAdd_32(pdle->nSubjectType);
 	SendToken.TokenAdd_32(pdle->nSubjectID);
 
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strSubjectInfo, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdle->strSubjectInfo);
+	SendToken.TokenAdd_String(pdle->strSubjectInfo);
 
 	SendToken.TokenAdd_32(pdle->nTargetType);
 	SendToken.TokenAdd_32(pdle->nTargetID);
 
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strTargetInfo, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdle->strTargetInfo);
+	SendToken.TokenAdd_String(pdle->strTargetInfo);
 
 	SendToken.TokenAdd_32(pdle->nObjectType);
 	SendToken.TokenAdd_32(pdle->nObjectCode);
 	SendToken.TokenAdd_32(pdle->nObjectID);
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strObjectInfo, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdle->strObjectInfo);
+	SendToken.TokenAdd_String(pdle->strObjectInfo);
 
 	SendToken.TokenAdd_32(pdle->nOperationType);
 
-	if(ConvertCharsetString(CHARSET_UTF8, CHARSET_EUCKR, pdle->strEventDescr, strEucData) == 0)
-	{
-		SendToken.TokenAdd_String(strEucData);
-	}
-	else
-		SendToken.TokenAdd_String(pdle->strEventDescr);
+	SendToken.TokenAdd_String(pdle->strEventDescr);
 
 	SendToken.TokenAdd_32(pdle->nUserID);
 
@@ -323,7 +302,6 @@ INT32					CManageLogEvent::SetPkt(PDB_LOG_EVENT pdle, MemToken& SendToken)
 
 INT32					CManageLogEvent::GetPkt(MemToken& RecvToken, DB_LOG_EVENT& dle)
 {
-	String strUtcData;
 	if (!RecvToken.TokenDel_32(dle.nID))						goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nRegDate))					goto	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nEvtTime))					goto	INVALID_PKT;
@@ -339,36 +317,15 @@ INT32					CManageLogEvent::GetPkt(MemToken& RecvToken, DB_LOG_EVENT& dle)
 	if (!RecvToken.TokenDel_32(dle.nSubjectType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nSubjectID))					goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strSubjectInfo) < 0)		goto	INVALID_PKT;
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strSubjectInfo, strUtcData) == 0)
-	{
-		dle.strSubjectInfo = strUtcData;
-	}
-
 	if (!RecvToken.TokenDel_32(dle.nTargetType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nTargetID))					goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strTargetInfo) < 0)		goto	INVALID_PKT;
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strTargetInfo, strUtcData) == 0)
-	{
-		dle.strTargetInfo = strUtcData;
-	}
-
 	if (!RecvToken.TokenDel_32(dle.nObjectType))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nObjectCode))				goto 	INVALID_PKT;
 	if (!RecvToken.TokenDel_32(dle.nObjectID))					goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strObjectInfo) < 0)		goto	INVALID_PKT;
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strObjectInfo, strUtcData) == 0)
-	{
-		dle.strObjectInfo = strUtcData;
-	}
-
 	if (!RecvToken.TokenDel_32(dle.nOperationType))				goto 	INVALID_PKT;
 	if ( RecvToken.TokenDel_String(dle.strEventDescr) < 0)		goto	INVALID_PKT;
-
-	if(ConvertCharsetString(CHARSET_EUCKR, CHARSET_UTF8, dle.strEventDescr, strUtcData) == 0)
-	{
-		dle.strEventDescr = strUtcData;
-	}
-
 	if (!RecvToken.TokenDel_32(dle.nUserID))					goto	INVALID_PKT;
 
 	RecvToken.TokenSkip_Block();
