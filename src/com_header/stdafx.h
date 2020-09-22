@@ -184,7 +184,7 @@ typedef wstring StringW;
 #define WM_CLOSE	0x0010
 #define WM_QUIT		0x0012
 
-#define NANNY_AGENT_VERSION		"2.0.0.7"
+#define NANNY_AGENT_VERSION		"2.0.0.8"
 #define NANNY_AGENT_IDENT		"nannysvc"
 #define NANNY_UPDATE_IDENT		"update"
 #define NANNY_AGENT_DIR			"nanny"

@@ -235,7 +235,8 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 
 		strObjectFullPath = SPrintf("%s/%s", tDLD.strObjectPath.c_str(), tDLD.strObjectName.c_str());
 
-		if(tFileUtil.GetFileDateTime(strObjectFullPath.c_str(), &tDLD.nFileCrTime, &tDLD.nFileMdTime, &tDLD.nFileAcTime) != 0)		{
+		if(tFileUtil.GetFileDateTime(strObjectFullPath.c_str(), &tDLD.nFileCrTime, &tDLD.nFileMdTime, &tDLD.nFileAcTime) != 0)
+		{
 			tDLD.nFileCrTime = tDLD.nFileMdTime = tDLD.nFileAcTime = 0;
 		}
 
