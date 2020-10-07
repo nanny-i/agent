@@ -1102,7 +1102,7 @@ String		CFileUtil::GetNewFileName(String strFilePath, String strFileName, INT32 
 	return strNewFileName;
 }
 
-UINT32		CFileUtil::FindFileList(TListStr& tListFiles, String strPath,      BOOL bIncludeSubPath, String strExtFilter)
+UINT32 CFileUtil::FindFileList(TListStr& tListFiles, String strPath, BOOL bIncludeSubPath, String strExtFilter)
 {
 	DIR *dp = NULL;
 	struct dirent *dirp = NULL;

@@ -364,10 +364,9 @@ INT32		CFindFileUtil::SearchDirFileThread(UINT32 nOrderID)
 
 	if(InitFindFileWork(nOrderID))
 	{
-		return -1;
+		return -11;
 	}
 
-	INT32 nTRtn = -1;
 	SetFindFileWork_SearchPath(nOrderID, 0, find->second.size());
 	
 	begin = find->second.begin();	end = find->second.end();
@@ -375,9 +374,9 @@ INT32		CFindFileUtil::SearchDirFileThread(UINT32 nOrderID)
 	{
 		strSR = _strlwr(begin->c_str());
 		nLen = begin->length();
-		if(nLen < 2)
+		if(nLen < 1)
 		{
-			return -1;
+			return -12;
 		}
 
 		if(PreSearchDirThread(nOrderID, *begin))
@@ -386,10 +385,9 @@ INT32		CFindFileUtil::SearchDirFileThread(UINT32 nOrderID)
 			continue;
 		}
 
-		nTRtn = 0;
 		SetFindFileWork_SearchPath(nOrderID, 1, 1);
 	}	
-	return nTRtn;	
+	return 0;	
 }
 //--------------------------------------------------------------------
 
@@ -404,7 +402,7 @@ INT32		CFindFileUtil::PreSearchDir(UINT32 nOrderID, String strRootPath)
 	String strFindDirPath;
 	nLen = strRootPath.length();
 	
-	if(strRootPath.length() < 2)
+	if(strRootPath.length() < 1)
 		return -1;
 	
 	strncpy(szFindDir, strRootPath.c_str(), MAX_PATH-1);
@@ -435,7 +433,7 @@ INT32		CFindFileUtil::PreSearchDirThread(UINT32 nOrderID, String strRootPath)
 	String strFindDirPath;
 
 	nLen = strRootPath.length();
-	if(strRootPath.length() < 2)
+	if(nLen < 1)
 	{
 		WriteLog("[Error] [PreSearchDirThread] invalid root path");
 		return -1;
@@ -446,16 +444,21 @@ INT32		CFindFileUtil::PreSearchDirThread(UINT32 nOrderID, String strRootPath)
 	{
 		nPreSubDirSearchLevel = GetPreSearchLevel(strRootPath);
 		nSubDirSearch = 1;
-		szFindDir[nLen - 2] = 0;
-	}
-
-	if(DirectoryExists(szFindDir) == FALSE)
-	{
-		WriteLog("[Error] [PreSearchDirThread] fail to find %s (%d)", szFindDir, errno);
-		return -3;
+		szFindDir[nLen - 1] = 0;
+		if(nLen != 2)
+			szFindDir[nLen - 2] = 0;
 	}
 
 	strFindDirPath = SPrintf(szFindDir);
+	nLen = strFindDirPath.length();
+	if(nLen > 1)
+	{
+		if(DirectoryExists(szFindDir) == FALSE)
+		{
+			WriteLog("[Error] [PreSearchDirThread] fail to find %s (%d)", szFindDir, errno);
+			return -3;
+		}
+	}
 
 	Recursive_SearchDir(nOrderID, strFindDirPath, "", nPreSubDirSearchLevel, tNameList, &tLastNameList, &tFindFileItemList);
 	WriteLog("[Info] pre search dir thread : [%s] name (%d) last name (%d) file (%d)", szFindDir, tNameList.size(), tLastNameList.size(), tFindFileItemList.size());
@@ -482,9 +485,19 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 	String strFindDirA;
 
 	memset(&tAFFI, 0, sizeof(tAFFI));
+
+	if (strRootPath.empty() == TRUE)
+	{
+		WriteLog( "[Error] [Recursive_SearchDir] invalid root path");
+		return 0 ;
+	}
+
 	if(strSubDir.empty() == FALSE)
 	{
-		strFindDirA = SPrintf("%s/%s", strRootPath.c_str(), strSubDir.c_str());	
+		if(strRootPath.length() == 1)
+			strFindDirA = SPrintf("%s%s", strRootPath.c_str(), strSubDir.c_str());	
+		else
+			strFindDirA = SPrintf("%s/%s", strRootPath.c_str(), strSubDir.c_str());	
 	}
 	else
 	{
@@ -551,11 +564,12 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 				}
 				else if(IsExistFileMask(nOrderID, strChkDirA, strFileNameA, nMatchType) && IsExistFileDateTime(nOrderID, strChkDirA, strFileNameA))
 				{
-					strSubAddPathA = (strSubDir.empty() ? strRootPath + "/" + strFileNameA : strRootPath + "/" + strSubDir + "/" + strFileNameA);
+					if(strRootPath.length() == 1)
+						strSubAddPathA = (strSubDir.empty() ? strRootPath + strFileNameA : strRootPath + strSubDir + "/" + strFileNameA);
+					else
+						strSubAddPathA = (strSubDir.empty() ? strRootPath + "/" + strFileNameA : strRootPath + "/" + strSubDir + "/" + strFileNameA);
 					get_file_size(strSubAddPathA.c_str(), &dwFileLen);
 					tAFFI.nFileSize		= dwFileLen;
-//					tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
-//					tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
 					tAFFI.strFilePath	= strChkDirA;
 					tAFFI.strFileName	= strFileNameA;
 					tAFFI.nFindType		= nMatchType;
@@ -625,8 +639,6 @@ INT32		CFindFileUtil::Recursive_SearchFile(UINT32 nOrderID, String strSearchPath
 			strDirA = strChkDirA + "/" + strFileNameA;
 			get_file_size(strDirA.c_str(), &dwFileLen);
 			tAFFI.nFileSize		= dwFileLen;
-//			tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
-//			tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
 			tAFFI.strFilePath	= strChkDirA;
 			tAFFI.strFileName	= strFileNameA;
 			tAFFI.nFindType		= nMatchType;
@@ -711,8 +723,6 @@ INT32		CFindFileUtil::Recursive_SearchDirFile(UINT32 nOrderID, String strSearchP
 				strPathA = strChkDirA + "/" + strFileNameA;
 				get_file_size(strPathA.c_str(), &dwFileLen);
 				tAFFI.nFileSize		= dwFileLen;
-//				tAFFI.strFilePathW	= ConvertWideString(strChkDirA);
-//				tAFFI.strFileNameW	= ConvertWideString(strFileNameA);
 				tAFFI.strFilePath	= strChkDirA;
 				tAFFI.strFileName	= strFileNameA;
 				tAFFI.nFindType		= nMatchType;

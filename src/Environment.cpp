@@ -127,7 +127,7 @@ INT32       CEnvironment::LoadEnv_Local()
 
 	if(t_RegUtil.RegReadString(HKEY_LOCAL_MACHINE, "", "host_bin_ver", m_pszBuf, CHAR_MAX_SIZE))
 	{
-		strncpy(m_pszBuf, "2.0.0.7", CHAR_MAX_SIZE-1);
+		strncpy(m_pszBuf, NANNY_AGENT_VERSION, CHAR_MAX_SIZE-1);
 		t_RegUtil.RegWriteString(HKEY_LOCAL_MACHINE, "", "host_bin_ver", m_pszBuf);
 	}
 	m_strHostBinVer = m_pszBuf;

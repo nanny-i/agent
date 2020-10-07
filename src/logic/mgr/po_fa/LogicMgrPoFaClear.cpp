@@ -335,7 +335,7 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 	CFileUtil tFileUtil;
 	CSystemInfo tSysInfo;
 	CProcUtil tProcUtil;	
-	INT32 nRetVal = 0;
+	INT32 i, nRetVal = 0;
 	{
 		tFileUtil.SetEnvPathRegKey(STR_REG_DEFAULT_SVC_PATH_ENV_PATH);
 	}	
@@ -428,22 +428,7 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 
 	{
 		strScanExPath = strReqScanExPath;
-
-		if(((pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_DEFAULT_PATH) == 0) &&
-			(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_ALL_PATH) == 0)
-		{
-			{
-				strScanExPath = SPrintf("<WINDOWS>\\*");
-				ConvertEnvPathToLocalPath("<PROGRAM_FILES>\\*", strScanExPath);
-
-				ConvertEnvPathToLocalPath("<WINDOWS.OLD>\\*", strScanExPath);
-				ConvertEnvPathToLocalPath("<$WINDOWS.~BT>\\*", strScanExPath);
-				ConvertEnvPathToLocalPath("<$WINDOWS.BT>\\*", strScanExPath);
-				ConvertEnvPathToLocalPath("<$WINDOWS.~WS>\\*", strScanExPath);
-			}
-		}
 	}
-
 
 
 	{
@@ -515,6 +500,34 @@ INT32		CLogicMgrPoFaClear::ApplyPolicy_Unit(PDB_PO_FA_CLEAR_UNIT pdpfcu, MEM_FIN
 		else
 			strScanPath += ";" + strReqScanPath;
 	}
+
+	//모든 경로
+	if(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_DEFAULT_PATH)
+	{
+		char acDefaultExPath[10][MAX_TYPE_LEN] = {"/proc/*", "/bin/*", "/boot/*", "/dev/*", "/lib/*", "/lib32/*", "/lib64/*", "/mnt/*", "/run/*", ""};
+		strScanPath = SPrintf("/*");
+
+		for(i=0; i<9; i++)
+		{
+			if(strScanExPath.empty())
+				strScanExPath = SPrintf("%s", acDefaultExPath[i]);
+			else
+				strScanExPath += SPrintf(";%s", acDefaultExPath[i]);
+		}
+	}
+	//관리자 설정 경로
+	else if(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_ALL_PATH)
+	{
+		strScanExPath.clear();
+	}
+	//기본 경로 제외
+	else if(((pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_DEFAULT_PATH) == 0) &&
+		(pdpfcu->tDPH.nExtOption & SS_PO_FA_CLEAR_UNIT_OPTION_FLAG_EXCLUDE_ALL_PATH) == 0)
+	{
+		strScanPath = SPrintf("/home/*");
+	}
+	
+
 		
 	WriteLogN("[%s] fa clear scan info : path : [%s]", m_strLogicName.c_str(), strScanPath.c_str());
 	WriteLogN("[%s] fa clear scan info : ptn : [%s]", m_strLogicName.c_str(), strScanPtn.c_str());

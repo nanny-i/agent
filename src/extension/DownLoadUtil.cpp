@@ -746,7 +746,7 @@ INT32 CDownLoadUtil::CheckHashValue(LPCSTR pszFileName, LPCSTR pszFileHash)
 
     if(bHashCheckPassed == FALSE)
     {
-		WriteLogE("fail to check file Integrity : [or:%s][chk:%s]", pszFileHash, szHashValue);
+		WriteLogE("fail to check %s Integrity : [or:%s][chk:%s]", pszFileName, pszFileHash, szHashValue);
 		return -3;
 	}
 	return 0;
