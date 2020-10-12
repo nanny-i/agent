@@ -32,6 +32,15 @@ INT32		CMainDlg::SyncDatabase()
 	{
 		TListStr tQueryList;
 
+		tQueryList.push_back("CREATE TABLE log_notify_file (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, used_flag BIGINT DEFAULT 1, reg_date BIGINT DEFAULT 0, order_id BIGINT DEFAULT 0, notify_file_path TEXT);");
+
+		tQueryList.push_back("UPDATE schema_info SET db_ver=70;");
+		m_tDBSyncMap[69] = tQueryList;	
+	}
+	
+	{
+		TListStr tQueryList;
+
 		tQueryList.push_back("CREATE TABLE env_socket (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, used_flag BIGINT DEFAULT 1, reg_date BIGINT DEFAULT 0, seq_no BIGINT DEFAULT 0, name TEXT, descr TEXT, admin_id BIGINT DEFAULT 0, sub_admin_lock BIGINT DEFAULT 0, target_lock BIGINT DEFAULT 0, notify_info_id BIGINT DEFAULT 0, ext_option BIGINT DEFAULT 0, used_mode BIGINT DEFAULT 0);");
 		tQueryList.push_back("ALTER TABLE po_in_vuln_sw_pkg ADD COLUMN sw_version TEXT;");
 

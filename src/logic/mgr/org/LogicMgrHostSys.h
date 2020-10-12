@@ -28,7 +28,7 @@ class CLogicMgrHostSys	: public CLogicBase
 private:
 	INT32		AnalyzePkt_FromMgr_Ext();
 	INT32		AnalyzePkt_FromMgr_Edit_Ext();
-
+	INT32		m_nSendSysFlag;
 public:
 	void		SendPkt_Edit();
 	void		SendPkt_SysInfo();

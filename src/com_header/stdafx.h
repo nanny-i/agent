@@ -70,6 +70,7 @@
 #include <sys/syscall.h>
 #include <sys/timeb.h>
 #include <sys/vfs.h>
+#include <sys/inotify.h>
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -184,7 +185,7 @@ typedef wstring StringW;
 #define WM_CLOSE	0x0010
 #define WM_QUIT		0x0012
 
-#define NANNY_AGENT_VERSION		"2.0.0.8"
+#define NANNY_AGENT_VERSION		"2.0.0.9"
 #define NANNY_AGENT_IDENT		"nannysvc"
 #define NANNY_UPDATE_IDENT		"update"
 #define NANNY_AGENT_DIR			"nanny"

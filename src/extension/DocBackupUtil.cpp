@@ -143,6 +143,7 @@ INT32		CDocBackupUtil::RemoveBackupFile(PDB_LOG_DOC pdld)
 INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nLimitSize, UINT32 nLimitDelCnt)
 {
 	INT32 nRtn = 0;
+	INT32 nLen = 0;
 	CFileUtil tFileUtil;
 	struct stat fStat;
 	PDB_PO_FA_BK pDpfb = NULL;
@@ -154,6 +155,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 	ASI_COMP_SECU tACS;
 	mode_t nMode = 0;
 	UINT32 nDelTime = 0;
+	char acPath[MAX_PATH] = {0,};
 	memset(&tACS, 0, sizeof(tACS));
 	memset(&fStat, 0, sizeof(fStat));
 
@@ -179,13 +181,45 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 		return -2;
 	}
 
-	strBkDir = SPrintf("%s/%s", t_EnvInfo->m_strRootPath.c_str(), STR_BACKUP_DOC_FILE);
+	strncpy(acPath, t_EnvInfo->m_strRootPath.c_str(), MAX_PATH-2);
+	acPath[MAX_PATH-2] = 0;
+	nLen = strlen(acPath);
+	if(nLen < 1)
+	{
+		WriteLogN("[%s] invalid root path.", m_strUtilName.c_str());
+		m_tBkMutex.UnLock();
+		return -3;
+	}
+
+	if(acPath[nLen-1] != '/')
+	{
+		acPath[nLen] = '/';
+		acPath[nLen+1] = 0;
+	}
+
+	strBkDir = SPrintf("%s%s", acPath, STR_BACKUP_DOC_FILE);
 	if (tFileUtil.FileExists(strBkDir.c_str()) == FALSE)
 	{
 		tFileUtil.ForceDirectory(strBkDir.c_str());
 	}
 
-	strFullPath = SPrintf("%s/%s", pdld->strObjectPath.c_str(), pdld->strObjectName.c_str());
+	strncpy(acPath, pdld->strObjectPath.c_str(), MAX_PATH-2);
+	acPath[MAX_PATH-2] = 0;
+	nLen = strlen(acPath);
+	if(nLen < 1)
+	{
+		WriteLogN("[%s] invalid object path.", m_strUtilName.c_str());
+		m_tBkMutex.UnLock();
+		return -4;
+	}
+
+	if(acPath[nLen-1] != '/')
+	{
+		acPath[nLen] = '/';
+		acPath[nLen+1] = 0;
+	}
+
+	strFullPath = SPrintf("%s%s", acPath, pdld->strObjectName.c_str());
 
 	if(tFileUtil.FileExists(strFullPath.c_str()) == FALSE)
 	{

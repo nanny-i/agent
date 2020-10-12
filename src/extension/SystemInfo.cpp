@@ -34,7 +34,8 @@ CSystemInfo::CSystemInfo()
 {
 	m_nSystemType	= ASI_SYSTEM_TYPE_WORKSTATION;
 	m_nSystemPaType	= PROCESSOR_ARCHITECTURE_INTEL;
-
+	m_nSystemID = 0;
+	m_nSystemType = 0;
 	memset(m_acOSName, 0, MAX_QHBUFF);
 	memset(m_acRelease, 0, MAX_QHBUFF);
 	memset(m_acSystem, 0, MAX_QHBUFF);
@@ -104,31 +105,37 @@ BOOL CSystemInfo::GetCurrentSystemInfo()
 {
 	struct utsname uname_data;
 
-	memset(&uname_data, 0, sizeof(struct utsname));
-	if(uname(&uname_data) == -1)
-		return FALSE;
+	if(m_acMachine[0] == 0 || m_acHostName[0] == 0 || m_acRelease[0] == 0)
+	{
+		memset(&uname_data, 0, sizeof(struct utsname));
+		if(uname(&uname_data) == -1)
+			return FALSE;
 
-	strncpy(m_acMachine, uname_data.machine, MAX_TYPE_LEN-1);
-	if(!_stricmp(m_acMachine, "x86_64"))
-	{
-		m_nSystemPaType = PROCESSOR_ARCHITECTURE_AMD64;
+		strncpy(m_acMachine, uname_data.machine, MAX_TYPE_LEN-1);
+		if(!_stricmp(m_acMachine, "x86_64"))
+		{
+			m_nSystemPaType = PROCESSOR_ARCHITECTURE_AMD64;
+		}
+		else if(!_stricmp(m_acMachine, "i386"))
+		{
+			m_nSystemPaType = PROCESSOR_ARCHITECTURE_INTEL;
+		}
+		else
+		{
+			m_nSystemPaType = PROCESSOR_ARCHITECTURE_ARM;
+		}
+		strncpy(m_acHostName, uname_data.nodename, MAX_TYPE_LEN-1);
+		strncpy(m_acRelease, uname_data.release, MAX_QHBUFF-1);
 	}
-	else if(!_stricmp(m_acMachine, "i386"))
-	{
-		m_nSystemPaType = PROCESSOR_ARCHITECTURE_INTEL;
-	}
-	else
-	{
-		m_nSystemPaType = PROCESSOR_ARCHITECTURE_ARM;
-	}
-	strncpy(m_acHostName, uname_data.nodename, MAX_TYPE_LEN-1);
-	strncpy(m_acRelease, uname_data.release, MAX_QHBUFF-1);
-	get_os_info(m_acOSName, MAX_QHBUFF, &m_nSystemID, &m_nSystemType);
+	if(m_acOSName[0] == 0 || m_nSystemID == 0 || m_nSystemType == 0)
+		get_os_info(m_acOSName, MAX_QHBUFF, &m_nSystemID, &m_nSystemType);
 	GetCompName();
 	GetIpAddress();
-	if(get_system_name(m_acSystem, MAX_QHBUFF) != 0)
-		return FALSE;
-
+	if(m_acSystem[0] == 0)
+	{
+		if(get_system_name(m_acSystem, MAX_QHBUFF) != 0)
+			return FALSE;
+	}
     return TRUE;
 }
 //---------------------------------------------------------------------------

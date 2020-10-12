@@ -351,6 +351,13 @@ INT32		CMainDlg::CreateSubClass()
 			nRetVal = -55;
 			break;
 		}
+
+		t_ThreadPoFaOp = new CThreadPoFaOp();
+		if(t_ThreadPoFaOp == NULL)
+		{
+			nRetVal = -55;
+			break;
+		}
 		
 		t_ThreadPoFeScan = new CThreadPoFeScan();
 		if(t_ThreadPoFeScan == NULL)
@@ -700,6 +707,13 @@ INT32		CMainDlg::CreateSubClass()
 		if(t_LogicMgrPoFaDelFileAfterBoot == NULL)
 		{
 			nRetVal = -156;
+			break;
+		}
+
+		t_LogicMgrPoFaInotifyFile = new CLogicMgrPoFaInotifyFile();
+		if(t_LogicMgrPoFaInotifyFile == NULL)
+		{
+			nRetVal = -157;
 			break;
 		}
 		
@@ -1631,13 +1645,18 @@ INT32		CMainDlg::StopSubClass()
 		t_ThreadPoInPtnScan->SetContinue(0);
 		SetER(StopThread_Common(t_ThreadPoInPtnScan));
 		WriteLogN("stop [po_in_scan] thread result : [%d]", g_nErrRtn);
-		
-		t_ThreadChkHkNoti->SetContinue(0);
-/*
+
+		if(t_ThreadPoFaOp->GetContinue())
+		{
+			t_ThreadPoFaOp->SetContinue(0);
+			SetER(StopThread_Common(t_ThreadPoFaOp));
+			WriteLogN("stop [po_fa_op] thread result : [%d]", g_nErrRtn);
+		}
+	/*
 		SetER(StopThread_Common(t_ThreadPoInRsBk));
 		WriteLogN("stop [po_in_rs_bk] thread result : [%d]", g_nErrRtn);
 */
-
+		t_ThreadChkHkNoti->SetContinue(0);
 		SetER(StopThread_Common(t_ThreadChkHkNoti));
 		WriteLogN("stop [chk_hk_noti] thread result : [%d]", g_nErrRtn);
 /*
@@ -1708,6 +1727,7 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_LogicMgrPoFaBk);
 		SAFE_DELETE(t_LogicMgrPoFaNotify);
 		SAFE_DELETE(t_LogicMgrPoFaDelFileAfterBoot);
+		SAFE_DELETE(t_LogicMgrPoFaInotifyFile);
 
 		SAFE_DELETE(t_LogicMgrPoFePtnOp);
 		SAFE_DELETE(t_LogicMgrPoFePtnLo);
@@ -1828,7 +1848,7 @@ INT32		CMainDlg::DeleteSubClass()
 		SAFE_DELETE(t_ThreadPoInPtnScan);
 		SAFE_DELETE(t_ThreadChkHkNoti);
 		SAFE_DELETE(t_ThreadEvtMon);
-
+		SAFE_DELETE(t_ThreadPoFaOp);
 //		SAFE_DELETE(t_ThreadPoInRsBk);		//TRACE("delete thread [%s]\n", "InRsBk");
 //		SAFE_DELETE(t_ThreadExecute);		//TRACE("delete thread [%s]\n", "Execute");
 

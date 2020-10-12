@@ -371,6 +371,7 @@ copy $(OutDir)$(ProjectName).pdb ..\output_pdb\x64\$(ProjectName).pdb
   <ItemGroup>
     <ClCompile Include="dbms_manage\env\DBMgrEnvSocket.cpp" />
     <ClCompile Include="dbms_manage\po_fa\DBMgrPoFaDelFileAfterBoot.cpp" />
+    <ClCompile Include="dbms_manage\po_fa\DBMgrPoFaInotifyFile.cpp" />
     <ClCompile Include="dll\download_file\HttpFileGetUtil.cpp" />
     <ClCompile Include="extension\BIniFile.cpp" />
     <ClCompile Include="extension\ComExternMethod.cpp" />
@@ -409,6 +410,9 @@ copy $(OutDir)$(ProjectName).pdb ..\output_pdb\x64\$(ProjectName).pdb
     <ClCompile Include="lib\as_lib\src\mz_unzip.cpp" />
     <ClCompile Include="lib\as_lib\src\mz_zip.c" />
     <ClCompile Include="lib\as_lib\src\zip.cpp" />
+    <ClCompile Include="logic\mgr\po_fa\LogicMgrPoFaInotifyFile.cpp" />
+    <ClCompile Include="manage\db\po_fa\ManagePoFaInotifyFile.cpp" />
+    <ClCompile Include="thread\ThreadPoFaOp.cpp" />
     <ClCompile Include="utils\update\getopt.cpp" />
     <ClCompile Include="utils\update\update.cpp" />
     <ClCompile Include="util\ApplyPatchUtil.cpp" />
@@ -1011,9 +1015,11 @@ copy $(OutDir)$(ProjectName).pdb ..\output_pdb\x64\$(ProjectName).pdb
     <ResourceCompile Include="NannySvc.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="com_header\com_header_notify_log_dll.h" />
     <ClInclude Include="com_header\com_struct_header.h" />
     <ClInclude Include="dbms_manage\env\DBMgrEnvSocket.h" />
     <ClInclude Include="dbms_manage\po_fa\DBMgrPoFaDelFileAfterBoot.h" />
+    <ClInclude Include="dbms_manage\po_fa\DBMgrPoFaInotifyFile.h" />
     <ClInclude Include="dll\download_file\HttpFileGetUtil.h" />
     <ClInclude Include="extension\BIniFile.h" />
     <ClInclude Include="extension\ComExternMethod.h" />
@@ -1050,6 +1056,9 @@ copy $(OutDir)$(ProjectName).pdb ..\output_pdb\x64\$(ProjectName).pdb
     <ClInclude Include="lib\as_lib\h\as_zip.h" />
     <ClInclude Include="lib\as_lib\h\mz_ioapi.h" />
     <ClInclude Include="lib\as_lib\h\mz_unzip.h" />
+    <ClInclude Include="logic\mgr\po_fa\LogicMgrPoFaInotifyFile.h" />
+    <ClInclude Include="manage\db\po_fa\ManagePoFaInotifyFile.h" />
+    <ClInclude Include="thread\ThreadPoFaOp.h" />
     <ClInclude Include="utils\update\getopt.h" />
     <ClInclude Include="util\ApplyPatchUtil.h" />
     <ClInclude Include="util\BIniFile.h" />
