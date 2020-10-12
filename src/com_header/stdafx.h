@@ -17,11 +17,6 @@
  * 
  */
 
-#include <unistd.h>// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
-
 #ifndef _STDAFX_H__
 
 #define _STDAFX_H__
@@ -202,9 +197,6 @@ typedef wstring StringW;
 
 #define HKEY_CLASSES_ROOT		"root"
 #define HKEY_CURRENT_USER		"user"
-#define HKEY_LOCAL_MACHINE		"machine"
-#define HKEY_USERS				"users"
-
 
 #define ERROR_SUCCESS			0L
 #define STATUS_WAIT_0       ((DWORD)0x00000000L)    
