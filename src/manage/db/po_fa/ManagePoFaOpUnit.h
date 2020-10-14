@@ -47,6 +47,7 @@ public:
 	INT32					SetPkt(PDB_PO_FA_OP_UNIT pdpfpu, MemToken& SendToken);
 	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_PO_FA_OP_UNIT& dpfpu);
+	INT32					SetInotifyUnit(UINT32 nUnitID);
 
 public:
 	CManagePoFaOpUnit();

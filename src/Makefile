@@ -36,8 +36,6 @@ install:
 	
 clean:
 	@$(make_sub_dir)
-#	rm -f nannysvc
-#	rm -rf *.o
 	make sys_clean
 
 sys_clean:

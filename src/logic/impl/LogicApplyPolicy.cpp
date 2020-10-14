@@ -393,6 +393,7 @@ INT32		CLogicApplyPolicy::SetEPSHookModuleByTS(INT32 nMode, UINT32 nHookPID)
 
 INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 {
+	INT32 nRetVal = 0;
 	{
 		MemToken SendToken(1000);
 		if(t_ManageEnvSelfProtectAgt->Count())
@@ -502,10 +503,18 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 
 			// 20200724 edit jhjung		
 		//	t_ManagePoFaOp->SetPktHost(pCurPolicy->tDPH.nID, SendToken);
-			t_ManagePoFaOp->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
-			WriteLogN("[%s] set po fa op success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+			nRetVal = t_ManagePoFaOp->SetPktHost_EPS(pCurPolicy->tDPH.nID, SendToken);
+			if(nRetVal == 0)
+				WriteLogN("[%s] set po fa op success : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+			else
+				WriteLogE("[%s] fail to set po fa op : [%d] [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID, nRetVal);
 			SendToken.Clear();
 
+			nRetVal = t_ManagePoFaOp->SetInotifyFaOp(pCurPolicy->tDPH.nID);
+			if(nRetVal == 0)
+				WriteLogN("[%s] success to set inotify fa op  : [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID);
+			else
+				WriteLogE("[%s] fail to set inotify fa op : [%d] [%d]", m_strLogicName.c_str(), pCurPolicy->tDPH.nID, nRetVal);
 		}while(FALSE);
 
 		do

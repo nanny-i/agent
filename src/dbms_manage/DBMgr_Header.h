@@ -128,6 +128,7 @@
 #include "DBMgrPoFaNotify.h"
 #include "DBMgrPoFaNotifyPkg.h"
 #include "DBMgrPoFaDelFileAfterBoot.h"
+#include "DBMgrPoFaInotifyFile.h"
 
 #include "DBMgrPoFePtnOp.h"
 #include "DBMgrPoFePtnLo.h"

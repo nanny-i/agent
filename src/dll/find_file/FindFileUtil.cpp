@@ -871,7 +871,19 @@ INT32		CFindFileUtil::IsExistFileMask(UINT32 nOrderID, String strFilePath, Strin
 
 	if(GetFileFindOption(nOrderID) & ASI_FF_FIND_OPTION_USED_DOC_FILE_FORMAT)
 	{
-		strChkFileNameA = SPrintf("%s%s", strFilePath.c_str(), strFileName.c_str());
+		char acPath[MAX_PATH] = {0,};
+		INT32 nLen = 0;
+		strncpy(acPath, strFilePath.c_str(), MAX_PATH-2);
+		acPath[MAX_PATH-2] = 0;
+		nLen = strlen(acPath);
+		if(nLen < 1)
+			return 0;
+		if(acPath[nLen-1] != '/')
+		{
+			acPath[nLen] = '/';
+			acPath[nLen+1] = 0;
+		}
+		strChkFileNameA = SPrintf("%s%s", acPath, strFileName.c_str());
 		if(IsExistFileMaskByDFF(nOrderID, strChkFileNameA))
 		{
 			nMatchType = ASI_FF_FILE_FIND_TYPE_DOC_FILE_FORMAT;
@@ -902,12 +914,15 @@ INT32		CFindFileUtil::IsExistFileMaskByDFF(UINT32 nOrderID, String strFileFullNa
 	if(m_tASIDFFDLLUtil->ASIDFF_GetDFFmtInfo(&tADFI, acLogMsg) != 0)
 	{
 		if(acLogMsg[0] != 0)
-			WriteLog("fail to get file fmt info : %s", acLogMsg);
+			WriteLog("fail to get file (%s) fmt info : %s", tADFI.szFileName, acLogMsg);
 	}
+
 	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW)
 		return 0;
 	if(tADFI.szFmtType[0] == 0)
 		return 0;
+
+	WriteLog("file (%s) fmt info : (type :%d) (%s)", tADFI.szFileName, tADFI.nFmtType, tADFI.szFmtType);
 
 	TMapIDMapStrItor find = m_tFileMaskMap.find(nOrderID);
 	if(find == m_tFileMaskMap.end())

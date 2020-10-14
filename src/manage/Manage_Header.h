@@ -131,6 +131,7 @@
 #include "ManagePoFaNotify.h"
 #include "ManagePoFaNotifyPkg.h"
 #include "ManagePoFaDelFileAfterBoot.h"
+#include "ManagePoFaInotifyFile.h"
 
 #include "ManagePoFePtnOp.h"
 #include "ManagePoFePtnLo.h"

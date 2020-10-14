@@ -491,6 +491,34 @@ INT32 CMainDlg::OnKernelFileLog(UINT32 nLogType, PPKT_DATA pPktData)
 	return nRetVal;
 }
 
+INT32 CMainDlg::OnNotifyFileLog(UINT32 nLogType, PNOTIFY_PATH pNotifyPath)
+{
+	INT32 nRetVal = 0;
+
+	if(pNotifyPath == NULL)
+	{
+		WriteLogE("invalid input data at on notify file log");
+		return -1;
+	}
+
+	if(nLogType == FILE_NOTIFY_TYPE_CREATE)
+	{
+		t_LogicMgrPoFaInotifyFile->InsertInotifyPath(pNotifyPath);
+		nRetVal = 0;
+	}
+	else if(nLogType == FILE_NOTIFY_TYPE_DELETE)
+	{
+		t_LogicMgrPoFaInotifyFile->DeleteInotifyPath(pNotifyPath);
+		nRetVal = 0;
+	}
+	else
+	{
+		WriteLogE("invalid log type at on notify file log (%d)", nLogType);
+		nRetVal = -2;
+	}
+	return nRetVal;
+}
+
 //--------------------------------------------------------------------
 
 DWORD CMainDlg::OnThreadLog(UINT32 nLogType, PDB_SITE_FILE pDsfSrc)

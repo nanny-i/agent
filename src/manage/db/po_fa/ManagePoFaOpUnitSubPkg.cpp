@@ -270,5 +270,18 @@ INT32					CManagePoFaOpUnitSubPkg::SetPktHost(UINT32 nID, MemToken& SendToken)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
+INT32					CManagePoFaOpUnitSubPkg::SetInotifySubPkg(UINT32 nOpID, UINT32 nSubPkgID)
+{
+	return 0;
+/*
+	PDB_PO_FA_OP_UNIT_SUB_PKG pdpfousp = FindItem(nSubPkgID);
+	if(!pdpfousp)
+		return -1001;
+
+	return t_ManagePoFaOpSubUnit->SetPkt(pdpfousp->tDPH.nUnitID, SendToken);
+*/
+}
+
+
 
 

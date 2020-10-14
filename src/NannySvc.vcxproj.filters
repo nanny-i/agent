@@ -1926,6 +1926,18 @@
     <ClCompile Include="extension\MatchFilterUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="thread\ThreadPoFaOp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\mgr\po_fa\LogicMgrPoFaInotifyFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="manage\db\po_fa\ManagePoFaInotifyFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbms_manage\po_fa\DBMgrPoFaInotifyFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NannySvc.rc">
@@ -4217,6 +4229,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="extension\MatchFilterUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\ThreadPoFaOp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="com_header\com_header_notify_log_dll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\mgr\po_fa\LogicMgrPoFaInotifyFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\db\po_fa\ManagePoFaInotifyFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbms_manage\po_fa\DBMgrPoFaInotifyFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

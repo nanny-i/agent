@@ -41,6 +41,7 @@ CLogicMgrHostSys::CLogicMgrHostSys()
 	m_nControlType	= SS_CONTROL_TYPE_ORG_HOST;	
 	m_nEvtObjType	= EVENT_OBJECT_TYPE_HOST;
 	m_nEvtObjCode	= 0;
+	m_nSendSysFlag = 0;
 }
 //---------------------------------------------------------------------------
 
@@ -149,6 +150,10 @@ void		CLogicMgrHostSys::SendPkt_Edit()
 
 	do 
 	{
+		if(m_nSendSysFlag == 0)
+		{
+			break;
+		}
 		// 20200724 edit jhjung
 		if( pdhs->nOsID != dhs.nOsID ||
 			pdhs->nOsSP != dhs.nOsSP ||
@@ -169,7 +174,7 @@ SEND_PKT:
 	t_ManageHostSys->SetPkt(&dhs, SendToken);
 	SendData_Mgr(G_TYPE_HOST_SYS, G_CODE_COMMON_EDIT, SendToken);
 	SendToken.Clear();
-
+	m_nSendSysFlag = 1;
 	return;
 }
 //---------------------------------------------------------------------------

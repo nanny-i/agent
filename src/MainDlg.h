@@ -38,6 +38,7 @@ public:
     void		WM_AgentAutoDestory(WPARAM wParam, LPARAM lParam);
 	DWORD		OnThreadTimer(WPARAM wParam, LPARAM lParam);
 	INT32 		OnKernelFileLog(UINT32 nLogType, PPKT_DATA pPktData);
+	INT32		OnNotifyFileLog(UINT32 nLogType, PNOTIFY_PATH pNotifyPath);
 	DWORD		OnThreadLog(UINT32 nLogType, PDB_SITE_FILE pDsfSrc);
 	DWORD 		OnThreadEnd(UINT32 nEndType, PDB_PO_FE_PTN_LO pDPFPO);
 	DWORD		OnThreadWorkEnd(UINT32 nEndWorkType, PMEM_FIND_ORDER_INFO pMFOI);

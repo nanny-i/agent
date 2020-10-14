@@ -114,6 +114,7 @@ typedef struct _db_id
 #include	"com_struct_po_fa_bk.h"
 #include	"com_struct_po_fa_notify.h"
 #include	"com_struct_po_fa_del_file_after_boot.h"
+#include	"com_struct_po_fa_inotify_file.h"
 
 #include	"com_struct_po_fe_ptn_op.h"
 #include	"com_struct_po_fe_ptn_lo.h"

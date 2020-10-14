@@ -56,6 +56,7 @@
 #include 	"com_header_hook_exit_win_dll.h"
 #include 	"com_header_ri_dll.h"
 #include 	"com_header_dvi_dll.h"
+#include 	"com_header_notify_log_dll.h"
 #include 	"com_header_remove_log_dll.h"
 #include 	"com_header_comp_dll.h"
 #include 	"com_header_weng_dll.h"
@@ -144,7 +145,7 @@
 #include	"ThreadPoFePtnLo.h"
 #include	"ThreadChkHkNoti.h"
 #include	"ThreadPoInPtnScan.h"
-
+#include	"ThreadPoFaOp.h"
 #include	"ThreadEvtMon.h"
 ///////////////////////////////////////////////////////////////////////
 

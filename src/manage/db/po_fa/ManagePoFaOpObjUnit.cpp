@@ -199,4 +199,23 @@ INVALID_PKT:
 //---------------------------------------------------------------------------
 
 
+INT32					CManagePoFaOpObjUnit::SetInotifyObjUnit(UINT32 nExtOption, UINT32 nUnitID)
+{
+	INT32 nRetVal = 0;
+	UINT32 nSubDir = 0;
+	PDB_PO_FA_OP_OBJ_UNIT pdpfoou = FindItem(nUnitID);
+	if(!pdpfoou || t_ThreadPoFaOp == NULL)
+		return -10001;
 
+	if(pdpfoou->tDPH.nExtOption == 1 && nExtOption == 1)
+		nSubDir = 1;
+
+	nRetVal = t_ThreadPoFaOp->AddWatchNotify(pdpfoou->tDPH.nID, nSubDir, (char *)pdpfoou->strFilePath.c_str());
+	if(nRetVal != 0)
+	{
+		nRetVal -= 10000;
+		return nRetVal;
+	}
+
+	return 0;
+}

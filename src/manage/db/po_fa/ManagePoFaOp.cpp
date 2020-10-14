@@ -280,6 +280,34 @@ INT32					CManagePoFaOp::SetPktHost_EPS(UINT32 nID, MemToken& SendToken)
 
 	return 0;
 }
+
+
+INT32					CManagePoFaOp::SetInotifyFaOp(UINT32 nID)
+{
+	INT32 i;
+	PDB_PO_FA_OP pdpfp = FindItem(nID);
+	if(!pdpfp)
+		return -1;
+
+	TListID tPkgIDList;
+	GetHostSysTypePkgListID(pdpfp->tDPH.tSubIDMap, tPkgIDList);
+
+	if(t_ThreadPoFaOp != NULL)
+	{
+		t_ThreadPoFaOp->ClearWatchNotify();
+	}
+
+	TListIDItor begin, end;
+	begin = tPkgIDList.begin();	end = tPkgIDList.end();
+	for(begin; begin != end; begin++)
+	{
+		t_ManagePoFaOpPkg->SetInotifyPkg(*begin);
+	}
+
+	return 0;
+}
+
+
 //---------------------------------------------------------------------------
 
 INT32					CManagePoFaOp::SetPkt(PDB_PO_FA_OP pdpfp, MemToken& SendToken)

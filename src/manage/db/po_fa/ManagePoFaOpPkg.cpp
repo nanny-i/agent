@@ -257,4 +257,13 @@ INT32					CManagePoFaOpPkg::SetPktHost(UINT32 nID, MemToken& SendToken)
 //---------------------------------------------------------------------------
 
 
+INT32					CManagePoFaOpPkg::SetInotifyPkg(UINT32 nPkgID)
+{
+	PDB_PO_FA_OP_PKG pdpfpp = FindItem(nPkgID);
+	if(!pdpfpp)
+		return -11;
+
+	return t_ManagePoFaOpUnit->SetInotifyUnit(pdpfpp->tDPH.nUnitID);
+}
+
 

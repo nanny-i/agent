@@ -94,6 +94,7 @@
 #include	"LogicMgrPoFaBk.h"
 #include	"LogicMgrPoFaNotify.h"
 #include	"LogicMgrPoFaDelFileAfterBoot.h"
+#include	"LogicMgrPoFaInotifyFile.h"
 
 #include	"LogicMgrPoFePtnOp.h"
 #include	"LogicMgrPoFePtnLo.h"
