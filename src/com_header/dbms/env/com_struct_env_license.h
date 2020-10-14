@@ -29,6 +29,7 @@ typedef struct _db_env_license
 	DB_PO_HEADER		tDPH;
 
 	String				strLicenseKey;
+	UINT32				nSupportOs;
 	TMapID64			tRightPackageMap;
 	TMapID64			tRightClassMap;
 	TMapID64			tRightPolicyMap;

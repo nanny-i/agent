@@ -32,6 +32,15 @@ INT32		CMainDlg::SyncDatabase()
 	{
 		TListStr tQueryList;
 
+		tQueryList.push_back("ALTER TABLE env_license ADD COLUMN sup_os BIGINT DEFAULT 2;");
+
+		tQueryList.push_back("UPDATE schema_info SET db_ver=71;");
+		m_tDBSyncMap[69] = tQueryList;	
+	}
+
+	{
+		TListStr tQueryList;
+
 		tQueryList.push_back("CREATE TABLE log_notify_file (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, used_flag BIGINT DEFAULT 1, reg_date BIGINT DEFAULT 0, order_id BIGINT DEFAULT 0, notify_file_path TEXT);");
 
 		tQueryList.push_back("UPDATE schema_info SET db_ver=70;");

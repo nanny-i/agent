@@ -95,9 +95,9 @@ INT32					CManageEnvLicense::InitHash()
 
 
 		strOrgValue = SPrintf("%s,"
-							"%s,%s,%s,%s,%s,", 
+							"%s,%u,%s,%s,%s,%s,", 
 							GetHdrHashInfo(pdel).c_str(),
-							pdel->strLicenseKey.c_str(), strRightPackage.c_str(), strRightClass.c_str(), strRightPolicy.c_str(), strRightControl.c_str());
+							pdel->strLicenseKey.c_str(), pdel->nSupportOs, strRightPackage.c_str(), strRightClass.c_str(), strRightPolicy.c_str(), strRightControl.c_str());
 	}
 
 	{
@@ -285,6 +285,7 @@ INT32					CManageEnvLicense::SetPkt(PDB_ENV_LICENSE pdel, MemToken& SendToken)
 	SendToken.TokenAdd_DPH(pdel->tDPH);
 
 	SendToken.TokenAdd_String(pdel->strLicenseKey);
+	SendToken.TokenAdd_32(pdel->nSupportOs);
 
 	SendToken.TokenAdd_ID64Map(pdel->tRightPackageMap);
 	SendToken.TokenAdd_ID64Map(pdel->tRightClassMap);
@@ -302,6 +303,7 @@ INT32					CManageEnvLicense::GetPkt(MemToken& RecvToken, DB_ENV_LICENSE& del)
 	if (!RecvToken.TokenDel_DPH(del.tDPH))						goto	INVALID_PKT;
 
 	if ( RecvToken.TokenDel_String(del.strLicenseKey) < 0)		goto	INVALID_PKT;
+	if (!RecvToken.TokenDel_32(del.nSupportOs))					goto	INVALID_PKT;
 	
 	if ( RecvToken.TokenDel_ID64Map(del.tRightPackageMap) < 0)	goto	INVALID_PKT;
 	if ( RecvToken.TokenDel_ID64Map(del.tRightClassMap) < 0)	goto	INVALID_PKT;

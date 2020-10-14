@@ -56,6 +56,7 @@ INT32			CDBMgrEnvLicense::LoadDB(TListDBEnvLicense& tDBEnvLicenseList)
 
     m_strQuery = SPrintf(DBMS_POLICY_QUERY_HDR_SELECT
 						", license_key"
+						", sup_os"
 						", right_package, right_class, right_policy, right_control "
 						" FROM env_license WHERE used_flag=1;");
     if(DBOP_Check(ExecuteQuery(m_strQuery)))
@@ -70,6 +71,7 @@ INT32			CDBMgrEnvLicense::LoadDB(TListDBEnvLicense& tDBEnvLicenseList)
 		tDPH					= GetDBField_PoHDR(nIndex);
 
 		del.strLicenseKey		= GetDBField_String(nIndex++);
+		del.nSupportOs			= GetDBField_UInt(nIndex++);
 		m_strValue				= GetDBField_String(nIndex++);
 		HexToMap_64(m_strValue, del.tRightPackageMap,	SS_ADMIN_RIGHT_TYPE_CLASS_NUM_PACKAGE);
 		m_strValue				= GetDBField_String(nIndex++);
@@ -103,14 +105,17 @@ INT32			CDBMgrEnvLicense::InsertEnvLicense(DB_ENV_LICENSE& del)
 
 	m_strQuery = SPrintf("INSERT INTO env_license("
 						DBMS_POLICY_QUERY_HDR_INSERT_NAME
-						", license_key, "
-						"right_package, right_class, right_policy, right_control"
+						", license_key"
+						", sup_os"
+						", right_package, right_class, right_policy, right_control"
 						") VALUES (%s"
-						", '%s', "
-						"'%s', '%s', '%s', '%s'"
-						");",                        
+						", '%s'"
+						", %u"
+						", '%s', '%s', '%s', '%s'"
+						");",                      
 						GetPoHDRQuery_InsertValue(tDPH).c_str(), 
 						del.strLicenseKey.c_str(), 
+						del.nSupportOs,
 						strRightPackage.c_str(), strRightClass.c_str(), strRightPolicy.c_str(), strRightControl.c_str());
 
 	if(DBOP_Check(ExecuteQuery(m_strQuery)))
@@ -134,11 +139,13 @@ INT32			CDBMgrEnvLicense::UpdateEnvLicense(DB_ENV_LICENSE& del)
 	MapToHex_64(del.tRightControlMap, strRightControl, SS_ADMIN_RIGHT_TYPE_CLASS_NUM_CONTROL);
 
 	m_strQuery = SPrintf("UPDATE env_license SET %s"
-						", license_key='%s', "
-						"right_package='%s', right_class='%s', right_policy='%s', right_control='%s'"
+						", license_key='%s'"
+						", sup_os=%u"
+						", right_package='%s', right_class='%s', right_policy='%s', right_control='%s'"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(),
 						del.strLicenseKey.c_str(), 
+						del.nSupportOs, 
 						strRightPackage.c_str(), strRightClass.c_str(), strRightPolicy.c_str(), strRightControl.c_str(),
                         tDPH.nID);
 
