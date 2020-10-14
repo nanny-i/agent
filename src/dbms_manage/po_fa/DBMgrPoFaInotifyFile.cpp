@@ -114,8 +114,7 @@ INT32			CDBMgrPoFaInotifyFile::InsertInotifyFile(PDB_LOG_NOTIFY_FILE pLogNotify)
 
     if(DBOP_Check(ExecuteQuery(m_strQuery)))
 		return ERR_DBMS_INSERT_FAIL;
-
-    
+    pLogNotify->nID      = GetLastID();
     return 0;
 }
 
