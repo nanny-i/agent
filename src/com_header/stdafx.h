@@ -197,6 +197,7 @@ typedef wstring StringW;
 
 #define HKEY_CLASSES_ROOT		"root"
 #define HKEY_CURRENT_USER		"user"
+#define HKEY_LOCAL_MACHINE		"machine"
 
 #define ERROR_SUCCESS			0L
 #define STATUS_WAIT_0       ((DWORD)0x00000000L)    

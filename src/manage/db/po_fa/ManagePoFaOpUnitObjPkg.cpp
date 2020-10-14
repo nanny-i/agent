@@ -270,5 +270,14 @@ INT32					CManagePoFaOpUnitObjPkg::SetPktHost(UINT32 nID, MemToken& SendToken)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
+INT32					CManagePoFaOpUnitObjPkg::SetInotifyObjPkg(UINT32 nExtOption, UINT32 nObjPkgID)
+{
+	PDB_PO_FA_OP_UNIT_OBJ_PKG pdpfouop = FindItem(nObjPkgID);
+	if(!pdpfouop)
+		return -1001;
+
+	return t_ManagePoFaOpObjUnit->SetInotifyObjUnit(nExtOption, pdpfouop->tDPH.nUnitID);
+}
+
 
 

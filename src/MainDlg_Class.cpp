@@ -1467,6 +1467,13 @@ INT32		CMainDlg::StartSubClass()
 			WriteLogE("start [chk_hk_noti] thread result : fail [%d]", errno);
 			return -10;
 		}
+
+		bRetVal = t_ThreadPoFaOp->CreateThreadExt("po_fa_op");
+		if(bRetVal == FALSE)
+		{
+			WriteLogE("start [po_fa_op] thread result : fail [%d]", errno);
+			return -11;
+		}
 	}	
 
 	{		
@@ -1646,12 +1653,9 @@ INT32		CMainDlg::StopSubClass()
 		SetER(StopThread_Common(t_ThreadPoInPtnScan));
 		WriteLogN("stop [po_in_scan] thread result : [%d]", g_nErrRtn);
 
-		if(t_ThreadPoFaOp->GetContinue())
-		{
-			t_ThreadPoFaOp->SetContinue(0);
-			SetER(StopThread_Common(t_ThreadPoFaOp));
-			WriteLogN("stop [po_fa_op] thread result : [%d]", g_nErrRtn);
-		}
+		t_ThreadPoFaOp->SetContinue(0);
+		SetER(StopThread_Common(t_ThreadPoFaOp));
+		WriteLogN("stop [po_fa_op] thread result : [%d]", g_nErrRtn);
 	/*
 		SetER(StopThread_Common(t_ThreadPoInRsBk));
 		WriteLogN("stop [po_in_rs_bk] thread result : [%d]", g_nErrRtn);

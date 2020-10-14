@@ -47,6 +47,7 @@ public:
 	INT32					SetPkt(UINT32 nID, MemToken& SendToken);
 	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
 	INT32					SetPktHost_EPS(UINT32 nID, MemToken& SendToken);
+	INT32					SetInotifyFaOp(UINT32 nID);
 	INT32					SetPkt(PDB_PO_FA_OP pdpfp, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_PO_FA_OP& dpfp);
 

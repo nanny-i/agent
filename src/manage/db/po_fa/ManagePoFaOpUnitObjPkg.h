@@ -54,6 +54,7 @@ public:
 
 public:
 	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
+	INT32					SetInotifyObjPkg(UINT32 nExtOption, UINT32 nObjPkgID);
 
 public:
 	CManagePoFaOpUnitObjPkg();

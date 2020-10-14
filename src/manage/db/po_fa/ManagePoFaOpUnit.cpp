@@ -331,4 +331,41 @@ INVALID_PKT:
 //---------------------------------------------------------------------------
 
 
+INT32					CManagePoFaOpUnit::SetInotifyUnit(UINT32 nUnitID)
+{
+	PDB_PO_FA_OP_UNIT pdpfpu 			= NULL;
+	UINT32 nExtOption = 0;
+	UINT32 nSubID = 0;
+	INT32 nRetVal = 0;
+	if( (pdpfpu = FindItem(nUnitID)) == NULL)
+	{
+		WriteLogE("not find po_fa_op_unit by inotify : [%d]", ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+		return -101;
+	}
+
+	nExtOption = pdpfpu->tDPH.nExtOption;
+
+	{
+		TListID tIDList;
+		TListIDItor begin, end;
+		{
+			pdpfpu->tDPH._get_id_list_by_key(SS_PO_FA_OP_UNIT_KEY_TYPE_OBJECT, tIDList);
+			begin = tIDList.begin();	end = tIDList.end();
+			for(begin; begin != end; begin++)
+			{
+				nSubID = pdpfpu->tDPH._get_id_to_subid(*begin);
+				nRetVal = t_ManagePoFaOpUnitObjPkg->SetInotifyObjPkg(nExtOption, nSubID);
+				if(nRetVal != 0)
+				{
+					WriteLogE("fail to set po_fa_op_unit by inotify : [%d]", nRetVal);
+				}
+			}
+			tIDList.clear();
+		}
+	}
+
+	return 0;
+}
+
+
 

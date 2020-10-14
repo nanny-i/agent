@@ -54,6 +54,7 @@ public:
 
 public:
 	INT32					SetPktHost(UINT32 nID, MemToken& SendToken);
+	INT32					SetInotifySubPkg(UINT32 nOpID, UINT32 nSubPkgID);
 
 public:
 	CManagePoFaOpUnitSubPkg();
