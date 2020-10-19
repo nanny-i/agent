@@ -21,7 +21,6 @@
 
 #define _STDAFX_H__
 
-
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
@@ -72,8 +71,6 @@
 #include <netinet/ether.h>
 #include <linux/limits.h>
 
-
-
 using namespace std;
 
 typedef struct sockaddr_in SOCKADDR_IN;
@@ -83,19 +80,15 @@ typedef struct sockaddr SOCKADDR;
 typedef char CHAR, CCHAR, *PCHAR;
 typedef char *LPSTR, *LPTSTR;
 typedef signed char INT8, *PINT8;
-//typedef bool BOOL, BOOLEAN;
 typedef const char *LPCSTR, *LPCTSTR;
-
 typedef unsigned char BYTE, *LPBYTE, *PBYTE;
 typedef unsigned char UINT8, *PUINT8;
-
 
 //2Bytes
 typedef signed short INT16, *PINT16;
 typedef unsigned short WORD;
 typedef unsigned short UINT16, *PUINT16;
 typedef wchar_t *PWSTR, *PWCHAR;
-
 
 //4Bytes
 typedef int SOCKET;
@@ -111,7 +104,6 @@ typedef unsigned int ULONG32, *PULONG32, *PULONG;
 
 
 //4~8Bytes
-//typedef long LPARAM;
 typedef uint64_t LPARAM;
 typedef long LONG;
 typedef unsigned long ULONG;
@@ -129,7 +121,6 @@ typedef int64_t LONGLONG;
 typedef double DOUBLE;
 
 typedef uint64_t UINT64, *PUINT64;
-typedef uint64_t ULONGLONG;
 
 #if defined(_AS_X86_64)
 	typedef uint64_t ULONG_PTR, *PULONG_PTR;
@@ -149,12 +140,12 @@ typedef wstring StringW;
 
 #define	_stricmp	strcasecmp
 #define _strnicmp	strncasecmp
+
 #define	FALSE	0
 #define TRUE	1
 
 #define	REG_FILE		0
 #define DIR_FILE		1
-
 
 #define	CHAR_MAX_SIZE	1024
 #define MAX_TIME_STR	64
@@ -174,7 +165,6 @@ typedef wstring StringW;
 
 #define INVALID_SOCKET	-1
 #define SOCKET_ERROR	-1
-#define INVALID_HANDLE_VALUE -1
 
 #define WM_USER 	0x0400
 #define WM_CLOSE	0x0010
@@ -207,12 +197,10 @@ typedef wstring StringW;
 
 
 #define DRIVE_UNKNOWN     0
-#define DRIVE_NO_ROOT_DIR 1
 #define DRIVE_REMOVABLE   2
 #define DRIVE_FIXED       3
 #define DRIVE_REMOTE      4
-#define DRIVE_CDROM       5
-#define DRIVE_RAMDISK     6
+
 #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD)(b)) & 0xff))) << 8))
 #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD)(b)) & 0xffff))) << 16))
 #define LOWORD(l)           ((WORD)(((DWORD)(l)) & 0xffff))
