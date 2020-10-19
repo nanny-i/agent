@@ -50,6 +50,7 @@ INT32		CManagePoFaInotifyFile::LoadDBMS()
 {
 	TListLogNotifyFile tDBLogNotifyFileList;
     TListLogNotifyFileItor begin, end;
+	INT32 nCount = 0;
 
 	if(t_DBMgrPoFaInotifyFile == NULL)
 	{
@@ -65,6 +66,7 @@ INT32		CManagePoFaInotifyFile::LoadDBMS()
     {
     	AddItem(begin->nID, *begin);
     }
+	nCount = GetInotifyPathCount();
     return 0;
 }
 //---------------------------------------------------------------------------
@@ -76,19 +78,40 @@ INT32	CManagePoFaInotifyFile::GetInotifyPathCount()
 
 INT32		CManagePoFaInotifyFile::FindID(char *pPath)
 {
-	TListLogNotifyFile tDBLogNotifyFileList;
-	TListLogNotifyFileItor begin, end;
-
+	TMapLogNotifyFileItor begin, end;
+	PDB_LOG_NOTIFY_FILE pLogNotify = NULL;
 	if(pPath == NULL)
 		return -1;
 
-	begin = tDBLogNotifyFileList.begin();	end = tDBLogNotifyFileList.end();
+	begin = m_tMap.begin();	end = m_tMap.end();
 	for(begin; begin != end; begin++)
 	{
-		if(!_stricmp(begin->strNotifyFilePath.c_str(), pPath))
-			return begin->nID;
+		pLogNotify = &(begin->second);
+		if(!_stricmp(pLogNotify->strNotifyFilePath.c_str(), pPath))
+			return pLogNotify->nID;
 	}
 	return -2;
+}
+
+INT32	CManagePoFaInotifyFile::GetAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nTotalCount)
+{
+	TMapLogNotifyFileItor begin, end;
+	PDB_LOG_NOTIFY_FILE pLogNotify = NULL;
+	INT32 i = 0;
+	if(pNotifyPath == NULL || nTotalCount < 1)
+		return -1;
+
+	begin = m_tMap.begin();	end = m_tMap.end();
+	for(begin; begin != end; begin++)
+	{
+		pLogNotify = &(begin->second);
+		strncpy(pNotifyPath[i].acNotifyPath, pLogNotify->strNotifyFilePath.c_str(), MAX_PATH-1);
+		pNotifyPath[i].nOrderID = pLogNotify->nOrderID;
+		pNotifyPath[i].nWatchd = pLogNotify->nID;
+		if(++i >= nTotalCount)
+			break;
+	}
+	return 0;
 }
 
 INT32	CManagePoFaInotifyFile::DeleteInotifyPath(PNOTIFY_PATH pNotifyPath)
@@ -102,7 +125,7 @@ INT32	CManagePoFaInotifyFile::DeleteInotifyPath(PNOTIFY_PATH pNotifyPath)
 	if(nID < 0)
 		return -2;
 
-	nRetVal = t_DBMgrPoFaClear->DeleteExecute(nID);
+	nRetVal = t_DBMgrPoFaInotifyFile->DeleteExecute(nID);
 	if(nRetVal != 0)
 	{
 		nRetVal -= 10;
@@ -145,27 +168,30 @@ INT32	CManagePoFaInotifyFile::InsertInotifyPath(PNOTIFY_PATH pNotifyPath)
 		WriteLogE("fail to add item inotify path %s (%d)", stLogNotify.strNotifyFilePath.c_str(), nRetVal);
 		nRetVal -= 20;
 	}
-	nID = FindID((char *)stLogNotify.strNotifyFilePath.c_str());
-	if(nID < 0)
-	{
-		WriteLogE("fail to find item inotify path %s (%d)", stLogNotify.strNotifyFilePath.c_str(), nRetVal);
-		nRetVal -= 30;
-	}
-	nRetVal = DeleteItem(nID);
-	if(nRetVal != 0)
-	{
-		nRetVal -= 40;
-		return nRetVal;
-	}
-	nRetVal = AddItem(stLogNotify.nID, stLogNotify);
-	if(nRetVal != 0)
-	{
-		WriteLogE("fail to add item inotify path %s (%d)", stLogNotify.strNotifyFilePath.c_str(), nRetVal);
-		nRetVal -= 50;
-	}
 	return nRetVal;
 }
 
+VOID	CManagePoFaInotifyFile::DelAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nCount)
+{
+	INT32 i, nRetVal = 0;
+	if(t_DBMgrPoFaInotifyFile == NULL || pNotifyPath == NULL || nCount < 1)
+	{
+		return;
+	}
+	for(i=0; i<nCount; i++)
+	{
+		if(pNotifyPath[i].nWatchd > 0)
+		{
+			nRetVal = t_DBMgrPoFaInotifyFile->DeleteExecute(pNotifyPath[i].nWatchd);
+			if(nRetVal != 0)
+			{
+				WriteLogE("fail to delete excute inotify path %d (%d)", pNotifyPath[i].nWatchd, nRetVal);
+			}
+
+			DeleteItem(pNotifyPath[i].nWatchd);
+		}
+	}
+}
 
 //---------------------------------------------------------------------------
 

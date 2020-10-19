@@ -1757,6 +1757,37 @@ INT32		CFindFileUtil::GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFI, 
 }
 //-------------------------------------------------------------
 
+INT32		CFindFileUtil::IsDocFileFormat(LPCTSTR pFilePath, INT32 *pnFileType)
+{
+	ASI_DFILE_FMT_INFO tADFI;
+	if(pFilePath == NULL || pnFileType == NULL)
+		return -1;
+
+	char acLogMsg[MAX_LOGMSG+1] = {0,};
+	if(m_tASIFIDLLUtil->ASIFI_GetFileElfMagic((char *)pFilePath))	
+	{
+		return -2;
+	}
+
+	strncpy(tADFI.szFileName, pFilePath, CHAR_MAX_SIZE-1);
+	tADFI.szFileName[CHAR_MAX_SIZE-1] = '\0';
+	mbstowcs((wchar_t*)tADFI.wszFileName, tADFI.szFileName, CHAR_MAX_SIZE-1);
+	tADFI.wszFileName[CHAR_MAX_SIZE-1] = L'\0';
+
+	if(m_tASIDFFDLLUtil->ASIDFF_GetDFFmtInfo(&tADFI, acLogMsg) != 0)
+	{
+		if(acLogMsg[0] != 0)
+			WriteLog("fail to get file (%s) fmt info : %s", tADFI.szFileName, acLogMsg);
+	}
+
+	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW)
+		return -3;
+
+	*pnFileType = tADFI.nFmtType;
+
+	return 0;
+}
+
 
 
 

@@ -85,6 +85,16 @@ String			CEnvironmentOp::GetComputerName()
 	CSystemInfo tSysInfo;
 	return tSysInfo.GetCompName();
 }
+
+String			CEnvironmentOp::GetRootPath()
+{
+	String strRootPath;
+	if(t_EnvInfo != NULL)
+		strRootPath = t_EnvInfo->m_strRootPath;
+	else
+		strRootPath = "";
+	return strRootPath;
+}
 //---------------------------------------------------------------------------
 
 String			CEnvironmentOp::GetUserUniCode()

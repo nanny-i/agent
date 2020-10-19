@@ -656,7 +656,6 @@ INT32		CThreadPoFaOp::CheckNotifyFile()
 		nRetVal = AnalyzeEvent( (PVOID)pEvent );
 		if(nRetVal != 0)
 		{
-			WriteLogE("fail to analyze event (%d) : [%s]", nRetVal, m_strThreadName.c_str());
 			if(nRetVal == -1001)
 			{
 				safe_free(pBuffer);

@@ -354,7 +354,7 @@ INT32					CManagePoFaOpUnit::SetInotifyUnit(UINT32 nUnitID)
 			for(begin; begin != end; begin++)
 			{
 				nSubID = pdpfpu->tDPH._get_id_to_subid(*begin);
-				nRetVal = t_ManagePoFaOpUnitObjPkg->SetInotifyObjPkg(nExtOption, nSubID);
+				nRetVal = t_ManagePoFaOpUnitObjPkg->SetInotifyObjPkg(pdpfpu->tDPH.nID, nExtOption, nSubID);
 				if(nRetVal != 0)
 				{
 					WriteLogE("fail to set po_fa_op_unit by inotify : [%d]", nRetVal);

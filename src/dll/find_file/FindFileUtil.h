@@ -148,6 +148,7 @@ public:
 	INT32		SearchDirFileThread(UINT32 nOrderID);
 	INT32		SearchDirFile(UINT32 nOrderID);
 	INT32		GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFI, PUINT32 nBufNum, PASI_FF_FILE_RESULT pAFFR);
+	INT32		IsDocFileFormat(LPCTSTR pFilePath, INT32 *pnFileType);
 
 public:
 	INT32		SetPreSearchLevel(UINT32 nLevel);

@@ -199,7 +199,7 @@ INVALID_PKT:
 //---------------------------------------------------------------------------
 
 
-INT32					CManagePoFaOpObjUnit::SetInotifyObjUnit(UINT32 nExtOption, UINT32 nUnitID)
+INT32					CManagePoFaOpObjUnit::SetInotifyObjUnit(UINT32 nPolID, UINT32 nExtOption, UINT32 nUnitID)
 {
 	INT32 nRetVal = 0;
 	UINT32 nSubDir = 0;
@@ -210,7 +210,7 @@ INT32					CManagePoFaOpObjUnit::SetInotifyObjUnit(UINT32 nExtOption, UINT32 nUni
 	if(pdpfoou->tDPH.nExtOption == 1 && nExtOption == 1)
 		nSubDir = 1;
 
-	nRetVal = t_ThreadPoFaOp->AddWatchNotify(pdpfoou->tDPH.nID, nSubDir, (char *)pdpfoou->strFilePath.c_str());
+	nRetVal = t_ThreadPoFaOp->AddWatchNotify(nPolID, nSubDir, (char *)pdpfoou->strFilePath.c_str());
 	if(nRetVal != 0)
 	{
 		nRetVal -= 10000;

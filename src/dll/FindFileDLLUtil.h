@@ -67,6 +67,7 @@ public:
 	INT32	ASIFF_SearchDirFileThread(UINT32 nOrderID);
 	INT32	ASIFF_GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFIList, PUINT32 nListSize, PASI_FF_FILE_RESULT pAFFR);
 
+	INT32	ASIFF_IsDocFileFormat(LPCTSTR pFilePath, INT32 *pnFileType);
 
 public:
 	CASIFFDLLUtil();

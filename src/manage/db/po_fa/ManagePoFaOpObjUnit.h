@@ -45,7 +45,7 @@ public:
 	INT32					SetPkt(UINT32 nID, MemToken& SendToken);
 	INT32					SetPkt(PDB_PO_FA_OP_OBJ_UNIT pdpfoou, MemToken& SendToken);
 	INT32					GetPkt(MemToken& RecvToken, DB_PO_FA_OP_OBJ_UNIT& dpfoou);
-	INT32					SetInotifyObjUnit(UINT32 nExtOption, UINT32 nUnitID);
+	INT32					SetInotifyObjUnit(UINT32 nPolID, UINT32 nExtOption, UINT32 nUnitID);
 
 public:
 	CManagePoFaOpObjUnit();

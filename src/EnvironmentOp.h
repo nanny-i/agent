@@ -82,6 +82,7 @@ public:
 
 public:
 	String			GetComputerName();
+	String			GetRootPath();
 	String			GetUserUniCode();
 
 private:

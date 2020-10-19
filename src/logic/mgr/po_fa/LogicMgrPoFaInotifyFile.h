@@ -28,7 +28,9 @@ class CLogicMgrPoFaInotifyFile	: public CLogicBase
 public:
 	INT32		InsertInotifyPath(PNOTIFY_PATH pNotifyPath);
 	INT32		DeleteInotifyPath(PNOTIFY_PATH pNotifyPath);
-
+	INT32		GetInotifyPathCount();
+	INT32		GetAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nCount);
+	VOID		DelAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nCount);
 public:
 	CLogicMgrPoFaInotifyFile();
     ~CLogicMgrPoFaInotifyFile();

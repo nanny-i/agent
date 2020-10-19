@@ -316,6 +316,21 @@ INT32	CASIFFDLLUtil::ASIFF_GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pA
 
 	return fnASIFF_GetFindFileItem(m_lpObject, nOrderID, pAFFIList, nListSize, pAFFR);
 }
+
+INT32	CASIFFDLLUtil::ASIFF_IsDocFileFormat(LPCTSTR pFilePath, INT32 *pnFileType)
+{
+	if(!m_hDLL)
+		return -100;
+	if(!m_lpObject)
+		return -101;
+
+	fn_ASIFF_IsDocFileFormatType fnASIFF_IsDocFileFormat = (fn_ASIFF_IsDocFileFormatType)GetProcAddress(m_hDLL, "ASIFF_IsDocFileFormat");
+	if(!fnASIFF_IsDocFileFormat)
+		return -102;
+
+	return fnASIFF_IsDocFileFormat(m_lpObject, pFilePath, pnFileType);
+}
+
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------

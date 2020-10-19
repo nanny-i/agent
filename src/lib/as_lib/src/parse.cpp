@@ -373,6 +373,48 @@ char *get_dirname(char *src, char *dest, int size)
     return (dest);
 }
 
+BOOL split_filename(char *pPath, char *pFile, int size)
+{
+    char *ptr;
+
+    if (pPath == NULL || pFile == NULL || size < 2)
+        return FALSE;
+
+    if (pPath[0] == '\0')
+    {
+		return FALSE;
+    }
+
+    ptr = pPath + strlen(pPath);
+    while (ptr != pPath && *--ptr == '/')  /* trim trailing slash */
+        ;
+
+    if (ptr == pPath && *ptr == '/')
+    {
+		return FALSE;
+    }
+
+    while (ptr != pPath)
+    {
+        if (*--ptr == '/')
+        {
+            while (*ptr == '/' && ptr != pPath)
+                ptr--;
+			++ptr;
+            ptr[0] = '\0';
+			++ptr;
+			if(ptr[0] != 0)
+			{
+				strncpy(pFile, ptr, size-1);
+				return TRUE;
+			}
+			else
+				return FALSE;
+        }
+    }
+	return FALSE;
+}
+
 
 char *get_extname(char *pFileName, char *pExtName, int nExtSize)
 {

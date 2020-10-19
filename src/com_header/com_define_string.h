@@ -32,12 +32,13 @@
 #define 	STR_SERVICE_DESCRIPTION			"ashin nanny service"
 
 #define		STR_PROC_NAME_NANNY_MGR			"nannymgr"
-#define		STR_PROC_NAME_NANNY_RM			"nannyrm"
 #define		STR_PROC_NAME_NANNY_INTRO		"intro"
 #define		STR_PROC_NAME_NANNY_DTLOCK		"dktop_lock"
 #define		STR_PROC_NAME_SERVICE_CONTROL	"sc"
 #define		STR_PROC_NAME_CMD				"cmd"
 #define		STR_PROC_NAME_REGEDIT			"regedit"
+
+#define		STR_SH_NAME_NANNY_UNINSTALL		"nanny_uninstall.sh"
 //------------------------------------------------------------------------------
 
 #define		STR_TS_NAME_NANNY_MGR			"nannymanager"

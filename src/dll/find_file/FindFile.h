@@ -55,6 +55,7 @@ INT32 ASIFF_ClearFileFindOption(PVOID lpObject, UINT32 nOrderID);
 INT32 ASIFF_SearchDirFile(PVOID lpObject, UINT32 nOrderID);
 INT32 ASIFF_SearchDirFileThread(PVOID lpObject, UINT32 nOrderID);
 INT32 ASIFF_GetFindFileItem(PVOID lpObject, UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFIList, PUINT32 nListSize, PASI_FF_FILE_RESULT pAFFR);
+INT32 ASIFF_IsDocFileFormat(PVOID lpObject, LPCTSTR pFilePath, INT32 *pnFileType);
 
 }
 

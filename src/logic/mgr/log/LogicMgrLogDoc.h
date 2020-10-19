@@ -23,6 +23,7 @@
 #define LogicMgrLogDocH
 //---------------------------------------------------------------------------
 
+#define		ASI_EPS_APP_POLICY_GROUP_ID_FA_OP				30000
 #define		ASI_EPS_APP_POLICY_GROUP_ID_FA_CLEAR		31000
 
 class CLogicMgrLogDoc	: public CLogicBase

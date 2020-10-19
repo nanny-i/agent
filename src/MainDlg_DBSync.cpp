@@ -35,7 +35,7 @@ INT32		CMainDlg::SyncDatabase()
 		tQueryList.push_back("ALTER TABLE env_license ADD COLUMN sup_os BIGINT DEFAULT 2;");
 
 		tQueryList.push_back("UPDATE schema_info SET db_ver=71;");
-		m_tDBSyncMap[69] = tQueryList;	
+		m_tDBSyncMap[70] = tQueryList;	
 	}
 
 	{

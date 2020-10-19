@@ -107,7 +107,7 @@ INT32			CDBMgrPoInDevOOp::UpdatePoInDevOOp(DB_PO_IN_DEVO_OP& data)
 	DB_PO_HEADER& tDPH = data.tDPH;
 
 	m_strQuery = SPrintf("UPDATE po_in_devo_op SET %s"
-						", block_mode=%u,"
+						", block_mode=%u"
 						" WHERE id=%u;",
 						GetPoHDRQuery_Update(tDPH).c_str(),
 						data.nBlockMode,

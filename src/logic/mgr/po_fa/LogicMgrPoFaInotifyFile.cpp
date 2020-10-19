@@ -43,6 +43,22 @@ CLogicMgrPoFaInotifyFile::~CLogicMgrPoFaInotifyFile()
 	SAFE_DELETE(t_ManagePoFaInotifyFile);
 }
 
+INT32		CLogicMgrPoFaInotifyFile::GetAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nCount)
+{
+	INT32 nRetVal = 0;
+	if(t_ManagePoFaInotifyFile == NULL || pNotifyPath == NULL || nCount < 1)
+	{
+		WriteLogE("[%s] invalid input data", m_strLogicName.c_str());
+		return -1;
+	}
+	nRetVal = t_ManagePoFaInotifyFile->GetAllInotifyPath(pNotifyPath, nCount);
+	if(nRetVal != 0)
+	{
+		WriteLogE("[%s] fail to get all inotify file path (%d)", m_strLogicName.c_str(), nRetVal);
+		nRetVal -= 100;
+	}
+	return nRetVal;
+}
 
 INT32		CLogicMgrPoFaInotifyFile::InsertInotifyPath(PNOTIFY_PATH pNotifyPath)
 {
@@ -74,12 +90,29 @@ INT32		CLogicMgrPoFaInotifyFile::DeleteInotifyPath(PNOTIFY_PATH pNotifyPath)
 	nRetVal = t_ManagePoFaInotifyFile->DeleteInotifyPath(pNotifyPath);
 	if(nRetVal != 0)
 	{
-		WriteLogE("[%s] fail to delete inotify file path (%d)", m_strLogicName.c_str(), nRetVal);
 		nRetVal -= 100;
 	}
 	return nRetVal;
 }
 
+INT32		CLogicMgrPoFaInotifyFile::GetInotifyPathCount()
+{
+	if(t_ManagePoFaInotifyFile == NULL)
+	{
+		return 0;
+	}
+
+	return t_ManagePoFaInotifyFile->GetInotifyPathCount();
+}
+
+
+VOID		CLogicMgrPoFaInotifyFile::DelAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nCount)
+{
+	if(t_ManagePoFaInotifyFile != NULL)
+	{
+		t_ManagePoFaInotifyFile->DelAllInotifyPath(pNotifyPath, nCount);
+	}
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

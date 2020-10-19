@@ -31,7 +31,8 @@ public:
 	INT32		FindID(char *pPath);
 	INT32		InsertInotifyPath(PNOTIFY_PATH pNotifyPath);
 	INT32		DeleteInotifyPath(PNOTIFY_PATH pNotifyPath);
-
+	INT32		GetAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nTotalCount);
+	VOID		DelAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 nCount);
 public:
 	CManagePoFaInotifyFile();
     ~CManagePoFaInotifyFile();

@@ -911,7 +911,7 @@ String			CDBMgrBase::GetPoHDRQuery_Update(DB_PO_HEADER& tDPH)
 	String strRtn;
 	strRtn = SPrintf(DBMS_POLICY_QUERY_HDR_UPDATE, 
 					tDPH.nRegDate, tDPH.nSeqNo, 
-					tDPH.strName, tDPH.strDescr, 
+					tDPH.strName.c_str(), tDPH.strDescr.c_str(), 
 					tDPH.nAdminID, tDPH.nSubAdminLock, tDPH.nTargetLock, tDPH.nNotifyInfoID, tDPH.nExtOption, tDPH.nUsedMode);
 
 	return strRtn;

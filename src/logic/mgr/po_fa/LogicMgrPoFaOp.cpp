@@ -470,6 +470,7 @@ INT32		CLogicMgrPoFaOp::ApplyPolicy_Sch()
 	
 	UINT32 nLastChkTime = pdb_po->nScanTime;
 	U64_SCHEDULE tIS;
+	INT32 nRetVal = 0;
 	tIS.all = pdb_po->nSchTime;	
 	if(tIS.all == 0)	tIS.U8.type = SCHEDULE_PERIOD_TYPE_BOOT;
 
@@ -486,7 +487,8 @@ INT32		CLogicMgrPoFaOp::ApplyPolicy_Sch()
 			t_LogicEnvNotifyInfo->SendPkt_Notify_Sch_info(menis);
 	}
 
-	if(IsValidSchedule(tIS.all, nLastChkTime) == 0)
+	nRetVal = IsValidSchedule(tIS.all, nLastChkTime);
+	if(nRetVal == 0)
 	{
 		return -1;
 	}
@@ -496,7 +498,8 @@ INT32		CLogicMgrPoFaOp::ApplyPolicy_Sch()
 	t_ManageDocDeleteInfo->UpdateDocScanTime();
 
 	pdb_po->nScanTime = nLastChkTime;
-	if(pdb_po->tDPH.nID)	t_ManagePoFaOp->EditPoFaOp(*pdb_po);
+	if(pdb_po->tDPH.nID)
+		t_ManagePoFaOp->EditPoFaOp(*pdb_po);
 
 	UINT32 nDelDocCnt = 0, nDelBkCnt = 0;
 	nDelDocCnt = t_LogicMgrLogDoc->ChkBackupOp(pdb_po->nDelMethod, pdb_po->nDelCount, pdb_po->nLimitSize, pdb_po->nLimitCnt, pdb_po->nChkFDTType, pdb_po->nChkFDTValue, t_EnvInfoOp->GetStopOpBySysOff());

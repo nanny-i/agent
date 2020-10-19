@@ -232,6 +232,8 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 		tDLD.strObjectPath	= tAFFI[nIdx].szFilePath;
 		tDLD.strObjectName	= tAFFI[nIdx].szFileName;
 		tDLD.strSubjectName	= STR_SERVICE_NAME;
+		if(t_EnvInfoOp != NULL)
+			tDLD.strSubjectPath	= SPrintf("%s/sbin", t_EnvInfoOp->GetRootPath().c_str());
 
 		strObjectFullPath = SPrintf("%s/%s", tDLD.strObjectPath.c_str(), tDLD.strObjectName.c_str());
 

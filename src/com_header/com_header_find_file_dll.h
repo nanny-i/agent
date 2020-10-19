@@ -141,6 +141,7 @@ typedef	INT32 (*fn_ASIFF_ClearFileFindOptionType)(PVOID lpObject, UINT32 nOrderI
 typedef	INT32 (*fn_ASIFF_SearchDirFileType)(PVOID lpObject, UINT32 nOrderID);
 typedef	INT32 (*fn_ASIFF_SearchDirFileThreadType)(PVOID lpObject, UINT32 nOrderID);
 typedef	INT32 (*fn_ASIFF_GetFindFileItemType)(PVOID lpObject, UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFIList, PUINT32 nListSize, PASI_FF_FILE_RESULT pAFFR);
+typedef	INT32 (*fn_ASIFF_IsDocFileFormatType)(PVOID lpObject, LPCTSTR pFilePath, INT32 *pnFileType);
 
 //////////////////////////////////////////////////////////////////////////
 

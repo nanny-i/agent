@@ -34,6 +34,7 @@ extern char *copy_token(char *dest, char *src, int ch);
 extern void remove_tail_crlf(char *szString);
 extern char *get_basename(char *pSrc, char *pDest, int nSize);
 extern char *get_dirname(char *src, char *dest, int size);
+extern BOOL split_filename(char *pPath, char *pFile, int size);
 extern char *get_extname(char *pFileName, char *pExtName, int nExtSize);
 extern char *remove_extname(char *pSrcName, char *pDestName, int nDestSize);
 extern void remove_tail_crlf(char *szString);

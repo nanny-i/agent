@@ -491,5 +491,24 @@ INT32 ASIFF_GetFindFileItem(PVOID lpObject, UINT32 nOrderID, PASI_FF_FILE_ITEM p
 }
 //-------------------------------------------------------------
 
+INT32 ASIFF_IsDocFileFormat(PVOID lpObject, LPCTSTR pFilePath, INT32 *pnFileType)
+{
+	INT32 nRtn = 0;
+	try
+	{
+		if(!lpObject)	return -100;
+
+		CFindFileUtil* tFFUtil = (CFindFileUtil*)lpObject;
+
+		return tFFUtil->IsDocFileFormat(pFilePath, pnFileType);
+	}
+	catch (...)
+	{
+		nRtn = -1001;
+	}
+	return nRtn;
+}
+//-------------------------------------------------------------
+
 
 

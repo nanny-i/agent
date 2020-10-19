@@ -419,69 +419,106 @@ void		CLogicMgrLogDoc::SetLogDoc_Mgr(DB_LOG_DOC& dld)
 
 INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nLimitSize, UINT32 nLimitDelCnt, UINT32 nChkFDTType, UINT32 nDelAfterDay, UINT32& nContinue)
 {
-	PDB_PO_FA_BK pdpfb = (PDB_PO_FA_BK)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_FA_BK);
-	if(!pdpfb)	
+	CFileUtil tFileUtil;
+	INT32 nDelDocCount = 0;
+	INT32 nFileFormat = 0;
+	INT32 i, nListCount = 0;
+	DB_LOG_DOC stDbLogDoc;
+	PNOTIFY_PATH pNotifyPath = NULL;
+	PCHAR pFileName = NULL;
+
+	nListCount = t_LogicMgrPoFaInotifyFile->GetInotifyPathCount();
+	if(nListCount < 1 || t_ASIFFDLLUtil == NULL)
 	{
-		WriteLogN("[%s] not find backup policy", m_strLogicName.c_str());
+		return 0;
+	}
+
+	pNotifyPath = (PNOTIFY_PATH)malloc(sizeof(NOTIFY_PATH )*nListCount);
+	if(pNotifyPath == NULL)
+	{
+		return 0;
+	}
+
+	memset(pNotifyPath, 0, sizeof(NOTIFY_PATH )*nListCount);
+
+	pFileName = (PCHAR)malloc(MAX_FILE_NAME);
+	if(pFileName == NULL)
+	{
+		safe_free(pNotifyPath);
+		return 0;
+	}
+
+	if(t_LogicMgrPoFaInotifyFile->GetAllInotifyPath(pNotifyPath, nListCount) != 0)
+	{
+		safe_free(pNotifyPath);
+		safe_free(pFileName);
 		return 0;
 	}
 	
-	WriteLogN("[%s] backup policy info : [%d][%d][%d][%d][%d]", m_strLogicName.c_str(), pdpfb->tDPH.nUsedMode, pdpfb->nKeepDay, pdpfb->nKeepSize, pdpfb->nFreeSize, pdpfb->nFileMaxSize);
-
-	CFileUtil tFileUtil;
-	INT32 nDelDocCount = 0;
-	
-	TListID tIDList;
-	t_ManageLogDoc->GetItemIDList(tIDList);
-	TListIDItor begin, end;
-	begin = tIDList.begin();	end = tIDList.end();
-	for(begin; begin != end && !nContinue; begin++)
+	for(i=0; i<nListCount; i++)
 	{
-		PDB_LOG_DOC pdld = t_ManageLogDoc->FindItem(*begin);
-		if(!pdld)	continue;
+		memset(&stDbLogDoc, 0, sizeof(stDbLogDoc));
+		memset(pFileName, 0, MAX_FILE_NAME);
 
-		String strFilePath, strFileName;
+		nFileFormat = 0;
 
- 		strFilePath = pdld->strObjectPath;
- 		strFileName = pdld->strObjectName;
+		if(tFileUtil.FileExists(pNotifyPath[i].acNotifyPath) == FALSE)
+		{
+			continue;
+		}
+
+		if(t_ASIFFDLLUtil->ASIFF_IsDocFileFormat(pNotifyPath[i].acNotifyPath, &nFileFormat) != 0)
+		{
+			continue;
+		}
+		if(nFileFormat == 0)
+		{
+			continue;
+		}
+
+
+		if(tFileUtil.GetFileDateTime(pNotifyPath[i].acNotifyPath, &stDbLogDoc.nFileCrTime, &stDbLogDoc.nFileMdTime, &stDbLogDoc.nFileAcTime) != 0)
+		{
+			stDbLogDoc.nFileCrTime = stDbLogDoc.nFileMdTime = stDbLogDoc.nFileAcTime = 0;
+		}
+
+		if(get_basename(pNotifyPath[i].acNotifyPath, pFileName, MAX_FILE_NAME-1) == NULL)
+		{
+			continue;
+		}
+		if(get_dirname(pNotifyPath[i].acNotifyPath, pNotifyPath[i].acNotifyPath, MAX_PATH-1) == NULL)
+		{
+			continue;
+		}
+
+		stDbLogDoc.strObjectName = pFileName;
+		stDbLogDoc.strObjectPath = pNotifyPath[i].acNotifyPath;
+		stDbLogDoc.strSubjectPath = SPrintf("%s/sbin", t_EnvInfo->m_strRootPath.c_str());
+		stDbLogDoc.strSubjectName = STR_SERVICE_NAME;
+		stDbLogDoc.strBkFileName = GetGUID();
+
+		stDbLogDoc.nOpType = SS_LOG_DOC_OP_TYPE_DOCTRACE;
+		stDbLogDoc.nPolicyType = pNotifyPath[i].nOrderID + ASI_EPS_APP_POLICY_GROUP_ID_FA_OP;
+
+		stDbLogDoc.nBackupTime = 0;
+		stDbLogDoc.nRemoveTime = 0;
+		stDbLogDoc.nEvtTime = GetCurrentDateTimeInt();
 		
-		UINT32 nEvtTimeHost = t_ManageLogDocHost->GetLogDocHostEvtTime(*begin);
 
+		if(SetER(t_DocBackupUtil->BackupFile(&stDbLogDoc, nDelCnt, nLimitSize, nLimitDelCnt)))
 		{
-			if(pdld->nBackupTime || pdld->nRemoveTime || pdld->nOpType != SS_LOG_DOC_OP_TYPE_DOCTRACE )		continue;
-			if(nEvtTimeHost && nEvtTimeHost > t_EnvInfo->m_nBootChkTime)	continue;
-		}
-
-/*
-		{
-			if(tFileUtil.FileExists(pdld->strObjectPath.c_str()))
-			{
-				if(nDelAfterDay && !tFileUtil.IsExistFileDateTime(nChkFDTType, nDelAfterDay * TIMER_INTERVAL_TIME_DAY, strFilePath, strFileName))	continue;
-			}
-		}
-*/
-		if(SetER(t_DocBackupUtil->BackupFile(pdld, nDelCnt, nLimitSize, nLimitDelCnt)))
-		{
-			WriteLogE("[%s] doc backup operation fail : [er:%d][id:%d]", m_strLogicName.c_str(), g_nErrRtn, pdld->nID);
+			WriteLogE("[%s] doc backup operation fail : [er:%d][%s/%s]", m_strLogicName.c_str(), g_nErrRtn, pNotifyPath[i].acNotifyPath, pFileName);
 			continue;
 		}		
-		HISYNCSTEPUP(pdld->nSyncSvrStep);
-		SetLogDoc(*pdld);
+		HISYNCSTEPUP(stDbLogDoc.nSyncSvrStep);
+		SetLogDoc(stDbLogDoc);
 
 		nDelDocCount++;
 	}
-	t_ManageDocDeleteInfo->UpdateDocDeleteInfo();
-	t_LogicDocDeleteInfo->SendPkt_DocDeleteInfo_Edit();
 
-	{
-		MEM_FIND_ORDER_INFO tMFOI;
-		tMFOI.nPoID				= 0;
-		tMFOI.nOpType			= SS_LOG_DOC_OP_TYPE_DOCTRACE;
-		tMFOI.nNotiTotalFind	= nDelDocCount;
-
-		if(tMFOI.nNotiTotalFind > 0)
-			t_LogicPoFaClear->SendPkt_Del_Last(tMFOI);
-	}
+	t_LogicMgrPoFaInotifyFile->DelAllInotifyPath(pNotifyPath, nListCount);
+	safe_free(pNotifyPath);
+	safe_free(pFileName);
 
 	return nDelDocCount;
 }

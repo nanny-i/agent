@@ -294,23 +294,27 @@ SEND_PKT:
 
 void		CLogicMgrHost::SetUninstallHost()
 {
-	ASI_TS_INFO tATI;
-	ASI_TS_MGR_PARAM tATMP;
+	String strSrcPath;
+	String strDstPath;
+	char szCmd[MAX_QBUFF] = {0,};
+	strSrcPath = SPrintf("%s/inst/%s", t_EnvInfo->m_strRootPath.c_str(), STR_SH_NAME_NANNY_UNINSTALL);
+	strDstPath = SPrintf("/tmp/%s", STR_SH_NAME_NANNY_UNINSTALL);
+	if(CopyFile(strSrcPath.c_str(), strDstPath.c_str(), FALSE) == FALSE)
 	{
-		String strPath;
-		strPath = SPrintf("%s/%s", t_EnvInfo->m_strRootPath.c_str(), STR_PROC_NAME_NANNY_RM);
-
-		sprintf_ext(CHAR_MAX_SIZE, tATI.szTaskName, STR_TS_NAME_RM); 
-		tATI.nChkPeriod = ASI_TS_CHECK_PREIOD_TYPE_ONCE;
-		tATI.nStartTime	= GetCurrentDateTimeInt() + 5;
-
-		tATMP.strTSChildPath	= strPath;
-		tATMP.strTSChildArgument= "/auto_remove";
-		tATMP.nTSChildHideMode	= 1;
-		tATMP.nTSSingleRun		= 1;
-		tATMP.nTSWaitMode		= 0;
+		WriteLogE("[%s] fail to copy from %s to %s (%d)", m_strLogicName.c_str(), strSrcPath.c_str(), strDstPath.c_str(), errno);
+		return;
 	}
-	t_ExecuteFileUtil->ExecuteFileByUser(tATI, tATMP);
 
-	return;
+	if(chmod(strDstPath.c_str(), 0755) == -1)
+	{
+		WriteLogE("[%s] fail to chmod %s (%d)\n", m_strLogicName.c_str(), strDstPath.c_str(), errno);
+		return;
+	}
+
+	snprintf(szCmd, MAX_QBUFF-1, "%s /auto_remove", strDstPath.c_str());
+
+	if(system(szCmd) == -1)
+	{
+		WriteLogE("[%s] fail to start %s (%d)\n", m_strLogicName.c_str(), szCmd, errno);
+	}
 }
