@@ -586,74 +586,89 @@ int read_lsb_release(char *acOsName, int nMaxLen, UINT64 *pddwOsID, UINT32 *pdwO
 	char *pDescr, *pEnd;
 	int i, nLen, nTail;
 
+	int ret = 0;
+
 	if(acOsName == NULL || nMaxLen < 1 || pddwOsID == NULL || pdwOsType == NULL)
 		return -1;
 
 	/* pipe() or fork() failed, failure! */
-	pPipe = popen("/usr/bin/lsb_release -d -s", "r");
-	if(pPipe == NULL)
-	{
-		return -2;
-	}
-
-	fgets(acFirst, MAX_QHBUFF-1, pPipe);
-	nLen = strlen(acFirst);
-	pclose(pPipe);
-	if(nLen < 1)
-	{
-		return -3;
-	}
-
-	/*Success, ignore first quotes*/
-	pDescr = acFirst;
-	if(*pDescr == '"')
-		++pDescr;
-
-	nTail = nLen - 1;
-
-	/*Remove trailing quotes and CRs*/
-	while(pDescr[nTail] == '"' || pDescr[nTail] == '\n')
-	{
-		pDescr[nTail] = '\0';
-		--nTail;
-	}
-
-	/* Cut out architecture label, or at least CR */
-	pEnd = strchr(pDescr, '(');
-	if(!pEnd || pEnd == pDescr)
-	{
-		pEnd = pDescr + nLen;
-	}
-	*--pEnd = '\0';
-
-	nLen = (int)strlen(pDescr);
-	if(nLen < 1)
-	{
-		return -4;
-	}
-
-	strncpy(acOsName, pDescr, nMaxLen-1);
-	for(i=0; i<nLen; i++)
-	{
-		if(pDescr[i] == ' ')
+	do{
+		pPipe = popen("/usr/bin/lsb_release -d -s", "r");
+		if(pPipe == NULL)
 		{
-			pDescr[i] = '\0';
+			ret = -2;
 			break;
 		}
-	}
-	if(!_stricmp(pDescr, LINUX_UBUNTU_NAME))
-	{
-		*pddwOsID = ASI_LINUX_SYSTEM_ID_UBUNTU;
-	}
-	else if(!_stricmp(pDescr, LINUX_TMAXOS_NAME))
-	{
-		*pddwOsID = ASI_LINUX_SYSTEM_ID_TMAXOS;
-	}
-	else if(!_stricmp(pDescr, LINUX_HAMONIKR_NAME))
-	{
-		*pddwOsID = ASI_LINUX_SYSTEM_ID_HAMONIKR;
-	}
-	else
+
+		fgets(acFirst, MAX_QHBUFF-1, pPipe);
+		nLen = strlen(acFirst);
+		pclose(pPipe);
+		if(nLen < 1)
+		{
+			ret = -3;
+			break;
+		}
+
+		/*Success, ignore first quotes*/
+		pDescr = acFirst;
+		if(*pDescr == '"')
+			++pDescr;
+
+		nTail = nLen - 1;
+
+		/*Remove trailing quotes and CRs*/
+		while(pDescr[nTail] == '"' || pDescr[nTail] == '\n')
+		{
+			pDescr[nTail] = '\0';
+			--nTail;
+		}
+
+		/* Cut out architecture label, or at least CR */
+		pEnd = strchr(pDescr, '(');
+		if(!pEnd || pEnd == pDescr)
+		{
+			pEnd = pDescr + nLen;
+		}
+		*--pEnd = '\0';
+
+		nLen = (int)strlen(pDescr);
+		if(nLen < 1)
+		{
+			ret = -4;
+			break;
+		}
+
+		strncpy(acOsName, pDescr, nMaxLen-1);
+		for(i=0; i<nLen; i++)
+		{
+			if(pDescr[i] == ' ')
+			{
+				pDescr[i] = '\0';
+				break;
+			}
+		}
+		if(!_stricmp(pDescr, LINUX_UBUNTU_NAME))
+		{
+			*pddwOsID = ASI_LINUX_SYSTEM_ID_UBUNTU;
+			ret = 0;
+		}
+		else if(!_stricmp(pDescr, LINUX_TMAXOS_NAME))
+		{
+			*pddwOsID = ASI_LINUX_SYSTEM_ID_TMAXOS;
+			ret = 0;
+		}
+		else if(!_stricmp(pDescr, LINUX_HAMONIKR_NAME))
+		{
+			*pddwOsID = ASI_LINUX_SYSTEM_ID_HAMONIKR;
+			ret = 0;
+		}
+		else
+		{
+			ret = 5;
+		}
+	}while(FALSE);
+
+	if(ret != 0)
 	{
 		if(read_lsb_release_file(pddwOsID) != 0)
 			*pddwOsID = ASI_LINUX_SYSTEM_ID_DEBIAN;

@@ -1487,10 +1487,6 @@ INT32		CMainDlg::StartSubClass()
 		tSID = t_EnvInfoOp->GetSvrLinkSID();
 		if( (SetER(t_LinkSvrUtil->StartServer(&tSID, NULL))))
 		{
-			WriteLogE("socket open fail for agent link connect! : [errcode:%d]", g_nErrRtn);			
-		}
-		else
-		{
 			WriteLogN("open socket for agent link success : [%u]", t_EnvInfo->m_nIFPort);
 		}
 

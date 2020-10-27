@@ -168,7 +168,9 @@ INT32		CLogicMgrPoInVulnScan::OnTimer_Logic()
 	PDB_PO_IN_VULN_SCAN pdata_po = (PDB_PO_IN_VULN_SCAN)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if(!pdata_po)	
 	{
-		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(m_nPolicyType);
+		if(nPolID != 0)
+			WriteLogE("[%s] not find current policy (%d)", m_strLogicName.c_str(), nPolID);
 		return 0;
 	}
 

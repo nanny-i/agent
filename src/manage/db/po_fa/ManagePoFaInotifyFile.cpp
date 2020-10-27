@@ -105,7 +105,8 @@ INT32	CManagePoFaInotifyFile::GetAllInotifyPath(PNOTIFY_PATH pNotifyPath, INT32 
 	for(begin; begin != end; begin++)
 	{
 		pLogNotify = &(begin->second);
-		strncpy(pNotifyPath[i].acNotifyPath, pLogNotify->strNotifyFilePath.c_str(), MAX_PATH-1);
+		strncpy(pNotifyPath[i].acNotifyPath, pLogNotify->strNotifyFilePath.c_str(), CHAR_MAX_SIZE-1);
+		pNotifyPath[i].acNotifyPath[CHAR_MAX_SIZE-1] = 0;
 		pNotifyPath[i].nOrderID = pLogNotify->nOrderID;
 		pNotifyPath[i].nWatchd = pLogNotify->nID;
 		if(++i >= nTotalCount)
@@ -154,7 +155,7 @@ INT32	CManagePoFaInotifyFile::InsertInotifyPath(PNOTIFY_PATH pNotifyPath)
 	stLogNotify.nUsedFlag = 1;
 	stLogNotify.nRegDate = GetCurrentDateTimeInt();
 	stLogNotify.nOrderID = pNotifyPath->nOrderID;
-	stLogNotify.strNotifyFilePath = SPrintf(pNotifyPath->acNotifyPath);
+	stLogNotify.strNotifyFilePath = pNotifyPath->acNotifyPath;
 
 	nRetVal = t_DBMgrPoFaInotifyFile->InsertExecute((PVOID)&stLogNotify);
 	if(nRetVal != 0)

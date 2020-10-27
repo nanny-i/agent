@@ -37,7 +37,6 @@ CLogicBase::CLogicBase()
 	m_nEvtObjCode		= 0;
 	m_nLastErrCode		= ERR_SUCCESS;
 
-
 	m_nConAPktType		= 0;
 	m_nConAPktCode		= 0;
 
@@ -69,6 +68,7 @@ void	CLogicBase::InitBaseMember(PPKT_DATA pkt_data)
     m_nRecvCnt			= 0;
     m_nPktRst			= 0;
 	m_nValue			= 0;
+	m_nIsStart			= 0;
 	m_strName			= "";
 
 	m_nPktType			= 0;
@@ -288,29 +288,38 @@ INT32	CLogicBase::IsValidSchedule(UINT64 nSchInfo, UINT32& nLastChkTime, PCHAR s
 		{
 			if(difftime(nCurTime, nLastChkTime) >= TIMER_INTERVAL_TIME_SYS_BOOT)
 			{
-				UINT32 nBootTime = uptime();
-				if(nBootTime < TIMER_INTERVAL_TIME_MIN*2 && t_EnvInfoOp->m_nMgrSvrAuthStatus != CLIENT_CON_STATUS_CONNECTED)
+				UINT32 nUpTime = uptime();
+				UINT32 nBootTime = nCurTime - nUpTime + TIMER_INTERVAL_TIME_SYS_BOOT;
+				if(m_nIsStart == 0)
+				{
+					if(nUpTime < TIMER_INTERVAL_TIME_MIN*6)
+					{
+						nLastChkTime = nCurTime - nUpTime;
+					}
+					m_nIsStart = 1;
+				}
+				if(nUpTime < TIMER_INTERVAL_TIME_MIN && t_EnvInfoOp->m_nMgrSvrAuthStatus != CLIENT_CON_STATUS_CONNECTED)
 					break;
 
 				if(tIS.U8.min)
 				{
-					nSchMin = tIS.U8.min + 2;
-					if((nBootTime < UINT32(nSchMin * TIMER_INTERVAL_TIME_MIN)))
+					nSchMin = tIS.U8.min;
+					if((nLastChkTime < nBootTime) && (nUpTime > UINT32(nSchMin * TIMER_INTERVAL_TIME_MIN)) && (nUpTime < UINT32((nSchMin+2) * TIMER_INTERVAL_TIME_MIN)))
 					{
 						nRtn = 1;
 						if(szLog)
 						{
-							sprintf_ext(nLogLen, szLog, "[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), nBootTime, tIS.U8.min);
+							sprintf_ext(nLogLen, szLog, "[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), nUpTime, tIS.U8.min);
 						}
 						else
 						{
-							WriteLogN("[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), nBootTime, tIS.U8.min);
+							WriteLogN("[%s] valid schedule time : boot wait min : [bt:%u][%u]", m_strLogicName.c_str(), nUpTime, tIS.U8.min);
 						}
 					}
 				}
 				else
 				{
-					if(nBootTime < TIMER_INTERVAL_TIME_MIN*6)
+					if(nUpTime < TIMER_INTERVAL_TIME_MIN*6)
 						nRtn = 1;
 				}
 				if(nRtn)

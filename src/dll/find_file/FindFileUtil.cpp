@@ -544,7 +544,8 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 	{			
 		if(_stricmp(pDirEnt->d_name, ".") && _stricmp(pDirEnt->d_name, ".."))
 		{
-			strFileNameA = String(pDirEnt->d_name);
+//			strFileNameA = String(pDirEnt->d_name);
+			strFileNameA = pDirEnt->d_name;
 			if(DT_DIR == pDirEnt->d_type)
 			{
 				if(nSubDirSearch)
@@ -616,7 +617,9 @@ INT32		CFindFileUtil::Recursive_SearchFile(UINT32 nOrderID, String strSearchPath
 		{
 			continue;
 		}
-		strFileNameA = String(pDirEnt->d_name);
+//		strFileNameA = String(pDirEnt->d_name);
+		strFileNameA = pDirEnt->d_name;
+
 		nMatchType = ASI_FF_FILE_FIND_TYPE_PATTERN;
 		if(DT_DIR == pDirEnt->d_type)
 		{
@@ -699,7 +702,8 @@ INT32		CFindFileUtil::Recursive_SearchDirFile(UINT32 nOrderID, String strSearchP
 	{			
 		if(_stricmp(pDirEnt->d_name, ".") && _stricmp(pDirEnt->d_name, ".."))
 		{
-			strFileNameA = String(pDirEnt->d_name);
+//			strFileNameA = String(pDirEnt->d_name);
+			strFileNameA = pDirEnt->d_name;
 			nMatchType = ASI_FF_FILE_FIND_TYPE_PATTERN;
 			
 			if(DT_DIR == pDirEnt->d_type)
@@ -917,7 +921,7 @@ INT32		CFindFileUtil::IsExistFileMaskByDFF(UINT32 nOrderID, String strFileFullNa
 			WriteLog("fail to get file (%s) fmt info : %s", tADFI.szFileName, acLogMsg);
 	}
 
-	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW)
+	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW || tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_ZIP)
 		return 0;
 	if(tADFI.szFmtType[0] == 0)
 		return 0;
@@ -1186,16 +1190,21 @@ INT32		CFindFileUtil::IsExistExceptDirFileMask(UINT32 nOrderID, String strFilePa
 		return 1;
 
 	pExt = strrchr((char *)strFileName.c_str(), '.');
-	if(pExt != NULL)
+	if(pExt == NULL)
 	{
-		strFileMask = SPrintf("%s", &pExt[1]);
+		return 0;
 	}
+
+	strFileMask = SPrintf("%s", &pExt[1]);
 
 	begin = find->second.begin();	end = find->second.end();
 	for(begin; begin != end; begin++)
 	{
 		if(StringMatchSpec(strFilePath.c_str(), begin->first.c_str()) && StringMatchSpec(strFileMask.c_str(), begin->second.c_str()))
+		{
+			WriteLog("match : [%s : %s] [%s : %s]", strFilePath.c_str(), begin->first.c_str(), strFileMask.c_str(), begin->second.c_str());
 			return 1;
+		}
 	}
 	return 0;
 }
@@ -1333,33 +1342,59 @@ INT32		CFindFileUtil::IsExistFileDateTime(UINT32 nOrderID, String strFilePath, S
 
 INT32		CFindFileUtil::StringMatchSpec(LPCTSTR pszTarget, LPCTSTR pszSpec) 
 {
-	const char *cp = NULL, *mp = NULL;
+	char *cp = NULL, *mp = NULL;
+	INT32 nLen = 0;
+	char *pTarget = NULL, *pSpec = NULL;
 	if(pszTarget == NULL || pszSpec == NULL)
 	{
 		return 0;
 	}
-	while (*pszTarget)
+
+	memset(m_acSrcPath, 0, MAX_PATH);
+	memset(m_acDstPath, 0, MAX_PATH);
+
+	strncpy(m_acSrcPath, pszSpec, MAX_PATH-1);
+	nLen = strlen(m_acSrcPath);
+	if(nLen < 1 || nLen > MAX_PATH-1)
+		return 0;
+	if(nLen != 1 && m_acSrcPath[nLen-1] == '/')
 	{
-		if (*pszSpec == '*') 
+		m_acSrcPath[nLen-1] = 0;
+	}
+	pSpec = m_acSrcPath;
+
+	strncpy(m_acDstPath, pszTarget, MAX_PATH-1);
+	nLen = strlen(m_acDstPath);
+	if(nLen < 1 || nLen > MAX_PATH-1)
+		return 0;
+	if(nLen != 1 && m_acDstPath[nLen-1] == '/')
+	{
+		m_acDstPath[nLen-1] = 0;
+	}
+	pTarget = m_acDstPath;
+
+	while (*pTarget)
+	{
+		if (*pSpec == '*') 
 		{
-			if (!*++pszSpec) 
+			if (!*++pSpec) 
 			{
 				return 1;
 			}
-			mp = pszSpec;
-			cp = pszTarget+1;
+			mp = pSpec;
+			cp = pTarget+1;
 		} 
-		else if (((TOLOWER(*pszSpec) == TOLOWER(*pszTarget)) && (*pszSpec != '#')) || (*pszSpec == '?') || ((*pszSpec == '#') && isdigit(*pszTarget))) 
+		else if (((TOLOWER(*pSpec) == TOLOWER(*pTarget)) && (*pSpec != '#')) || (*pSpec == '?') || ((*pSpec == '#') && isdigit(*pTarget))) 
 		{
-			pszSpec++;
-			pszTarget++;
+			pSpec++;
+			pTarget++;
 		} 
 		else 
 		{
 			if (mp)
 			{
-				pszSpec = (LPTSTR)mp;
-				pszTarget = (LPTSTR)cp++;
+				pSpec = (char *)mp;
+				pTarget = (char *)cp++;
 			}
 			else
 			{
@@ -1368,11 +1403,11 @@ INT32		CFindFileUtil::StringMatchSpec(LPCTSTR pszTarget, LPCTSTR pszSpec)
 		}
 	}
 
-	while (*pszSpec == '*')
+	while (*pSpec == '*')
 	{
-		pszSpec++;
+		pSpec++;
 	}
-	return !*pszSpec;
+	return !*pSpec;
 }
 //-------------------------------------------------------------
 //-------------------------------------------------------------
@@ -1780,7 +1815,7 @@ INT32		CFindFileUtil::IsDocFileFormat(LPCTSTR pFilePath, INT32 *pnFileType)
 			WriteLog("fail to get file (%s) fmt info : %s", tADFI.szFileName, acLogMsg);
 	}
 
-	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW)
+	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW || tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_ZIP)
 		return -3;
 
 	*pnFileType = tADFI.nFmtType;

@@ -43,12 +43,14 @@ protected:
 	INT32 CheckDocFmtAnalysis(char *pcFilePath, char *szFmt, char *acLogMsg);
 	INT32 CheckDocumentFile(char *pcFilePath, char *acLogMsg);
 	INT32 CheckFileExtAnalysis(char *pcFilePath, INT32 *pnFileFmtType);
+	INT32 CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType);
 
 protected:
 	INT32	ConvertFmtTypeToName(PASI_DFILE_FMT_INFO pADFFI);
 
 
 protected:
+	INT32 m_n_zip_Count;
 	INT32 m_n_pptx_Han_Count;
 	INT32 m_n_pptx_Office_Count;
 	INT32 m_n_pptx2_Office_Count;

@@ -148,7 +148,9 @@ INT32		CLogicMgrPoHostNotify::OnTimer_Logic()
 	PDB_PO_HOST_NOTIFY pdb_pol = (PDB_PO_HOST_NOTIFY)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if(!pdb_pol)
 	{
-		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(m_nPolicyType);
+		if(nPolID != 0)
+			WriteLogE("[%s] not find current policy (%d)", m_strLogicName.c_str(), nPolID);
 		return 0;
 	}
 	if(pdb_pol->tDPH.nUsedMode != STATUS_USED_MODE_ON)	return 0;

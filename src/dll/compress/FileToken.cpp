@@ -378,7 +378,7 @@ INT16 FileToken::TokenDel_String(String& aSrc)
 	}
 	pszBuff[nLen] = 0;
 
-	aSrc = String(pszBuff);
+	aSrc = pszBuff;
 	safe_free(pszBuff);
 
     return nLen;

@@ -63,12 +63,16 @@ String CSystemInfo::GetCompName()
 {
     String strResult = "";
 	if(m_acHostName[0] != 0)
-		strResult = String(m_acHostName);
+	{
+//		strResult = String(m_acHostName);
+		strResult = m_acHostName;
+	}
 	else
 	{
 	    if(gethostname(m_acHostName, MAX_QHBUFF-1) == 0)
 	    {
-	        strResult = String(m_acHostName);
+//	        strResult = String(m_acHostName);
+			strResult = m_acHostName;
 	    }
 	}
     return strResult;
@@ -81,7 +85,7 @@ String CSystemInfo::GetIpAddress()
     struct hostent *pHostEnt = NULL;
 	if(m_acIpAddr[0] != 0)
 	{
-		strIpAddr = String(m_acIpAddr);
+		strIpAddr = m_acIpAddr;
 	    return strIpAddr;
 
 	}
@@ -95,7 +99,8 @@ String CSystemInfo::GetIpAddress()
         return "" ;
     }
     strncpy(m_acIpAddr, (char *)inet_ntoa(*(struct in_addr *)*pHostEnt->h_addr_list), MAX_QHBUFF-1);
-	strIpAddr = String(m_acIpAddr);
+//	strIpAddr = String(m_acIpAddr);
+	strIpAddr = m_acIpAddr;
     return strIpAddr;
 
 }

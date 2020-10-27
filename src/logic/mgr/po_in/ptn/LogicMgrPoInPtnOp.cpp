@@ -176,7 +176,9 @@ INT32		CLogicMgrPoInPtnOp::AnalyzePkt_FromMgr_Ext_Scan()
 	PDB_PO_IN_PTN_OP pdb_po = (PDB_PO_IN_PTN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if(!pdb_po)	
 	{
-		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(m_nPolicyType);
+		if(nPolID != 0)
+			WriteLogE("[%s] not find current policy (%d)", m_strLogicName.c_str(), nPolID);
 		return 0;
 	}	
 
@@ -215,7 +217,9 @@ INT32		CLogicMgrPoInPtnOp::OnTimer_Logic()
 	PDB_PO_IN_PTN_OP pdata_po = (PDB_PO_IN_PTN_OP)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if(!pdata_po)	
 	{
-//		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(m_nPolicyType);
+		if(nPolID != 0)
+			WriteLogE("[%s] not find current policy (%d)", m_strLogicName.c_str(), nPolID);
 		return 0;
 	}
 

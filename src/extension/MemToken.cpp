@@ -753,12 +753,14 @@ INT32 MemToken::TokenDel_String(String& strSrc)
 		nRetVal = Conver_Utf8(pszBuf, nLen, &pszUtfBuf);
 		if(nRetVal == 0 && pszUtfBuf != NULL)
 		{
-			strSrc = String(pszUtfBuf);
+			//strSrc = String(pszUtfBuf);
+			strSrc = pszUtfBuf;
 			safe_free(pszUtfBuf);
 		}
 		else
 		{
-			strSrc = String(pszBuf);
+			//strSrc = String(pszBuf);
+			strSrc = pszBuf;
 		}
 		nRetVal = nLen;
 	}while(FALSE);

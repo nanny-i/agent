@@ -311,10 +311,6 @@ INT32		CLogicMgrLogDoc::DeleteLogDoc(DB_LOG_DOC& dld)
 	{
 		PDB_PO_FA_CLEAR_UNIT pdb_unit = t_ManagePoFaClearUnit->FindItem(dld.nPolicyType - ASI_EPS_APP_POLICY_GROUP_ID_FA_CLEAR);
 		// 20200728 edit jhjung
-		if(pdb_unit && (t_EnvInfo->m_nHostSysType & pdb_unit->tDPH.nNotifyInfoID))
-			WriteLogN("m_nHostSysType %u nNotifyInfoID %u ", t_EnvInfo->m_nHostSysType, pdb_unit->tDPH.nNotifyInfoID);
-		else
-			WriteLogN("m_nHostSysType %u nNotifyInfoID null ", t_EnvInfo->m_nHostSysType);
 		if(pdb_unit)
 		{
 			nDelCnt			= pdb_unit->nDelCount;
@@ -486,7 +482,7 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 		{
 			continue;
 		}
-		if(get_dirname(pNotifyPath[i].acNotifyPath, pNotifyPath[i].acNotifyPath, MAX_PATH-1) == NULL)
+		if(get_dirname(pNotifyPath[i].acNotifyPath, pNotifyPath[i].acNotifyPath, CHAR_MAX_SIZE-1) == NULL)
 		{
 			continue;
 		}

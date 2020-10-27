@@ -284,6 +284,7 @@ BOOL CThreadPoFaOp::InitNotifyFd()
 	m_nNotifyFd = inotify_init();
 	if ( m_nNotifyFd < 0 )
 	{
+		WriteLogE("[%s] fail to init inotify : [%d]", m_strThreadName.c_str(), errno);
 		return FALSE;
 	}
 	return TRUE;
@@ -313,12 +314,14 @@ INT32 CThreadPoFaOp::AddSubDirWatchNotify(INT32 nOrderID, INT32 nExtOption, char
 	pNotifyPath = (PNOTIFY_PATH)malloc(sizeof(NOTIFY_PATH));
 	if(pNotifyPath == NULL)
 	{
+		WriteLogE("[%s] fail to allocate memory : [%d]", m_strThreadName.c_str(), errno);
 		return -2;
 	}
 
 	pDir = opendir(pPath);
 	if (pDir == NULL)
 	{
+		WriteLogE("[%s] fail to open path [%s] : [%d]", m_strThreadName.c_str(), pPath, errno);
 		safe_free(pNotifyPath);
 		return -3;
 	}
@@ -332,7 +335,8 @@ INT32 CThreadPoFaOp::AddSubDirWatchNotify(INT32 nOrderID, INT32 nExtOption, char
 		if(DT_DIR == pDirEnt->d_type)
 		{
 			memset(pNotifyPath, 0, sizeof(NOTIFY_PATH));
-			snprintf(pNotifyPath->acNotifyPath, MAX_PATH-1, "%s/%s", pPath, pDirEnt->d_name);
+			snprintf(pNotifyPath->acNotifyPath, CHAR_MAX_SIZE-1, "%s/%s", pPath, pDirEnt->d_name);
+			pNotifyPath->acNotifyPath[CHAR_MAX_SIZE-1] = 0;
 			pNotifyPath->nPathLen = strlen(pNotifyPath->acNotifyPath);
 			pNotifyPath->nExtOption = nExtOption;
 			pNotifyPath->nOrderID = nOrderID;
@@ -367,6 +371,7 @@ INT32 CThreadPoFaOp::AddDirWatchNotify(PNOTIFY_PATH pNotifyPath)
 	pNotifyPath->nWatchd = inotify_add_watch( m_nNotifyFd, pNotifyPath->acNotifyPath, dwMask );
 	if( pNotifyPath->nWatchd < 0 )
 	{
+		WriteLogE("[%s] fail to add inotify watch [%s] : [%d]", m_strThreadName.c_str(), pNotifyPath->acNotifyPath, errno);
 		return -2;
 	}
 
@@ -392,14 +397,17 @@ INT32 CThreadPoFaOp::AddWatchNotify(INT32 nOrderID, INT32 nExtOption, char *pPat
 	pNotifyPath = (PNOTIFY_PATH)malloc(sizeof(NOTIFY_PATH));
 	if(pNotifyPath == NULL)
 	{
+		WriteLogE("[%s] fail to allocate memory : [%d]", m_strThreadName.c_str(), errno);
 		return -2;
 	}
 	memset(pNotifyPath, 0, sizeof(NOTIFY_PATH));
 
-	strncpy(pNotifyPath->acNotifyPath, pPath, MAX_PATH-1);
+	strncpy(pNotifyPath->acNotifyPath, pPath, CHAR_MAX_SIZE-1);
+	pNotifyPath->acNotifyPath[CHAR_MAX_SIZE-1] = 0;
 	nLen = strlen(pNotifyPath->acNotifyPath);
 	if(nLen < 2)
 	{
+		WriteLogE("[%s] invalid notify path len [%d]", m_strThreadName.c_str(), nLen);
 		safe_free(pNotifyPath);
 		return -3;
 	}
@@ -445,7 +453,8 @@ INT32 CThreadPoFaOp::DelWatchNotify(char *pPath)
 	}
 
 	memset(&stNotifyPath, 0, sizeof(stNotifyPath));
-	strncpy(stNotifyPath.acNotifyPath, pPath, MAX_PATH-1);
+	strncpy(stNotifyPath.acNotifyPath, pPath, CHAR_MAX_SIZE-1);
+	stNotifyPath.acNotifyPath[CHAR_MAX_SIZE-1] = 0;
 	nLen = strlen(stNotifyPath.acNotifyPath);
 	if(nLen < 1)
 	{

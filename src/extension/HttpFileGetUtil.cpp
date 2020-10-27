@@ -208,6 +208,7 @@ INT32 CHttpFileGetUtil::GetFile_Address(LPSTR lpAddress, LPSTR lpFile, LPSTR lpS
 	int l,line_length = 0;
 	bool loop = true;
 	String strMessage;
+	String strRecvMsg;
 	INT32 nLoopCnt = 100;
 
 	INT32 nRecvHMsgIdx = 0;
@@ -248,14 +249,16 @@ INT32 CHttpFileGetUtil::GetFile_Address(LPSTR lpAddress, LPSTR lpFile, LPSTR lpS
 
 		if(nRecvHMsgIdx == 1000)
 		{
-			strMessage += String(szRecvHMsg);
+			strRecvMsg = szRecvHMsg;
+			strMessage += strRecvMsg;
 			memset(szRecvHMsg, 0, CHAR_MAX_SIZE);
 			nRecvHMsgIdx = 0;
 		}
 	}
 	WriteLog("recv hdr : [%s]", szRecvHMsg);
 
-	strMessage += String(szRecvHMsg);
+	strRecvMsg = szRecvHMsg;
+	strMessage += strRecvMsg;
 
 	DWORD dwWriteTotal = 0;
 	DWORD dwRecvTotal = 0;

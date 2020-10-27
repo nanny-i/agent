@@ -38,7 +38,7 @@ typedef struct _notify_path
 	INT32 nExtOption;
 	INT32 nWatchd;
 	INT32 nPathLen;
-	char acNotifyPath[MAX_PATH];
+	char acNotifyPath[CHAR_MAX_SIZE];
 } NOTIFY_PATH, *PNOTIFY_PATH;
 
 typedef map<INT32, NOTIFY_PATH>			TMapNotifyPath;

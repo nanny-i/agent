@@ -68,14 +68,16 @@ INT32		CCompSecuUtil::SetNotifyState(PVOID lParam, PVOID NotifyState)
 
 String		CCompSecuUtil::GetSHA2(PBYTE pBuff, INT32 nLen)
 {
+	String strHash;
 	CHAR szHash[CHAR_MAX_SIZE] = {0, };
 	if(pBuff == NULL || nLen < 1)
 		return "";
 
-	if(get_sha256_hash((char *)pBuff, nLen, szHash, CHAR_MAX_SIZE) != 0)
+	if(get_sha256_hash((char *)pBuff, nLen, szHash, CHAR_MAX_SIZE) != 0)
 		return "";
-	
-	return String(szHash);
+
+	strHash = szHash;
+	return strHash;
 }
 //-----------------------------------------------------------------------------------
 

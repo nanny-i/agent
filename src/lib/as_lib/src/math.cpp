@@ -66,14 +66,17 @@ String UInt64ToStr(UINT64 nValue)
 
 String	BinToHex(BYTE nValue)
 {
+	String strValue;
 	CHAR szHex[3] = {0, };
 	sprintf_ext(3, szHex, "%02X", nValue);
-	return String(szHex);
+	strValue = szHex;
+	return strValue;
 }
 //---------------------------------------------------------------------------
 
 String	IntToHex(UINT32 nValue)
 {    
+	String strValue;
 	CHAR szHex[9] = {0, };
 	nValue = htonl_ext(nValue);
 
@@ -82,12 +85,14 @@ String	IntToHex(UINT32 nValue)
 		String strHex = BinToHex(((PBYTE)&nValue)[nIdx]);
 		strcat_ext(szHex, strHex.c_str(), 9);
 	}
-	return String(szHex);
+	strValue = szHex;
+	return strValue;
 }
 //---------------------------------------------------------------------------
 
 String	Int16ToHex(UINT16 nValue)
-{    
+{
+	String strValue;
 	CHAR szHex[5] = {0, };
 	nValue = htonl16_ext(nValue);
 
@@ -96,12 +101,14 @@ String	Int16ToHex(UINT16 nValue)
 		String strHex = BinToHex(((PBYTE)&nValue)[nIdx]);
 		strcat_ext(szHex, strHex.c_str(), 5);
 	}
-	return String(szHex);
+	strValue = szHex;
+	return strValue;
 }
 //---------------------------------------------------------------------------
 
 String	Int64ToHex(UINT64 nValue)
-{    
+{
+	String strValue;
 	CHAR szHex[17] = {0, };
 	nValue = htonl64_ext(nValue);
 
@@ -110,7 +117,8 @@ String	Int64ToHex(UINT64 nValue)
 		String strHex = BinToHex(((PBYTE)&nValue)[nIdx]);
 		strcat_ext(szHex, strHex.c_str(), 17);
 	}
-	return String(szHex);
+	strValue = szHex;
+	return strValue;
 }
 //---------------------------------------------------------------------------
 

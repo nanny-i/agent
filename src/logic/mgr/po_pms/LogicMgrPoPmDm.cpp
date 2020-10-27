@@ -157,7 +157,9 @@ INT32		CLogicMgrPoPmDm::OnTimer_Logic()
 	PDB_PO_PM_DM pdb_po = (PDB_PO_PM_DM)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if(!pdb_po)	
 	{
-		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(m_nPolicyType);
+		if(nPolID != 0)
+			WriteLogE("[%s] not find current policy (%d)", m_strLogicName.c_str(), nPolID);
 		return 0;
 	}
 

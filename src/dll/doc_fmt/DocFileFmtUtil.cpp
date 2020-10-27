@@ -24,6 +24,7 @@
 
 CDocFileFmtUtil::CDocFileFmtUtil(void)
 {
+	m_n_zip_Count = 0;
 	m_n_pptx_Han_Count = 0;
 	m_n_pptx_Office_Count = 0;
 	m_n_pptx2_Office_Count = 0;	
@@ -136,6 +137,8 @@ INT32	CDocFileFmtUtil::ConvertFmtTypeToName(PASI_DFILE_FMT_INFO pADFFI)
 		case ASIDFF_FILE_FMT_TYPE_XLSX:		strncpy(pADFFI->szFmtType, "xlsx", CHAR_MAX_SIZE-1);	break;
 		case ASIDFF_FILE_FMT_TYPE_DOC:		strncpy(pADFFI->szFmtType, "doc", CHAR_MAX_SIZE-1);		break;
 		case ASIDFF_FILE_FMT_TYPE_DOCX:		strncpy(pADFFI->szFmtType, "docx", CHAR_MAX_SIZE-1);	break;
+
+		case ASIDFF_FILE_FMT_TYPE_ZIP:		strncpy(pADFFI->szFmtType, "zip", CHAR_MAX_SIZE-1);		break;
 
 		case ASIDFF_FILE_FMT_TYPE_PDF:		strncpy(pADFFI->szFmtType, "pdf", CHAR_MAX_SIZE-1);		break;
 		case ASIDFF_FILE_FMT_TYPE_HWP:		strncpy(pADFFI->szFmtType, "hwp", CHAR_MAX_SIZE-1);		break;
@@ -581,6 +584,8 @@ INT32 CDocFileFmtUtil::CheckPkFmtAnalysis(char *pcFilePath, char *szFmt, char *a
 	if(CheckFileExtAnalysis(pcFilePath, &nFileFmt) == 0)
 		return nFileFmt;
 
+	if(CheckZipFileContentAnalysis(pcFilePath, &nFileFmt) == 0)
+		return nFileFmt;
 	m_n_doc_Office_Count++;
 	return ASIDFF_FILE_FMT_TYPE_DOC;
 }
@@ -970,9 +975,69 @@ INT32 CDocFileFmtUtil::CheckDocFmtAnalysis(char *pcFilePath, char *szFmt, char *
 	if(CheckFileExtAnalysis(pcFilePath, &nFileFmt) == 0)
 		return nFileFmt;
 
+	if(CheckZipFileContentAnalysis(pcFilePath, &nFileFmt) == 0)
+		return nFileFmt;
+
 	m_n_doc_Office_Count++;
 	return ASIDFF_FILE_FMT_TYPE_DOC;
 }
+
+INT32 CDocFileFmtUtil::CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType)
+{
+	FILE* fp = NULL;
+	char *pData = NULL; 
+	INT32 nErrCode = 0;
+	UINT32 dwMagicNumber = 0;
+	ZIP_FILE_HEADER stZipHeader;
+	if(pcFilePath == NULL || pnFileFmtType == NULL)
+	{
+		return -1;
+	}
+
+	fp = fopen(pcFilePath, "rb");
+	if(fp==NULL)
+	{
+		return -2;
+	}
+
+	fread( &dwMagicNumber, sizeof(UINT32), 1, fp );
+
+	if(ASIDFF_LOCAL_HEADER_MAGIC!=dwMagicNumber)
+	{
+		fclose(fp);
+		return -3;
+	}
+
+	fread( &stZipHeader, sizeof(stZipHeader), 1, fp );
+	if(stZipHeader.wNameSize < 1 || stZipHeader.wNameSize > 65535)
+	{
+		fclose(fp);
+		return -4;
+	}
+	pData = (char *)malloc(stZipHeader.wNameSize + 1);
+	if(pData == NULL)
+	{
+		fclose(fp);
+		return -5;
+	}
+	fread(pData, stZipHeader.wNameSize, 1, fp );
+	fclose(fp);
+	
+	if(!_stricmp(pData, DOCUFORMAT_office_open_xml))
+	{
+		m_n_docx_Office_Count++;
+		*pnFileFmtType = ASIDFF_FILE_FMT_TYPE_DOCX;
+	}
+	else
+	{
+		m_n_zip_Count++;
+		*pnFileFmtType = ASIDFF_FILE_FMT_TYPE_ZIP;
+	}
+
+	safe_free(pData);
+	return 0;
+}
+
 
 
 INT32 CDocFileFmtUtil::CheckDocumentFile(char *pcFilePath, char *acLogMsg)

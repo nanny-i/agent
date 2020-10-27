@@ -159,25 +159,29 @@ void replace_char_in_str(char *str, char s, char d)
 
 String	SPrintf(const char* fmt,...)
 {
+	String strBuff;
 	char acBuf[2*CHAR_MAX_SIZE] = {0, };
 	va_list args;
 	va_start(args,fmt);
     vsnprintf(acBuf, 2*CHAR_MAX_SIZE-1, fmt, args);
     va_end(args);
 	acBuf[2*CHAR_MAX_SIZE-1] = 0;
-	return String(acBuf);
+	strBuff = acBuf;
+	return strBuff;
 }
 
 
 StringW	WPrintf(const wchar_t* fmt,...)
 {
+	StringW wstrBuff;
 	wchar_t wcBuf[2*CHAR_MAX_SIZE] = {0, };
 	va_list args;
 	va_start(args,fmt);
     vswprintf(wcBuf, 2*CHAR_MAX_SIZE-1, fmt, args);
     va_end(args);
 	wcBuf[2*CHAR_MAX_SIZE-1] = 0;
-	return StringW(wcBuf);
+	wstrBuff = wcBuf;
+	return wstrBuff;
 }
 
 String _strlwr(const char *str)
@@ -207,7 +211,7 @@ String _strlwr(const char *str)
 	{
         acTempData[i]=(char)_tolower(acTempData[i]);
     }
-    strRet = String(acTempData);
+    strRet = acTempData;
 	return strRet;
 }
 
@@ -238,7 +242,7 @@ String _strupr(const char *str)
 	{
 		acTempData[i]=(char)_toupper(acTempData[i]);
 	}
-	strRet = String(acTempData);
+	strRet = acTempData;
 	return strRet;
 }
 //-------------------------------------------------------------------------
@@ -258,15 +262,17 @@ LPTSTR	FormatString(LPTSTR lpBuf, LPTSTR fmt,...)
 
 String	ConvertAnsiString(StringW strInputW)
 {
+	String strBuff;
 	char pcBuf[CHAR_MAX_SIZE] = {0,};
 	int nLast = 0;
 	nLast = wcstombs(pcBuf,strInputW.c_str(), 100);
 	if(nLast == -1)
-		return String("");
+		return "";
 	else if(nLast > CHAR_MAX_SIZE-1)
 		nLast = CHAR_MAX_SIZE-1;
 	pcBuf[nLast] = '\0';
-	return String(pcBuf);
+	strBuff = pcBuf;
+	return strBuff;
 }
 
 StringW	ConvertWideString(String strInput)
@@ -561,7 +567,7 @@ INT32  ConvertCharsetString(char *pSrcCharSet, char *pDstCharSet, String strSrcD
 			nRetVal = -6;
 			break;
 		}
-		strDstData = String(pDstData);
+		strDstData = pDstData;
 		nRetVal = 0;
 	}while(FALSE);
 

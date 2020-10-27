@@ -132,10 +132,11 @@ void	CLogicBase::Disconnected_Link(TListID& tHIDList)
 
 String	CLogicBase::GetHostAddr_Link(INT32 nID)
 {
+	String strAddr;
 	char pszAddr[CHAR_MAX_SIZE] = {0, };
 	t_LinkSvrUtil->GetSocketAddress(nID, pszAddr);
-
-	return String(pszAddr);
+	strAddr = pszAddr;
+	return strAddr;
 }
 //---------------------------------------------------------------------------
 

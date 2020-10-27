@@ -293,7 +293,8 @@ INT16 CompMemToken::TokenDel_String(String& aSrc)
         return -4;
 	}
 
-	aSrc = String(pszBuf);
+//	aSrc = String(pszBuf);
+	aSrc = pszBuf;
 	safe_free(pszBuf);
 
     return nLen;

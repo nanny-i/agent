@@ -93,7 +93,9 @@ INT32		CLogicMgrPoHostRmInfo::ApplyPolicy()
 	PDB_PO_HOST_RM_INFO pdphri = (PDB_PO_HOST_RM_INFO)t_DeployPolicyUtil->GetCurPoPtr(m_nPolicyType);
 	if(!pdphri)	
 	{
-		WriteLogE("[%s] not find current policy", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(m_nPolicyType);
+		if(nPolID != 0)
+			WriteLogE("[%s] not find current policy (%d)", m_strLogicName.c_str(), nPolID);
 		return -1;
 	}
 

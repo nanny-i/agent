@@ -172,7 +172,7 @@ String CFileUtil::DelLasCHAR(String& strInput, char cAddChar)
 String CFileUtil::GetShortPathName_Yss(String strFullPathName)
 {
 
-	return String("");
+	return strFullPathName;
 }
 
 INT32 CFileUtil::RemoveDirectoryAll(String strDir)
@@ -436,7 +436,8 @@ LPCTSTR	CFileUtil::FindExtension(LPTSTR lpFileName)
 String		CFileUtil::FindFileName(String strFullName)
 {
 	LPCTSTR szFullName = strFullName.c_str();
-
+	CHAR szFileName[MAX_FILE_NAME] = {0, };
+	String strFileName;
 	INT32 nLen = strFullName.length();
 	INT32 nRtnLen = 0;
 
@@ -445,7 +446,11 @@ String		CFileUtil::FindFileName(String strFullName)
 		if(szFullName[i] == '/')
 		{
 			if(nRtnLen)
-				return String(&(szFullName[i+1]));
+			{
+				strncpy(szFileName, &szFullName[i+1], MAX_FILE_NAME-1);
+				strFileName = szFileName;
+				return strFileName;
+			}
 			return "";
 		}
 		nRtnLen += 1;
@@ -456,6 +461,7 @@ String		CFileUtil::FindFileName(String strFullName)
 
 String		CFileUtil::FindFilePath(String strFullName)
 {
+	String strPath;
 	INT32 nLen = strFullName.length();
 	CHAR szFullName[CHAR_MAX_SIZE] = {0, };
 	if(nLen > CHAR_MAX_SIZE-1)
@@ -470,7 +476,8 @@ String		CFileUtil::FindFilePath(String strFullName)
 			break;
 		}
 	}
-	return String(szFullName);
+	strPath = szFullName;
+	return strPath;
 }
 
 INT32 CFileUtil::GetFileDateTime(LPCSTR lpFileName, UINT32 *pnCDT, UINT32 *pnMDT, UINT32 *pnADT)

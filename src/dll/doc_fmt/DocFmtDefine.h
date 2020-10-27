@@ -129,6 +129,8 @@
 #define DOCUFORMAT_odb_han_   "xxoo"
 #define DOCUFORMAT_odg_han_   "xxoo"
 
+#define DOCUFORMAT_office_open_xml "[Content_Types].xml"
+
 #endif /*_DOC_FMT_DEFINE_H__*/
 
 

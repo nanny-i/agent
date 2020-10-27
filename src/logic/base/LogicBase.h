@@ -30,6 +30,7 @@ private:
 	UINT32		m_nTokRecvCnt;
     UINT32		m_nTokRecvID;
     UINT32		m_nTokRecvValue;
+	UINT32		m_nIsStart;
 
 public:
 	UINT32		m_nDbgPos;

@@ -32,6 +32,8 @@
 #define	ASIDFF_FILE_FMT_TYPE_DOC		0x00000007
 #define	ASIDFF_FILE_FMT_TYPE_DOCX		0x00000008
 
+#define	ASIDFF_FILE_FMT_TYPE_ZIP		0x00000050
+
 #define	ASIDFF_FILE_FMT_TYPE_PDF		0x00000100
 #define	ASIDFF_FILE_FMT_TYPE_HWP		0x00000200
 #define	ASIDFF_FILE_FMT_TYPE_HPT		0x00000201
@@ -48,6 +50,8 @@
 #define	ASIDFF_FILE_FMT_TYPE_CELL		0x00000501
 #define	ASIDFF_FILE_FMT_TYPE_NXL		0x00000502
 #define	ASIDFF_FILE_FMT_TYPE_NXT		0x00000503
+
+#define ASIDFF_LOCAL_HEADER_MAGIC		0x04034b50
 
 //-------------------------------------------------------------------------------------
 
@@ -83,6 +87,40 @@ typedef struct _asi_dfile_fmt_info
 	CHAR			szFmtType[CHAR_MAX_SIZE];
 
 }ASI_DFILE_FMT_INFO, *PASI_DFILE_FMT_INFO;
+
+
+#pragma pack(2)
+
+typedef struct _zip_date
+{
+	UINT16 wMday:5;
+	UINT16 wMon:4;
+	UINT16 wYear:7;
+}ZIP_DATE, *PZIP_DATE;
+
+typedef struct _zip_time
+{
+	UINT16 wSec:5;
+	UINT16 wMin:6;
+	UINT16 wHour:5;
+}ZIP_TIME, *PZIP_TIME;
+
+typedef struct _zip_file_header
+{
+	UINT16 wYersionNeeded;
+	UINT16 wFlag;
+	UINT16 wCompressionMethod;
+	ZIP_TIME stLastModTime;
+	ZIP_DATE stLastModDate;
+	UINT32 dwCRC;
+	UINT32 dwCompressedSize;
+	UINT32 dwUncompressedSize;
+	UINT16 wNameSize;
+	UINT16 wExtraSize;
+}ZIP_FILE_HEADER, *PZIP_FILE_HEADER;
+
+#pragma pack()
+
 //-------------------------------------------------------------------------------------
 
 typedef	INT32	(*ASIDFF_SetDFFmtInitType)(PASI_DFILE_FMT_INIT pADFFI);

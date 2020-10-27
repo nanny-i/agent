@@ -32,11 +32,12 @@ CLogicMgrHostSys*		t_LogicMgrHostSys = NULL;
 
 CLogicMgrHostSys::CLogicMgrHostSys()
 {
+	char acLogicName[MAX_TYPE_LEN] = "logic mgr host sys";
  	t_ManageHostSys		= new CManageHostSys();
 	
 	t_ManageHostSys->LoadDBMS();
 
-	m_strLogicName = "logic mgr host sys";
+	m_strLogicName = acLogicName;
 	
 	m_nControlType	= SS_CONTROL_TYPE_ORG_HOST;	
 	m_nEvtObjType	= EVENT_OBJECT_TYPE_HOST;

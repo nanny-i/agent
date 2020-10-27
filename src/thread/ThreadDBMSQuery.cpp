@@ -102,6 +102,7 @@ void	CThreadDBMSQuery::Logic()
 	INT32       nTotalPktOp;
     INT32		nTotalOpCnt = 0;
 	String		strNewQuery;
+	String		strQuery;
     TListStr	tQueryList;
 	TListStrItor begin, end;
 
@@ -115,7 +116,8 @@ void	CThreadDBMSQuery::Logic()
         begin = tQueryList.begin();	end = tQueryList.end();
         for(begin; begin != end; begin++)
         {
-			strNewQuery += (String(begin->c_str()) + String(";"));
+			strQuery = SPrintf("%s;", begin->c_str());
+			strNewQuery += strQuery;
         }
         ExecuteQuery_Exe(strNewQuery);
 		tQueryList.clear();

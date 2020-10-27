@@ -357,7 +357,9 @@ INT32		CLogicApplyPolicy::SetEPSSvcPolicy(UINT32 nUserMode)
 	PDB_PO_SELF_PROTECT pCurPolicy = (PDB_PO_SELF_PROTECT)t_DeployPolicyUtil->GetCurPoPtr(SS_POLICY_TYPE_SELF_PROTECT);
 	if(!pCurPolicy)
 	{
-		WriteLogE("[%s] set eps svc protect : not find current policy.", m_strLogicName.c_str());
+		UINT32 nPolID = t_DeployPolicyUtil->GetCurPoID(SS_POLICY_TYPE_SELF_PROTECT);
+		if(nPolID != 0)
+			WriteLogE("[%s] set eps svc protect : not find current policy. (%d)", m_strLogicName.c_str(), nPolID);
 		return -1;
 	}
 

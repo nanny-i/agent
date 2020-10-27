@@ -58,6 +58,8 @@ private:
 	pthread_mutex_t m_log_mutex;
 	char		m_acLogPath[MAX_PATH];
 	char		m_acLogFile[MAX_PATH];
+	char		m_acSrcPath[MAX_PATH];
+	char		m_acDstPath[MAX_PATH];
 	UINT32		m_nPreSearchLevel;
 	UINT32		GetPreSearchLevel(String strSearchPath);
 
