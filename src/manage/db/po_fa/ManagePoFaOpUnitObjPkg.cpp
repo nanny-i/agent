@@ -69,7 +69,8 @@ INT32					CManagePoFaOpUnitObjPkg::InitPkg()
 		PDB_PO_FA_OP_UNIT pdpfou = t_ManagePoFaOpUnit->FindItem(begin->second.tDPH.nPolicyID);
 		if(!pdpfou)
 		{
-			WriteLogE("not find po_fa_op_unit information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+			if(begin->second.tDPH.nPolicyID != 0)
+				WriteLogE("not find po_fa_op_unit information [%d]:po_id[%d]:[%d]", begin->second.tDPH.nPolicyID, begin->first, ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			continue;
 		}
 
@@ -85,7 +86,8 @@ INT32					CManagePoFaOpUnitObjPkg::GetHash(UINT32 nID, String& strOrgValue)
 	{
 		if( (pdpfouop = FindItem(nID)) == NULL)
 		{
-			WriteLogE("not find po_fa_op_unit_obj_pkg by hash : [%d]", ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
+			if(nID != 0)
+				WriteLogE("not find po_fa_op_unit_obj_pkg by hash : [%d]", ERR_INFO_NOT_OP_BECAUSE_NOT_FIND);
 			return ERR_INFO_NOT_OP_BECAUSE_NOT_FIND;
 		}
 	}
