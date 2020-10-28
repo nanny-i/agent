@@ -312,7 +312,7 @@ INT32	CFileUtil::GatherFileNameList(String strPrePath, String strAddPath, String
 		else
 		{
 			String strFileExtension = FindExtension((LPSTR)strFileName.c_str());
-			strFileExtension = _strlwr(strFileExtension.c_str());
+//			strFileExtension = _strlwr(strFileExtension.c_str());
 			if(strPassExtension.find(strFileExtension) == string::npos)
 			{
 				FF_GATHER_FILE_INFO gather_file_info;
@@ -349,8 +349,7 @@ INT32	CFileUtil::GetFileNameList(String strPrePath, String strAddPath, String st
 		return -1;
 	}
 
-//	strSkipName.MakeLower();
-	strSkipName = _strlwr(strSkipName.c_str());
+//	strSkipName = _strlwr(strSkipName.c_str());
 
 	dp = opendir(strFindDir.c_str());
 	if (dp == NULL)
@@ -371,7 +370,7 @@ INT32	CFileUtil::GetFileNameList(String strPrePath, String strAddPath, String st
 		{	
 			String strTempName = strFileName;
 //			strDirName.MakeLower();
-			strTempName = _strlwr(strTempName.c_str());
+//			strTempName = _strlwr(strTempName.c_str());
 			if(nSubSearch && strSkipName.find(strTempName) == string::npos)
 			{
 				String strSubAddPath;
@@ -397,7 +396,7 @@ INT32	CFileUtil::GetFileNameList(String strPrePath, String strAddPath, String st
 		{
 			String strFileExtension = FindExtension((LPSTR)strFileName.c_str());
 //			strFileExtension.MakeLower();
-			strFileExtension = _strlwr(strFileExtension.c_str());
+//			strFileExtension = _strlwr(strFileExtension.c_str());
 			if(strSkipName.find(strFileExtension) == string::npos)
 			{
 				FF_GATHER_FILE_INFO gather_file_info;
