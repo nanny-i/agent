@@ -342,7 +342,8 @@ INT32		CFindFileUtil::SearchDirFile(UINT32 nOrderID)
 	begin = find->second.begin();	end = find->second.end();
 	for(begin; begin != end; begin++)
 	{
-		strSR = _strlwr(begin->c_str());
+//		strSR = _strlwr(begin->c_str());
+		strSR = begin->c_str();
 		nLen = begin->length();
 		if(nLen < 2)
 			return -1;
@@ -372,7 +373,8 @@ INT32		CFindFileUtil::SearchDirFileThread(UINT32 nOrderID)
 	begin = find->second.begin();	end = find->second.end();
 	for(begin; begin != end; begin++)
 	{
-		strSR = _strlwr(begin->c_str());
+//		strSR = _strlwr(begin->c_str());
+		strSR = begin->c_str();
 		nLen = begin->length();
 		if(nLen < 1)
 		{
@@ -754,7 +756,7 @@ INT32		CFindFileUtil::AddFileMask(UINT32 nOrderID, LPCTSTR lpFileMask)
 	
 	strncpy(szFileExt, lpFileMask, MAX_PATH-3);
 	szFileExt[MAX_PATH-3] = 0;
-	_strlwr(szFileExt);
+//	_strlwr(szFileExt);
 	nFileLen = (INT32)strlen(szFileExt);
 	if(nFileLen < 1)
 		return -2;
@@ -819,7 +821,7 @@ INT32		CFindFileUtil::DelFileMask(UINT32 nOrderID, LPCTSTR lpFileMask)
 	begin = find->second.begin();	end = find->second.end();
 	for(begin; begin != end; )
 	{
-		if(_stricmp(begin->first.c_str(), szFileExt))
+		if(strcmp(begin->first.c_str(), szFileExt))
 		{
 			begin++;
 		}
@@ -941,7 +943,7 @@ INT32		CFindFileUtil::IsExistFileMaskByDFF(UINT32 nOrderID, String strFileFullNa
 	begin = find->second.begin();	end = find->second.end();
 	for(begin; begin != end; begin++)
 	{
-		if(!_stricmp(begin->second.c_str(), tADFI.szFmtType))
+		if(strcmp(begin->second.c_str(), tADFI.szFmtType) == 0)
 		{
 			return 1;
 		}
@@ -970,7 +972,7 @@ INT32		CFindFileUtil::AddExceptDir(UINT32 nOrderID, LPCTSTR lpDirPath)
 
 	strncpy(szDirPath, lpDirPath, MAX_PATH-1);
 	szDirPath[MAX_PATH-1] = 0;
-	_strlwr(szDirPath);
+//	_strlwr(szDirPath);
 	pExt = strrchr(szDirPath, '.');
 	if(pExt != NULL)
 		strFileMask = SPrintf("%s", pExt);
@@ -1015,7 +1017,7 @@ INT32		CFindFileUtil::DelExceptDir(UINT32 nOrderID, LPCTSTR lpDirPath)
 
 	strncpy(szDirPath, lpDirPath, MAX_PATH-1);
 	szDirPath[MAX_PATH-1] = 0;
-	_strlwr(szDirPath);
+//	_strlwr(szDirPath);
 	
 	pExt = strrchr(szDirPath, '.');
 	if(pExt != NULL)
@@ -1100,7 +1102,7 @@ INT32		CFindFileUtil::AddExceptDirFileMask(UINT32 nOrderID, LPCTSTR lpDirPathFil
 
 	strncpy(szDirPath, lpDirPathFileMask, MAX_PATH-1);
 	szDirPath[MAX_PATH-1] = 0;
-	_strlwr(szDirPath);
+//	_strlwr(szDirPath);
 
 	pExt = strrchr(szDirPath, '.');
 	if(pExt != NULL)
@@ -1141,7 +1143,7 @@ INT32		CFindFileUtil::DelExceptDirFileMask(UINT32 nOrderID, LPCTSTR lpDirPathFil
 		return -2;
 
 	strncpy(szDirPath, lpDirPathFileMask, MAX_PATH-1);
-	_strlwr(szDirPath);
+//	_strlwr(szDirPath);
 	pExt = strrchr(szDirPath, '.');
 	if(pExt != NULL)
 		strFileMask = SPrintf("%s", pExt);
@@ -1384,7 +1386,8 @@ INT32		CFindFileUtil::StringMatchSpec(LPCTSTR pszTarget, LPCTSTR pszSpec)
 			mp = pSpec;
 			cp = pTarget+1;
 		} 
-		else if (((TOLOWER(*pSpec) == TOLOWER(*pTarget)) && (*pSpec != '#')) || (*pSpec == '?') || ((*pSpec == '#') && isdigit(*pTarget))) 
+//		else if (((TOLOWER(*pSpec) == TOLOWER(*pTarget)) && (*pSpec != '#')) || (*pSpec == '?') || ((*pSpec == '#') && isdigit(*pTarget))) 
+		else if (((*pSpec == *pTarget) && (*pSpec != '#')) || (*pSpec == '?') || ((*pSpec == '#') && isdigit(*pTarget))) 
 		{
 			pSpec++;
 			pTarget++;
