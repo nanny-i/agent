@@ -136,14 +136,14 @@ INT32		CMainDlg::CreateLoadLibrary()
 			nRetVal = -5;
 			break;
 		}
-
+/*
 		t_DevInfoDLLUtil			= new CDEVINFODLLUtil();
 		if(t_DevInfoDLLUtil == NULL)
 		{
 			nRetVal = -6;
 			break;
 		}
-
+*/
 		t_LgnCltUtil				= new CCltSocketUtil();
 		if(t_LgnCltUtil == NULL)
 		{
@@ -1218,7 +1218,7 @@ INT32		CMainDlg::InitLoadLibrary()
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
 			return -18;
 		}
-
+/*
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_devinfo.so", t_EnvInfo->m_strDLLPath.c_str());
 		if(t_DevInfoDLLUtil)
 			nRetVal = t_DevInfoDLLUtil->LoadLibraryExt(szDLLName);
@@ -1227,7 +1227,7 @@ INT32		CMainDlg::InitLoadLibrary()
 			WriteLogE("fail to load library : [%s][%d]", szDLLName, nRetVal);
 			return -19;
 		}
-
+*/
 		snprintf(szDLLName, CHAR_MAX_SIZE-1, "%s/asi_cltsock.so", t_EnvInfo->m_strDLLPath.c_str());
 		if(t_LgnCltUtil)
 			nRetVal = t_LgnCltUtil->LoadLibraryExt(szDLLName);
@@ -1293,8 +1293,10 @@ INT32		CMainDlg::InitSubClass()
 	{
 		if(t_ProcInfoDLLUtil)
 			t_ProcInfoDLLUtil->Init();
+/*
 		if(t_DevInfoDLLUtil)
 			t_DevInfoDLLUtil->Init();
+*/
 	}
 
 	return 0;
@@ -1898,7 +1900,7 @@ INT32		CMainDlg::DeleteSubClass()
 //		SAFE_DELETE(t_ASIEPSAPPDLLUtil);
 //		SAFE_DELETE(t_ASIWENGDLLUtil);
 		SAFE_DELETE(t_ProcInfoDLLUtil);
-		SAFE_DELETE(t_DevInfoDLLUtil);
+//		SAFE_DELETE(t_DevInfoDLLUtil);
 	}
 
 	{
