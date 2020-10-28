@@ -87,7 +87,8 @@ INT32		CManagePoFaInotifyFile::FindID(char *pPath)
 	for(begin; begin != end; begin++)
 	{
 		pLogNotify = &(begin->second);
-		if(!_stricmp(pLogNotify->strNotifyFilePath.c_str(), pPath))
+//		if(!_stricmp(pLogNotify->strNotifyFilePath.c_str(), pPath))
+		if(!strcmp(pLogNotify->strNotifyFilePath.c_str(), pPath))
 			return pLogNotify->nID;
 	}
 	return -2;
