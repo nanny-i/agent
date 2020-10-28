@@ -156,9 +156,12 @@ INT32					CManageLogRsBk::IsExistLogRsBk(DB_LOG_RS_BK&	data)
 		if(nChkDay != nCurDay)			continue;
 
 		//if(difftime(GetCurrentDateTimeInt(), begin->second.nRegDate) > (TIMER_INTERVAL_TIME_DAY * 30))	break;
-
+/*
 		if(!_stricmp(begin->second.strObjectPath.c_str(), data.strObjectPath.c_str()) && 
 			!_stricmp(begin->second.strObjectName.c_str(), data.strObjectName.c_str()))
+*/
+		if(!strcmp(begin->second.strObjectPath.c_str(), data.strObjectPath.c_str()) && 
+			!strcmp(begin->second.strObjectName.c_str(), data.strObjectName.c_str()))
 		{
 			return begin->second.nID;
 		}

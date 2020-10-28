@@ -173,8 +173,8 @@ void		CLogicMgrLogRsBk::SetLogRsBk(DB_LOG_RS_BK& data)
 	}
 
 	{
-		data.strObjectName = _strlwr(data.strObjectName.c_str());
-		data.strObjectPath = _strlwr(data.strObjectPath.c_str());
+//		data.strObjectName = _strlwr(data.strObjectName.c_str());
+//		data.strObjectPath = _strlwr(data.strObjectPath.c_str());
 		if(data.nRegDate == 0)	data.nRegDate = GetCurrentDateTimeInt();
 	}
 	
