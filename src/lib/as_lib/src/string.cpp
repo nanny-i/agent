@@ -416,7 +416,8 @@ INT32 StrMatchSpec(LPCTSTR pszTarget, LPCTSTR pszSpec)
 			mp = (LPTSTR)pszSpec;
 			cp = (LPTSTR)(pszTarget+1);
 		}
-		else if (((TOLOWER(*pszSpec) == TOLOWER(*pszTarget)) && (*pszSpec != '#')) || (*pszSpec == '?') || ((*pszSpec == '#') && isdigit(*pszTarget)))
+//		else if (((TOLOWER(*pszSpec) == TOLOWER(*pszTarget)) && (*pszSpec != '#')) || (*pszSpec == '?') || ((*pszSpec == '#') && isdigit(*pszTarget)))
+		else if (((*pszSpec == *pszTarget) && (*pszSpec != '#')) || (*pszSpec == '?') || ((*pszSpec == '#') && isdigit(*pszTarget)))
 		{
 			pszSpec++;
 			pszTarget++;
