@@ -131,7 +131,8 @@ BOOL CThreadPoFaOp::IsNotifyPathWithPath(char *pPath)
 	for (; begin != end; begin++)
 	{
 		pFindPath = &(begin->second);
-		if(!_stricmp(pFindPath->acNotifyPath, pPath))
+//		if(!_stricmp(pFindPath->acNotifyPath, pPath))
+		if(!strcmp(pFindPath->acNotifyPath, pPath))
 		{
 			pthread_mutex_unlock (&m_NotifyMutex);
 			return TRUE;
@@ -171,7 +172,8 @@ BOOL CThreadPoFaOp::ModNotifyPath(PNOTIFY_PATH pNotifyPath)
 		for (; begin != end; begin++)
 		{
 			pFindPath = &(begin->second);
-			if(!_stricmp(pFindPath->acNotifyPath, pNotifyPath->acNotifyPath))
+//			if(!_stricmp(pFindPath->acNotifyPath, pNotifyPath->acNotifyPath))
+			if(!strcmp(pFindPath->acNotifyPath, pNotifyPath->acNotifyPath))
 			{
 				pFindPath->nOrderID = pNotifyPath->nOrderID;
 				pFindPath->nExtOption = pNotifyPath->nExtOption;
@@ -234,7 +236,8 @@ BOOL CThreadPoFaOp::GetNotifyPath(PNOTIFY_PATH pNotifyPath)
 		for (; begin != end; begin++)
 		{
 			pFindPath = &(begin->second);
-			if(!_stricmp(pFindPath->acNotifyPath, pNotifyPath->acNotifyPath))
+//			if(!_stricmp(pFindPath->acNotifyPath, pNotifyPath->acNotifyPath))
+			if(!strcmp(pFindPath->acNotifyPath, pNotifyPath->acNotifyPath))
 			{
 				memcpy(pNotifyPath, pFindPath, sizeof(NOTIFY_PATH));
 				pthread_mutex_unlock (&m_NotifyMutex);
