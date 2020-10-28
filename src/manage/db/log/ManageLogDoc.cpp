@@ -155,7 +155,8 @@ INT32					CManageLogDoc::IsExistLogDoc(DB_LOG_DOC&	dld)
 		//if(difftime(GetCurrentDateTimeInt(), begin->second.nRegDate) > (TIMER_INTERVAL_TIME_DAY * 30))	break;
 
 //		if(begin->second.strObjectPath.CompareNoCase(dld.strObjectPath) == 0 && begin->second.strObjectName.CompareNoCase(dld.strObjectName) == 0)
-		if(!_stricmp(begin->second.strObjectPath.c_str(), dld.strObjectPath.c_str()) && !_stricmp(begin->second.strObjectName.c_str(), dld.strObjectName.c_str()))		
+//		if(!_stricmp(begin->second.strObjectPath.c_str(), dld.strObjectPath.c_str()) && !_stricmp(begin->second.strObjectName.c_str(), dld.strObjectName.c_str()))
+		if(!strcmp(begin->second.strObjectPath.c_str(), dld.strObjectPath.c_str()) && !strcmp(begin->second.strObjectName.c_str(), dld.strObjectName.c_str()))
 		{
 			return begin->second.nID;
 		}
@@ -186,7 +187,8 @@ INT32					CManageLogDoc::IsExistLogDocByBkName(String strBkName, UINT32 nChkRmTi
 		if(nChkBkTime && !begin->second.nBackupTime)	continue;
 
 //		if(strBkName.CompareNoCase(begin->second.strBkFileName) == 0)
-		if(!_stricmp(strBkName.c_str(), begin->second.strBkFileName.c_str()))
+//		if(!_stricmp(strBkName.c_str(), begin->second.strBkFileName.c_str()))
+		if(!strcmp(strBkName.c_str(), begin->second.strBkFileName.c_str()))
 		{
 			return begin->second.nID;
 		}
