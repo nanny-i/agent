@@ -1,0 +1,15 @@
+language: cpp
+before_script:
+- sudo apt-get install libboost-test-dev -y
+script:
+- cmake .
+- cmake --build .
+- cmake --build . --target test
+- cmake --build . --target package
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+  - curl -T helloworld-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -u artbataev:$BINTRAY_API_KEY "https://api.bintray.com/content/vladimirbataev/helloworld_cpp/cpp-hello-world-artbataev/$TRAVIS_BUILD_NUMBER/helloworld-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
+  on:
+    branch: master
