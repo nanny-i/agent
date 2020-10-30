@@ -27,8 +27,8 @@
 
 void PrintUsage()
 {
-	printf("usage: makehash directory\n");
-	printf("ex. makehash /usr/local/ashini/nanny\n");
+	printf("usage : makehash directory\n");
+	printf("ex    : makehash /usr/local/ashin/nanny\n");
 }
 
 int MakeModuleHashFromDir(const char* pcRootDir, char *pcCurDir, FILE* fRes)
