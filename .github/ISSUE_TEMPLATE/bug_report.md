@@ -1,38 +1,28 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+
+일감제목 : ''
+일감유형 : ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**현상**
+ - *[오류가 발생하는 현상에 대해서 자세히 기술합니다.]*
+ - *[특히, 특정 정책의 영향이 있는 경우 정책의 설정에 대해서도 자세히 기술합니다.]*
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**시스템환경**
+ - 운영체제 : [e.g. ubuntu 18.4]
+ - 서버버전 : [e.g. v2.0.0.14]
+ - 에이전트 : [e.g. v2.0.0.7]
+ - 발생범위 : [e.g. 전체, 특정PC, 특정OS]
+ - 발생일시 : [e.g. 2020년 10월 21일 17시 40분]
+ 
+**확인사항**
+ - *[기술지원에서 확인한 사항, 테스트(재연) 방법에 대해서 자세히 기술합니다.]*
+ - *[기술지원의 확인이 없는 경우 요청 처리가 늦어질 수 있습니다.]*
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+**추가정보**
+ - 스크린 캡쳐 or 스마트폰 영상
+ - 오류가 발생한 서버, 에이전트의 로그, db (반드시 첨부, 첨부 불가 시 사유 적을 것)
+ - 덤프 발생 시 덤프 파일 포함
+ - 로그 경로
+ - 기타 오류 분석에 필요한 자료
