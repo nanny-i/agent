@@ -27,14 +27,14 @@ void daemon_init(void)
 	pid_t  pid;
 	if ( (pid = fork()) == -1)
 	{
-		exit(0);
+		exit(1);
 
 	}
 
 	/* parent terminate */
 	if (pid != 0)
 	{
-		exit(0);
+		exit(2);
 	}
 
 	/* become session leader */
@@ -44,7 +44,7 @@ void daemon_init(void)
 
 	if ( (pid = fork()) == -1)
 	{
-		exit(0);
+		exit(3);
 	}
 
 	/* 1st child terminate */
@@ -63,6 +63,5 @@ void daemon_init(void)
 	{
 		close(i);
 	}
+	exit(0);
 }
-
-
