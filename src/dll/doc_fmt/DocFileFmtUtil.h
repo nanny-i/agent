@@ -44,8 +44,6 @@ protected:
 	INT32 CheckDocumentFile(char *pcFilePath, char *acLogMsg);
 	INT32 CheckFileExtAnalysis(char *pcFilePath, INT32 *pnFileFmtType);
 	INT32 CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType);
-
-protected:
 	INT32	ConvertFmtTypeToName(PASI_DFILE_FMT_INFO pADFFI);
 
 
@@ -108,6 +106,7 @@ protected:
 	INT32 m_n_odb_Known_Count;
 	INT32 m_n_odg_Known_Count;
 	INT32 m_n_user_define_Count;
+	pthread_mutex_t m_mutex;
 };
 
 #endif /*_ASI_FIND_DOCF_H__*/

@@ -84,23 +84,30 @@ CDocFileFmtUtil::CDocFileFmtUtil(void)
 	m_n_odg_Known_Count = 0;
 	m_n_user_define_Count = 0;
 
-	m_n_ods_Office_Count = 0; 
+	m_n_ods_Office_Count = 0;
+	pthread_mutex_init(&m_mutex, NULL);
 }
 //-----------------------------------------------------------------------------------------------
 
 
 CDocFileFmtUtil::~CDocFileFmtUtil(void)
 {
+	pthread_mutex_destroy(&m_mutex);
 }
 
 //-----------------------------------------------------------------------------------------------
 
 INT32 CDocFileFmtUtil::ProcAnalysis(PASI_DFILE_FMT_INFO pADFFI, char *acLogMsg)
 {
+	INT32 nRetVal = 0;
 	if(pADFFI == NULL)
 		return -1;
 
-	return SetSearchFileList(pADFFI, acLogMsg);
+	pthread_mutex_lock (&m_mutex);
+	nRetVal = SetSearchFileList(pADFFI, acLogMsg);
+	pthread_mutex_unlock(&m_mutex);
+
+	return nRetVal;
 }
 //-----------------------------------------------------------------------------------------------
 

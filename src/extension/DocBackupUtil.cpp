@@ -281,27 +281,27 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 		}
 
 		nDelTime = GetTickCount();
+
 		t_FileDeleteUtil->SecureDeleteFile(strFullPath.c_str(), nDelMethod,  nDelCnt, TRUE, TRUE, nLimitSize, nLimitDelCnt);
-		WriteLogN("doc del file : opt[%u]:[%s]", GetTickCount() - nDelTime, strFullPath.c_str());
 
 		if(tFileUtil.FileExists(strFullPath.c_str()) == TRUE)
 		{
 			//if(unlink(strFullPath.c_str()) == -1)
 			{
-				if(nRemainLog)
-					WriteLogN("[%s] doc file delete fail : [%d]:[%d][%s]", m_strUtilName.c_str(), errno, nDelCnt, strFullPath.c_str());
+				WriteLogE("[%s] fail to delete %s", m_strUtilName.c_str(), strFullPath.c_str());
 				if(t_LogicMgrPoFaDelFileAfterBoot)
 					t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(strFullPath.c_str());
 			}
 		}
-		WriteLogN("[%s] doc file delete success : [%s]", m_strUtilName.c_str(), strFullPath.c_str());
+		else
+		{
+			WriteLogN("[%s] success to delete %s", m_strUtilName.c_str(), strFullPath.c_str());
+		}
 	}
 	else
 	{
 		strBkFileName = SPrintf("%s_%u", pdld->strObjectName.c_str(), GetTickCount());
 		strBkFilePath = SPrintf("%s/%s", strBkDir.c_str(), strBkFileName.c_str());
-
-		WriteLogA("[%s] doc file delete start: [%d][%s]:[%s]", m_strUtilName.c_str(), nRtn, strFullPath.c_str(), strBkFilePath.c_str());
 
 		pdld->nRemoveTime = t_ValidTimeUtil->GetValidTime();
 
@@ -310,13 +310,15 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 		{
 			//if(unlink(strFullPath.c_str()) == -1)
 			{
-				if(nRemainLog)
-					WriteLogN("[%s] doc file delete fail : [%d]:[%d][%s]", m_strUtilName.c_str(), errno, nDelCnt, strFullPath.c_str());
+				WriteLogE("[%s] fail to delete %s", m_strUtilName.c_str(), strFullPath.c_str());
 				if(t_LogicMgrPoFaDelFileAfterBoot)
 					t_LogicMgrPoFaDelFileAfterBoot->InsertDelFileInfo(strFullPath.c_str());
 			}
 		}
+		else
+			WriteLogN("[%s] success to delete %s", m_strUtilName.c_str(), strFullPath.c_str());
         t_ManageDocDeleteInfo->DocDeleteCount(pdld->nOpType);
+		
 	}
 
 	m_tBkMutex.UnLock();

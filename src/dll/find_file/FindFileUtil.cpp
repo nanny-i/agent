@@ -577,6 +577,8 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 					tAFFI.strFileName	= strFileNameA;
 					tAFFI.nFindType		= nMatchType;
 
+					WriteLog( "[Info] [Recursive_SearchDir] find to file %s/%s (%d)", tAFFI.strFilePath.c_str(), tAFFI.strFileName.c_str(), nMatchType);
+
 					tFindFileItemList->push_back(tAFFI);
 					if(tFindFileItemList->size() == 10)
 					{
@@ -1711,6 +1713,7 @@ INT32		CFindFileUtil::AddFindFileItemList(UINT32 nOrderID, UINT32 nSearchDirNum,
 	tMutexExt->Lock();
 	if(pAFFI)
 	{
+		WriteLog( "[Info] [AddFindFileItemList2] add to file %s/%s (%d)", pAFFI->strFilePath.c_str(), pAFFI->strFileName.c_str(), pAFFI->nFindType);
 		pSFFW->tFFIList.push_back(*pAFFI);
 		pSFFW->nFileTotalNum += 1;
 	}
@@ -1756,6 +1759,8 @@ INT32		CFindFileUtil::GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFI, 
 			
 			pAFFI[nIdx].nFileSize = begin->nFileSize;
 			pAFFI[nIdx].nFindType = begin->nFindType;
+
+			WriteLog("[GetFindFileItem] [%02d] get to file %s/%s (%d)", nIdx, pAFFI[nIdx].szFilePath, pAFFI[nIdx].szFileName, pAFFI[nIdx].nFileSize);
 
 			pSFFW->tFFIList.erase(begin++);
 			pSFFW->nFileWorkedNum += 1;

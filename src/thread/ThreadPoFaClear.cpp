@@ -141,7 +141,7 @@ INT32		CThreadPoFaClear::ChkScanFileList()
 				}
 				default:
 				{
-					WriteLogA("[%s] find file default case value : [%d]", m_strThreadName.c_str(), nRet);
+					WriteLogN("[%s] find file default case value : [%d]", m_strThreadName.c_str(), nRet);
 				}
 			}
 		}
@@ -180,7 +180,7 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 
 	if(tAFFR.nContinue == 0 && tAFFR.nMoreFileItem == 0)  
 	{
-		WriteLogA("[%s] find file work end : [%d][%d:%d]", m_strThreadName.c_str(), pMFOI->nID, tAFFR.nFileWorkedNum, tAFFR.nFileTotalNum);
+		WriteLogN("[%s] find file work end : [%d][%d:%d]", m_strThreadName.c_str(), pMFOI->nID, tAFFR.nFileWorkedNum, tAFFR.nFileTotalNum);
 		if(pMainDlg != NULL)
 		{
 			pMainDlg->OnThreadPoFaClearEnd(G_TYPE_PO_FA_CLEAR_UNIT, pMFOI);
@@ -208,7 +208,7 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 
 	if(!nAFFINum)
 	{
- 		WriteLogA("[%s] find file working: [%d][%d:%d]:[%d:%d]-[%d:%d]-[%d:%d]-[%d:%d]", 
+ 		WriteLogN("[%s] find file working: [%d][%d:%d]:[%d:%d]-[%d:%d]-[%d:%d]-[%d:%d]", 
  													m_strThreadName.c_str(), pMFOI->nID, 
  													tAFFR.nContinue, tAFFR.nMoreFileItem,
  													tAFFR.nSearchPathNum, tAFFR.nSearchedPathNum,
@@ -254,8 +254,7 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 		pkt_data.hdr.type = G_TYPE_LOG_DOC;
 		pkt_data.hdr.code = UINT16(pMFOI->nNextOp);
 
-	
-		WriteLogA("[%s] send message : [%x]", m_strThreadName.c_str(), t_EnvInfoOp->GetMainHandle());
+		WriteLogN("[%s] [%02d] send message : %s", m_strThreadName.c_str(), nIdx, strObjectFullPath.c_str());
 		if(pMainDlg != NULL)
 		{
 			nRetVal = pMainDlg->OnKernelFileLog(ASI_EPS_APP_LOG_TYPE_DOC, &pkt_data);
