@@ -27,14 +27,14 @@ void daemon_init(void)
 	pid_t  pid;
 	if ( (pid = fork()) == -1)
 	{
+		fprintf(stdout, "fail to fork (%d).\n", errno);
 		exit(1);
-
 	}
 
 	/* parent terminate */
 	if (pid != 0)
 	{
-		exit(2);
+		exit(0);
 	}
 
 	/* become session leader */
@@ -44,6 +44,7 @@ void daemon_init(void)
 
 	if ( (pid = fork()) == -1)
 	{
+		fprintf(stdout, "fail to fork (%d).\n", errno);
 		exit(3);
 	}
 
