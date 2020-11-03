@@ -63,5 +63,4 @@ void daemon_init(void)
 	{
 		close(i);
 	}
-	exit(0);
 }
