@@ -52,7 +52,8 @@ int make_daemon(void)
 	}
 
 	ret = check_proc_exist_by_name(NANNY_AGENT_IDENT, getpid());
-	if (ret == 1) {
+	if (ret == 1)
+	{
 		fprintf(stdout, "nanny agent daemon is already running.\n\n");
 		return -2;
 	}
@@ -110,6 +111,7 @@ int set_opt(int argc, char *argv[])
 
 int main(int argc, char* argv[])
 {
+	int nRetVal = 0;
 	struct sigaction sigact;
 
 	if(argc > 1)
@@ -121,8 +123,10 @@ int main(int argc, char* argv[])
 	}
 
 #ifdef MAKE_DAEMON
-	if (make_daemon() != 0)
+	nRetVal = make_daemon();
+	if (nRetVal != 0)
 	{
+		fprintf(stdout, "fail to make daemon (%d).\n", nRetVal);
 		exit(2);
 	}
 #endif

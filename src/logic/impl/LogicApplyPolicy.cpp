@@ -397,7 +397,7 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 {
 	INT32 nRetVal = 0;
 	{
-		MemToken SendToken(1000);
+		MemToken SendToken(2048);
 		if(t_ManageEnvSelfProtectAgt->Count())
 		{		
 			t_ManageEnvSelfProtectAgt->SetPkt(SendToken);
@@ -802,7 +802,7 @@ INT32		CLogicApplyPolicy::SetEPSDrvPolicy()
 
 INT32		CLogicApplyPolicy::SetEPSDrvPolicy_PoDv()
 {
-	MemToken SendToken(1000);
+	MemToken SendToken(2048);
 
 	do
 	{		

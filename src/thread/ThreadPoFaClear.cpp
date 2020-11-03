@@ -221,7 +221,7 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 	DB_LOG_DOC tDLD;
 	String strObjectFullPath;
 	PKT_DATA pkt_data;
-	MemToken SendToken(1024);
+	MemToken SendToken(2048);
 	UINT32 nIdx = 0;
 	while(nIdx < nAFFINum && GetContinue())
 	{
@@ -244,7 +244,6 @@ INT32		CThreadPoFaClear::ChkScanFile(PMEM_FIND_ORDER_INFO pMFOI)
 
 		tDLD.nOpType		= pMFOI->nOpType;
 		tDLD.nPolicyType	= (pMFOI->nPoID ? pMFOI->nPoID : pMFOI->nID) + ASI_EPS_APP_POLICY_GROUP_ID_FA_CLEAR;
-
 		
 		SendToken.TokenAdd_32(ERR_SUCCESS);
 		t_ManageLogDoc->SetPkt_Link(&tDLD, SendToken);

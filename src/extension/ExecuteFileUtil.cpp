@@ -928,7 +928,7 @@ INT32		CExecuteFileUtil::ExecuteFileByUser(ASI_TS_INFO& tATI, ASI_TS_MGR_PARAM& 
 	{
 		UINT32 nExistMode = 0, nProID = 0;
 		String strExeName;
-		char szExeName[MAX_FILE_NAME] = {0,};
+		char szExeName[MAX_HBUFF] = {0,};
 
 		if(tATMP.nTSWaitMode == TS_EXCUTE_WAIT_MODE_EXCUTE_PROC || tATMP.nTSWaitMode == TS_EXCUTE_WAIT_MODE_EXCUTE_PROC_CHILD)
 		{
@@ -938,8 +938,9 @@ INT32		CExecuteFileUtil::ExecuteFileByUser(ASI_TS_INFO& tATI, ASI_TS_MGR_PARAM& 
 				if(tATMP.nTSWaitMode == 3 && nProID)
 				{
 
-					if(get_basename((char *)tATMP.strTSChildPath.c_str(), szExeName, MAX_FILE_NAME-1) != NULL)
+					if(get_basename((char *)tATMP.strTSChildPath.c_str(), szExeName, MAX_HBUFF-1) != NULL)
 					{
+						szExeName[MAX_HBUFF-1] = 0;
 						strExeName = szExeName;
 						nProID = m_tProcUtil.GetChildProcessID(nProID, strExeName);
 					}

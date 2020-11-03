@@ -272,7 +272,7 @@ INT32		CCompUtil::CompressFileAndSave(LPCSTR lpFileName, LPCSTR lpSaveDir, LPCST
 	INT32 nLen = 0;
 	String strSaveName;
 	CFileUtil tFileUtil;
-	CHAR	acCompFileName[MAX_FILE_NAME] = {0, };
+	CHAR	acCompFileName[MAX_HBUFF] = {0, };
 
 	CompMemToken	tSaveToken(100000000);
 
@@ -322,12 +322,13 @@ INT32		CCompUtil::CompressFileAndSave(LPCSTR lpFileName, LPCSTR lpSaveDir, LPCST
 	if(tFileUtil.FileExists(strSaveName.c_str()) == TRUE)	
 		unlink(strSaveName.c_str());	
 
-	if(get_basename((char *)lpFileName, (char *)acCompFileName, MAX_FILE_NAME-1) == NULL)
+	if(get_basename((char *)lpFileName, (char *)acCompFileName, MAX_HBUFF-1) == NULL)
 	{
 		safe_free(lpBuf);
 		safe_free(lpOutBuf);
 		return -6;
-	}	
+	}
+	acCompFileName[MAX_HBUFF-1] = 0;
 
 	CompMemToken tCompHeadToken(1);
 
@@ -495,7 +496,7 @@ INT32		CCompUtil::CompressBufferAndBuffer(BYTE* lpInBuffer, INT32 nLen, LPCSTR l
 {	
 	INT32	nOutLen = 0;
 	PVOID	lpOutBuf = NULL;
-	CHAR	acCompFileName[MAX_FILE_NAME] = {0, };
+	CHAR	acCompFileName[MAX_HBUFF] = {0, };
 
 	if(lpInBuffer == NULL || nLen < 1 || lpOutBuffer == NULL || lpAbsoluteFileName == NULL || lpRelativeFilePath == NULL)
 		return -1;
@@ -526,11 +527,12 @@ INT32		CCompUtil::CompressBufferAndBuffer(BYTE* lpInBuffer, INT32 nLen, LPCSTR l
 
 	CompMemToken tSaveToken(100000000);
 	
-	if(get_basename((char *)lpAbsoluteFileName, (char *)acCompFileName, MAX_FILE_NAME-1) == NULL)
+	if(get_basename((char *)lpAbsoluteFileName, (char *)acCompFileName, MAX_HBUFF-1) == NULL)
 	{
 		safe_free(lpOutBuf);
 		return -4;
 	}
+	acCompFileName[MAX_HBUFF-1] = 0;
 
 	tSaveToken.TokenAdd_String(lpRelativeFilePath);
 	tSaveToken.TokenAdd_String(acCompFileName);
@@ -562,7 +564,7 @@ INT32		CCompUtil::CompressFileAndBuffer(LPCSTR lpRelativeFilePath, LPCSTR lpAbso
 	INT32 nOutLen = 0;
 	PVOID lpBuf = NULL;
 	PVOID lpOutBuf = NULL;
-	CHAR	acCompFileName[MAX_FILE_NAME] = {0, };
+	CHAR	acCompFileName[MAX_HBUFF] = {0, };
 
 	if(lpRelativeFilePath == NULL || lpAbsoluteFileName == NULL || lpOutBuffer == NULL)
 		return -1;
@@ -607,11 +609,12 @@ INT32		CCompUtil::CompressFileAndBuffer(LPCSTR lpRelativeFilePath, LPCSTR lpAbso
 
 	CompMemToken tSaveToken(100000000);
 
-	if(get_basename((char *)lpAbsoluteFileName, (char *)acCompFileName, MAX_FILE_NAME-1) == NULL)
+	if(get_basename((char *)lpAbsoluteFileName, (char *)acCompFileName, MAX_HBUFF-1) == NULL)
 	{
 		safe_free(lpOutBuf);
 		return -6;
 	}
+	acCompFileName[MAX_HBUFF-1] = 0;
 
 	tSaveToken.TokenAdd_String(lpRelativeFilePath);
 	tSaveToken.TokenAdd_String(acCompFileName);

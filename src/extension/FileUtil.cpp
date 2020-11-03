@@ -1053,16 +1053,17 @@ String		CFileUtil::GetNewFileName(String strFileFullName, INT32 nOrUsed, String 
 {
 	String strFilePath, strFileName;
 	CHAR szFilePath[CHAR_MAX_SIZE] = {0, };
-	char szFileName[MAX_FILE_NAME] = {0,};
+	char szFileName[MAX_HBUFF] = {0,};
 
 	strncpy(szFilePath, strFileFullName.c_str(), CHAR_MAX_SIZE-1);
 	szFilePath[CHAR_MAX_SIZE-1] = 0;
 
-	if(get_basename(szFilePath, szFileName, MAX_FILE_NAME-1) != NULL)
+	if(get_basename(szFilePath, szFileName, MAX_HBUFF-1) != NULL)
 	{
+		szFileName[MAX_HBUFF-1] = 0;
 		strFileName = szFileName;
 	}
-	if(get_basename(szFilePath, szFilePath, CHAR_MAX_SIZE-1) != NULL)
+	if(get_dirname(szFilePath, szFilePath, CHAR_MAX_SIZE-1) != NULL)
 	{
 		strFilePath = szFilePath;
 	}

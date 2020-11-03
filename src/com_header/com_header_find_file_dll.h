@@ -69,18 +69,18 @@ typedef struct _asi_ff_file_item
 {
 	_asi_ff_file_item()
 	{
-		memset(szFilePath, 0, MAX_PATH);
-		memset(szFileName, 0, MAX_PATH);
+		memset(szFilePath, 0, CHAR_MAX_SIZE);
+		memset(szFileName, 0, MAX_HBUFF);
 
-		memset(wzFilePath, 0, sizeof(WCHAR)*MAX_PATH);
-		memset(wzFileName, 0, sizeof(WCHAR)*MAX_PATH);
+//		memset(wzFilePath, 0, sizeof(WCHAR)*MAX_PATH);
+//		memset(wzFileName, 0, sizeof(WCHAR)*MAX_PATH);
 
 		nFileSize		= 0;
 	}
-	CHAR		szFilePath[MAX_PATH];
-	CHAR		szFileName[MAX_PATH];
-	WCHAR		wzFilePath[MAX_PATH];
-	WCHAR		wzFileName[MAX_PATH];
+	CHAR		szFilePath[CHAR_MAX_SIZE];
+	CHAR		szFileName[MAX_HBUFF];
+//	WCHAR		wzFilePath[MAX_PATH];
+//	WCHAR		wzFileName[MAX_PATH];
 	UINT64		nFileSize;
 	UINT32		nFindType;
 }ASI_FF_FILE_ITEM, *PASI_FF_FILE_ITEM;

@@ -1748,14 +1748,14 @@ INT32		CFindFileUtil::GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFI, 
 		begin = pSFFW->tFFIList.begin();	end = pSFFW->tFFIList.end();
 		for(begin; begin != end && (*nBufNum) > nIdx; )
 		{
-			strncpy(pAFFI[nIdx].szFilePath, begin->strFilePath.c_str(), MAX_PATH-1);
-			pAFFI[nIdx].szFilePath[MAX_PATH-1] = '\0';
-			strncpy(pAFFI[nIdx].szFileName, begin->strFileName.c_str(), MAX_PATH-1);
-			pAFFI[nIdx].szFileName[MAX_PATH-1] = '\0';
-			mbstowcs((wchar_t*)pAFFI[nIdx].wzFilePath, pAFFI[nIdx].szFilePath, MAX_PATH-1);
-			pAFFI[nIdx].wzFilePath[MAX_PATH-1] = L'\0';
-			mbstowcs((wchar_t*)pAFFI[nIdx].wzFileName, pAFFI[nIdx].szFileName, MAX_PATH-1);
-			pAFFI[nIdx].wzFileName[MAX_PATH-1] = L'\0';
+			strncpy(pAFFI[nIdx].szFilePath, begin->strFilePath.c_str(), CHAR_MAX_SIZE-1);
+			pAFFI[nIdx].szFilePath[CHAR_MAX_SIZE-1] = '\0';
+			strncpy(pAFFI[nIdx].szFileName, begin->strFileName.c_str(), MAX_HBUFF-1);
+			pAFFI[nIdx].szFileName[MAX_HBUFF-1] = '\0';
+//			mbstowcs((wchar_t*)pAFFI[nIdx].wzFilePath, pAFFI[nIdx].szFilePath, MAX_PATH-1);
+//			pAFFI[nIdx].wzFilePath[MAX_PATH-1] = L'\0';
+//			mbstowcs((wchar_t*)pAFFI[nIdx].wzFileName, pAFFI[nIdx].szFileName, MAX_PATH-1);
+//			pAFFI[nIdx].wzFileName[MAX_PATH-1] = L'\0';
 			
 			pAFFI[nIdx].nFileSize = begin->nFileSize;
 			pAFFI[nIdx].nFindType = begin->nFindType;

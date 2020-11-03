@@ -437,7 +437,7 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 
 	memset(pNotifyPath, 0, sizeof(NOTIFY_PATH )*nListCount);
 
-	pFileName = (PCHAR)malloc(MAX_FILE_NAME);
+	pFileName = (PCHAR)malloc(MAX_HBUFF);
 	if(pFileName == NULL)
 	{
 		safe_free(pNotifyPath);
@@ -454,7 +454,7 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 	for(i=0; i<nListCount; i++)
 	{
 		memset(&stDbLogDoc, 0, sizeof(stDbLogDoc));
-		memset(pFileName, 0, MAX_FILE_NAME);
+		memset(pFileName, 0, MAX_HBUFF);
 
 		nFileFormat = 0;
 
@@ -478,10 +478,11 @@ INT32		CLogicMgrLogDoc::ChkBackupOp(UINT32 nDelMethod, UINT32 nDelCnt, UINT32 nL
 			stDbLogDoc.nFileCrTime = stDbLogDoc.nFileMdTime = stDbLogDoc.nFileAcTime = 0;
 		}
 
-		if(get_basename(pNotifyPath[i].acNotifyPath, pFileName, MAX_FILE_NAME-1) == NULL)
+		if(get_basename(pNotifyPath[i].acNotifyPath, pFileName, MAX_HBUFF-1) == NULL)
 		{
 			continue;
 		}
+		pFileName[MAX_HBUFF-1] = 0;
 		if(get_dirname(pNotifyPath[i].acNotifyPath, pNotifyPath[i].acNotifyPath, CHAR_MAX_SIZE-1) == NULL)
 		{
 			continue;

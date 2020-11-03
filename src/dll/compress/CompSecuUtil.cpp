@@ -289,7 +289,7 @@ INT32		CCompSecuUtil::CompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 	INT32 nRetVal = 0;
 	DWORD dwSize = 0;
 	DWORD dwMode = 0666;
-	CHAR acCompFileName[MAX_FILE_NAME] = {0, };
+	CHAR acCompFileName[MAX_HBUFF] = {0, };
 	ASI_COMP_SECU tACS;
 	ASI_COMP_SECU_FILE_HDR tACSFH;
 	if(pACS == NULL)
@@ -310,11 +310,12 @@ INT32		CCompSecuUtil::CompFile(PASI_COMP_SECU pACS, UINT32 nSize)
 	}
 
 	do{
-		if(get_basename(tACS.acSrcFile, acCompFileName, MAX_FILE_NAME-1) == NULL)
+		if(get_basename(tACS.acSrcFile, acCompFileName, MAX_HBUFF-1) == NULL)
 		{
 			nRetVal = -4;
 			break;
 		}
+		acCompFileName[MAX_HBUFF-1] = 0;
 		if(get_file_size(tACS.acSrcFile, &dwSize, &dwMode) != 0)
 		{
 			nRetVal = -5;
