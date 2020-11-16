@@ -35,4 +35,9 @@ void	Decript_Log(UINT32	key, PBYTE SrcData,	INT32 SrcLen);
 void	WriteLog_Enc(LPTSTR lpLog, FILE* fp);
 void	SetLogSKey(UINT32 nSKey);
 
+#ifdef _PERP_TEST_LOG
+void	WritePerfTest3Log(char* fmt,...);
+void	WritePerfTest4Log(char* fmt,...);
+void	WritePerfTest5Log(char* fmt,...);
+#endif /*_PERP_TEST_LOG*/
 #endif

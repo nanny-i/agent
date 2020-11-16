@@ -307,4 +307,119 @@ void	SetLogFileInfo(LPSTR lpLogPath, LPSTR lpLogName, INT32 nRmLog, UINT32 nFile
 	if(lpLogName != NULL && lpLogName[0] != 0)
 		strncpy(g_acLogFileName, lpLogName, MAX_PATH-1);
 }
+
+#ifdef _PERP_TEST_LOG
+void	WritePerfTest3Log(char* fmt,...)
+{
+	FILE *fp = NULL;
+	va_list args;
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+
+	g_MutexLog.Lock();
+	do{
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(g_acLogFilePath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(g_acLogFilePath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		snprintf(acSaveFile, MAX_PATH-1, "%s/nanny_perf_test3_log_%s.txt", g_acLogFilePath, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
+		va_start(args,fmt);
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		va_end(args);
+		fprintf(fp, "%s\t[TC3]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	g_MutexLog.UnLock();
+}
+
+void	WritePerfTest4Log(char* fmt,...)
+{
+	FILE *fp = NULL;
+	va_list args;
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+
+	g_MutexLog.Lock();
+	do{
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(g_acLogFilePath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(g_acLogFilePath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		snprintf(acSaveFile, MAX_PATH-1, "%s/nanny_perf_test4_log_%s.txt", g_acLogFilePath, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
+		va_start(args,fmt);
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		va_end(args);
+		fprintf(fp, "%s\t[TC4]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	g_MutexLog.UnLock();
+}
+
+void	WritePerfTest5Log(char* fmt,...)
+{
+	FILE *fp = NULL;
+	va_list args;
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+
+	g_MutexLog.Lock();
+	do{
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(g_acLogFilePath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(g_acLogFilePath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		snprintf(acSaveFile, MAX_PATH-1, "%s/nanny_perf_test5_log_%s.txt", g_acLogFilePath, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
+		va_start(args,fmt);
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		va_end(args);
+		fprintf(fp, "%s\t[TC5]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	g_MutexLog.UnLock();
+}
+
+#endif /*_PERP_TEST_LOG*/
+
 //-------------------------------------------------------------------------
