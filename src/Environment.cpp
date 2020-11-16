@@ -164,6 +164,15 @@ INT32       CEnvironment::LoadEnv_Local()
 	}
 	m_nFileLogRetention = m_nValue;
 
+#ifdef _PERP_TEST_LOG
+	if(t_RegUtil.RegReadInt(HKEY_LOCAL_MACHINE, "", "perf_test_log", m_nValue))
+	{
+		m_nValue = 0;
+		t_RegUtil.RegWriteInt(HKEY_LOCAL_MACHINE, "", "perf_test_log", m_nValue);
+	}
+	m_nPertTestLog = m_nValue;
+#endif
+
 	{
 		m_strLogPath = SPrintf("%s/log", m_strRootPath.c_str());
 		CreateDirectory(m_strLogPath.c_str(), NULL);

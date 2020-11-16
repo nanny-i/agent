@@ -58,8 +58,10 @@ public:
 	INT32		m_nTsDebugMode;
 	UINT32		m_nDbLogRetention;
 	UINT32		m_nFileLogRetention;
-
 	UINT32		m_nHostSysType;
+#ifdef _PERP_TEST_LOG
+	UINT32		m_nPertTestLog;
+#endif
 
 public://Con
 	String		m_strLgnSvrInfoList;

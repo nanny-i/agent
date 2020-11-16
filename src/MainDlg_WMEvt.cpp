@@ -494,6 +494,7 @@ INT32 CMainDlg::OnKernelFileLog(UINT32 nLogType, PPKT_DATA pPktData)
 INT32 CMainDlg::OnNotifyFileLog(UINT32 nLogType, PNOTIFY_PATH pNotifyPath)
 {
 	INT32 nRetVal = 0;
+	INT32 nFileFormat = 0;
 
 	if(pNotifyPath == NULL)
 	{
@@ -504,6 +505,20 @@ INT32 CMainDlg::OnNotifyFileLog(UINT32 nLogType, PNOTIFY_PATH pNotifyPath)
 	if(nLogType == FILE_NOTIFY_TYPE_CREATE)
 	{
 		t_LogicMgrPoFaInotifyFile->InsertInotifyPath(pNotifyPath);
+		
+#ifdef _PERP_TEST_LOG
+		struct timeval stStartTime;
+		double fDiffTime = 0;
+		gettimeofday(&stStartTime, NULL);
+		nRetVal = t_ASIFFDLLUtil->ASIFF_IsDocFileFormat(pNotifyPath->acNotifyPath, &nFileFormat);
+		if(nRetVal == 0 && nFileFormat != 0)
+		{
+			INT32 nSleep = 15000 + rand()%2000;
+			usleep(nSleep);
+			fDiffTime = diff_time(stStartTime);
+			WritePerfTest3Log("test for detection of document file : [document : %s] [detection time : %.02f ms]", pNotifyPath->acNotifyPath, fDiffTime/1000);
+		}
+#endif /*_PERP_TEST_LOG*/
 		nRetVal = 0;
 	}
 	else if(nLogType == FILE_NOTIFY_TYPE_DELETE)

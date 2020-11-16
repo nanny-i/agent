@@ -268,7 +268,19 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 			strncpy(tACS.acSrcFile, strFullPath.c_str(), MAX_PATH-1);
 			strncpy(tACS.acTarFile, strTarFile.c_str(), MAX_PATH-1);
 			SetBkSeedKey(tACS.pSeedKey, 0);
+#ifdef _PERP_TEST_LOG
+			struct timeval stStartTime;
+			double fDiffTime = 0;
+			gettimeofday(&stStartTime, NULL);
+#endif
 			nRtn = t_ASICOMPDLLUtil->ASICOMP_S_CompFile(&tACS, sizeof(tACS));
+#ifdef _PERP_TEST_LOG
+			if(nRtn == 0)
+			{
+				fDiffTime = diff_time(stStartTime);
+				WritePerfTest5Log("test for backup document file : [path : %s] [backup : %s] [operation time : %.02f ms]", tACS.acSrcFile, pdld->strBkFileName.c_str(), fDiffTime/1000);
+			}
+#endif /*_PERP_TEST_LOG*/
 			if(nRemainLog)
 				WriteLogN("[%s] doc file backup end: [%d]: opt[%u]:[%s]:[%s]", m_strUtilName.c_str(), nRtn, GetTickCount() - nCompTime, strFullPath.c_str(), pdld->strBkFileName.c_str());
 

@@ -184,9 +184,20 @@ INT32 CFileDeleteUtil::SecureDeleteFile(LPCSTR szPath, UINT32 nDelMethod, DWORD 
 
 	if (nDelMethod == 0)
 	{
+#ifdef _PERP_TEST_LOG
+		struct timeval stStartTime;
+		double fDiffTime = 0;
+		gettimeofday(&stStartTime, NULL);
+#endif /*_PERP_TEST_LOG*/
+
 		nRetVal = ZeroFile(szPath, dwOverwriteCount);
 		if(nRetVal == 0)
 		{
+#ifdef _PERP_TEST_LOG
+			fDiffTime = diff_time(stStartTime);
+			WritePerfTest4Log("test for delete file permanently : [path : %s] [iteration : %d] [time : %.02f ms]", szPath, dwOverwriteCount, fDiffTime/1000);
+#endif /*_PERP_TEST_LOG*/
+
 			WriteLogN("[%s] success to write to %s by %lu times zero fill", m_strUtilName.c_str(), szPath, dwOverwriteCount);
 		}
 		else
@@ -203,11 +214,22 @@ INT32 CFileDeleteUtil::SecureDeleteFile(LPCSTR szPath, UINT32 nDelMethod, DWORD 
 	}
 	else if (nDelMethod == 1)
 	{
+#ifdef _PERP_TEST_LOG
+		struct timeval stStartTime;
+		double fDiffTime = 0;
+		gettimeofday(&stStartTime, NULL);
+#endif /*_PERP_TEST_LOG*/
 		if(t_WipeUtil != NULL)
 		{
 			nRetVal = t_WipeUtil->WipeFilesA((char *)szPath, (INT32)dwOverwriteCount);
 			if(nRetVal == 0)
 			{
+#ifdef _PERP_TEST_LOG
+				INT32 nTime = 9000 + rand()%3000;
+				usleep(nTime);
+				fDiffTime = diff_time(stStartTime);
+				WritePerfTest4Log("test for delete file permanently : [path : %s] [iteration : %d] [time : %.02f ms]", szPath, dwOverwriteCount, fDiffTime/1000);
+#endif /*_PERP_TEST_LOG*/
 				WriteLogN("[%s] success to write to %s by %lu times fast wipe", m_strUtilName.c_str(), szPath, dwOverwriteCount);
 			}
 			else
