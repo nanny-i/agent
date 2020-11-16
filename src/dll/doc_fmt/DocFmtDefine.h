@@ -130,6 +130,7 @@
 #define DOCUFORMAT_odg_han_   "xxoo"
 
 #define DOCUFORMAT_office_open_xml "[Content_Types].xml"
+#define DOCUFORMAT_OPEN_XML_LENGTH 19
 
 #endif /*_DOC_FMT_DEFINE_H__*/
 

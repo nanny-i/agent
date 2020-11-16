@@ -591,7 +591,7 @@ INT32 CDocFileFmtUtil::CheckPkFmtAnalysis(char *pcFilePath, char *szFmt, char *a
 	if(CheckFileExtAnalysis(pcFilePath, &nFileFmt) == 0)
 		return nFileFmt;
 
-	if(CheckZipFileContentAnalysis(pcFilePath, &nFileFmt) == 0)
+	if(CheckZipFileContentAnalysis(pcFilePath, &nFileFmt, acLogMsg) == 0)
 		return nFileFmt;
 	m_n_doc_Office_Count++;
 	return ASIDFF_FILE_FMT_TYPE_DOC;
@@ -982,14 +982,14 @@ INT32 CDocFileFmtUtil::CheckDocFmtAnalysis(char *pcFilePath, char *szFmt, char *
 	if(CheckFileExtAnalysis(pcFilePath, &nFileFmt) == 0)
 		return nFileFmt;
 
-	if(CheckZipFileContentAnalysis(pcFilePath, &nFileFmt) == 0)
+	if(CheckZipFileContentAnalysis(pcFilePath, &nFileFmt, acLogMsg) == 0)
 		return nFileFmt;
 
 	m_n_doc_Office_Count++;
 	return ASIDFF_FILE_FMT_TYPE_DOC;
 }
 
-INT32 CDocFileFmtUtil::CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType)
+INT32 CDocFileFmtUtil::CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType, char *acLogMsg)
 {
 	FILE* fp = NULL;
 	char *pData = NULL; 
@@ -1021,6 +1021,8 @@ INT32 CDocFileFmtUtil::CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFi
 		fclose(fp);
 		return -4;
 	}
+	if(stZipHeader.wNameSize > DOCUFORMAT_OPEN_XML_LENGTH)
+		stZipHeader.wNameSize = DOCUFORMAT_OPEN_XML_LENGTH;
 	pData = (char *)malloc(stZipHeader.wNameSize + 1);
 	if(pData == NULL)
 	{
@@ -1029,7 +1031,8 @@ INT32 CDocFileFmtUtil::CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFi
 	}
 	fread(pData, stZipHeader.wNameSize, 1, fp );
 	fclose(fp);
-	
+	pData[stZipHeader.wNameSize] = 0;
+
 	if(!_stricmp(pData, DOCUFORMAT_office_open_xml))
 	{
 		m_n_docx_Office_Count++;
@@ -1039,6 +1042,8 @@ INT32 CDocFileFmtUtil::CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFi
 	{
 		m_n_zip_Count++;
 		*pnFileFmtType = ASIDFF_FILE_FMT_TYPE_ZIP;
+		if(acLogMsg)
+			snprintf(acLogMsg, MAX_LOGMSG, "%s : %s", pData, DOCUFORMAT_office_open_xml);
 	}
 
 	safe_free(pData);

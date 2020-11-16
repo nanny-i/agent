@@ -43,7 +43,7 @@ protected:
 	INT32 CheckDocFmtAnalysis(char *pcFilePath, char *szFmt, char *acLogMsg);
 	INT32 CheckDocumentFile(char *pcFilePath, char *acLogMsg);
 	INT32 CheckFileExtAnalysis(char *pcFilePath, INT32 *pnFileFmtType);
-	INT32 CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType);
+	INT32 CheckZipFileContentAnalysis(char *pcFilePath, INT32 *pnFileFmtType, char *acLogMsg);
 	INT32	ConvertFmtTypeToName(PASI_DFILE_FMT_INFO pADFFI);
 
 
