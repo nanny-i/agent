@@ -208,8 +208,6 @@ typedef TMapIDVect::iterator			TMapIDVectItor;
 
 typedef list<RECT>						TListRect;
 typedef TListRect::iterator				TListRectItor;
-typedef	map<UINT32, RECT>				TMapRect;
-typedef TMapRect::iterator				TMapRectItor;
 
 typedef list<StringW>					TListStrW;
 typedef TListStrW::iterator    		 	TListStrWItor;
