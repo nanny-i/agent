@@ -17,25 +17,16 @@
  * 
  */
 
-#ifndef COM_HEADER_OTP_DLL_H_4D39CDDB_E289_4d56_9F98_FE42776F4467
-#define COM_HEADER_OTP_DLL_H_4D39CDDB_E289_4d56_9F98_FE42776F4467
-
-#pragma pack(1)
-//--------------------------------------------------------------------------
-//--------------------------------------------------------------------------
-//--------------------------------------------------------------------------
-//////////////////////////////////////////////////////////////////////////
+#ifndef _COM_HEADER_OTP_DLL_H__
+#define _COM_HEADER_OTP_DLL_H__
 
 typedef	INT32 (*ASIOTP_GenOtpRandomKeyType)(LPTSTR lpKey, INT32 nKeyLen);
 typedef	INT32 (*ASIOTP_GenOtpValueType)(LPCTSTR lpKey, UINT32 nTimeKey, UINT32& nCode);
 typedef	INT32 (*ASIOTP_ChkOtpValueType)(LPCTSTR lpKey, UINT32 nTimeKey, UINT32 nCode, INT32 nTimeArea);
 typedef	INT32 (*ASIOTP_GenOtpQRCodeType)(LPCTSTR lpKey, LPCTSTR lpName, LPCTSTR lpEmail, PBYTE* pQRCode, INT32& nQRSize);
 typedef	INT32 (*ASIOTP_FreeBufferType)(PBYTE* pQRCode);
-//--------------------------------------------------------------------------
 
-#pragma pack()
-
-#endif //COM_HEADER_NET_DLL_H_4D39CDDB_E289_4d56_9F98_FE42776F4467
+#endif /*_COM_HEADER_OTP_DLL_H__*/
 
 
 
