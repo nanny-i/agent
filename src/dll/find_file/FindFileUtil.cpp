@@ -99,6 +99,90 @@ void CFindFileUtil::WriteLog(char *fmt,...)
 	pthread_mutex_unlock(&m_log_mutex);
 }
 
+#ifdef _PERP_TEST_LOG
+void CFindFileUtil::WritePerfTest1Log(char *fmt,...)
+{
+	FILE *fp = NULL;
+	va_list args;
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+	pthread_mutex_lock(&m_log_mutex);
+	do{
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(m_acLogPath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(m_acLogPath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		snprintf(acSaveFile, MAX_PATH-1, "%s/nanny_perf_test1_log_%s.txt", m_acLogPath, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(m_acLogPath, m_acLogFile, m_nFileLogRetention);
+		}
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
+		va_start(args,fmt);
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		va_end(args);
+		fprintf(fp, "%s\t[TC1]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	pthread_mutex_unlock(&m_log_mutex);
+}
+
+void CFindFileUtil::WritePerfTest2Log(char *fmt,...)
+{
+	FILE *fp = NULL;
+	va_list args;
+	char acSaveFile[MAX_PATH] = {0, };
+	char acTimeBuf[MAX_TIME_STR] = {0, };
+	char acLogBuf[CHAR_MAX_SIZE] = {0, };
+	pthread_mutex_lock(&m_log_mutex);
+	do{
+		GetCurrentDateTime(0, acTimeBuf);
+
+		if(m_acLogPath[0] == 0)
+		{
+			if(get_nanny_agent_root(acSaveFile, MAX_PATH) != 0)
+				break;
+			snprintf(m_acLogPath, MAX_PATH-1, "%s/nanny/log", acSaveFile);
+		}
+		snprintf(acSaveFile, MAX_PATH-1, "%s/nanny_perf_test2_log_%s.txt", m_acLogPath, acTimeBuf);
+		acSaveFile[MAX_PATH-1] = 0;
+
+		if(is_file(acSaveFile) != 0)
+		{
+			ClearOldLogFile(m_acLogPath, m_acLogFile, m_nFileLogRetention);
+		}
+
+		fp = fopen(acSaveFile, "at");
+		if(fp == NULL)
+		{
+			break;
+		}
+
+		GetCurrentDateTime(1, acTimeBuf);
+		va_start(args,fmt);
+		vsnprintf(acLogBuf, CHAR_MAX_SIZE - 1, fmt, args);		
+		va_end(args);
+		fprintf(fp, "%s\t[TC2]\t%s\n", acTimeBuf, acLogBuf);
+		fclose(fp);
+	}while(FALSE);
+	pthread_mutex_unlock(&m_log_mutex);
+}
+#endif /*_PERP_TEST_LOG*/
+
 //--------------------------------------------------------------
 
 INT32		CFindFileUtil::Init(PASI_FF_INIT_INFO pAfii)
@@ -911,6 +995,12 @@ INT32		CFindFileUtil::IsExistFileMaskByDFF(UINT32 nOrderID, String strFileFullNa
 	char acLogMsg[MAX_LOGMSG+1] = {0,};
 	if(m_tASIFIDLLUtil->ASIFI_GetFileElfMagic((char *)strFileFullName.c_str()))	
 	{
+#ifdef _PERP_TEST_LOG
+		char acFileType[CHAR_MAX_SIZE] = {0,};
+		m_tASIFIDLLUtil->ASIFI_GetFileDescription((char *)strFileFullName.c_str(), acFileType);
+		acFileType[MAX_TYPE_LEN-1] = 0;
+		WritePerfTest2Log("test for detection of binary file : [binary file : %s] ", (char *)strFileFullName.c_str());
+#endif /*_PERP_TEST_LOG*/
 		return 0;
 	}
 
@@ -926,11 +1016,21 @@ INT32		CFindFileUtil::IsExistFileMaskByDFF(UINT32 nOrderID, String strFileFullNa
 	}
 
 	if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_UNKNOW || tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_ZIP)
+	{
+		if(tADFI.nFmtType == ASIDFF_FILE_FMT_TYPE_ZIP && acLogMsg[0])
+			WriteLog("zip file : [pt:%s] [ty:%d] [ct:%s]", tADFI.szFileName, tADFI.nFmtType, acLogMsg);
 		return 0;
+	}
 	if(tADFI.szFmtType[0] == 0)
+	{
 		return 0;
+	}
 
 	WriteLog("file (%s) fmt info : (type :%d) (%s)", tADFI.szFileName, tADFI.nFmtType, tADFI.szFmtType);
+
+#ifdef _PERP_TEST_LOG
+	WritePerfTest1Log("test for detection of document file : [document file : %s]", (char *)strFileFullName.c_str());
+#endif /*_PERP_TEST_LOG*/
 
 	TMapIDMapStrItor find = m_tFileMaskMap.find(nOrderID);
 	if(find == m_tFileMaskMap.end())
@@ -1713,7 +1813,6 @@ INT32		CFindFileUtil::AddFindFileItemList(UINT32 nOrderID, UINT32 nSearchDirNum,
 	tMutexExt->Lock();
 	if(pAFFI)
 	{
-		WriteLog( "[Info] [AddFindFileItemList2] add to file %s/%s (%d)", pAFFI->strFilePath.c_str(), pAFFI->strFileName.c_str(), pAFFI->nFindType);
 		pSFFW->tFFIList.push_back(*pAFFI);
 		pSFFW->nFileTotalNum += 1;
 	}
@@ -1759,8 +1858,6 @@ INT32		CFindFileUtil::GetFindFileItem(UINT32 nOrderID, PASI_FF_FILE_ITEM pAFFI, 
 			
 			pAFFI[nIdx].nFileSize = begin->nFileSize;
 			pAFFI[nIdx].nFindType = begin->nFindType;
-
-			WriteLog("[GetFindFileItem] [%02d] get to file %s/%s (%d)", nIdx, pAFFI[nIdx].szFilePath, pAFFI[nIdx].szFileName, pAFFI[nIdx].nFileSize);
 
 			pSFFW->tFFIList.erase(begin++);
 			pSFFW->nFileWorkedNum += 1;

@@ -71,6 +71,12 @@ public:
 	INT32		Release();
 	void		SetLogPath(char *pLogPath, char *pLogFile, INT32 nRemainLog, UINT32 nFileLogRetention);
 	void		WriteLog(char* fmt,...);
+
+#ifdef _PERP_TEST_LOG
+	void		WritePerfTest1Log(char *fmt,...);
+	void		WritePerfTest2Log(char *fmt,...);
+#endif /*_PERP_TEST_LOG*/
+
 private:
 	INT32		StopThread_Common(CThreadBase* tThreadObject, UINT32 nWaitTime = 5/*sec*/);
 
@@ -154,9 +160,6 @@ public:
 
 public:
 	INT32		SetPreSearchLevel(UINT32 nLevel);
-
-
-
 
 public:
 	CFindFileUtil(void);
