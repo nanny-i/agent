@@ -47,23 +47,23 @@ static const LONGLONG SECS_TO_100NS = 10000000; /* 10^7 */
 
 #define		ONE_HOUR		3600
 
-extern void UnixTimeToFileTime(time_t* pt, LPFILETIME pft);
-extern void FileTimeToUnixTime(LPFILETIME pft, time_t* pt);
-extern void UnixTimeToSystemTime(time_t* pt, LPSYSTEMTIME pst);
-extern void SystemTimeToUnixTime(LPSYSTEMTIME pst, time_t* pt);
-extern void FileTimeToDBTime( LPFILETIME pft, PTIMSTM pts );
-extern void DBTimeToFileTime( PTIMSTM pts, LPFILETIME pft );
-extern void DBTimeToSystemTime(PTIMSTM pt, LPSYSTEMTIME pst);
-extern void SystemTimeToDBTime(LPSYSTEMTIME pst, PTIMSTM pt);
-extern void UnixTimeToDBTime(time_t* pt, PTIMSTM pst);
-extern void DBTimeToUnixTime(PTIMSTM pst, time_t* pt);
-extern time_t LocalTimeToGlobalTime(time_t& nTime);
-extern time_t GlobalTimeToLocalTime(time_t& nTime);
-extern void GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf);
-extern void	GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf);
+extern void		UnixTimeToFileTime(time_t* pt, LPFILETIME pft);
+extern void		FileTimeToUnixTime(LPFILETIME pft, time_t* pt);
+extern void		UnixTimeToSystemTime(time_t* pt, LPSYSTEMTIME pst);
+extern void		SystemTimeToUnixTime(LPSYSTEMTIME pst, time_t* pt);
+extern void		FileTimeToDBTime( LPFILETIME pft, PTIMSTM pts );
+extern void		DBTimeToFileTime( PTIMSTM pts, LPFILETIME pft );
+extern void		DBTimeToSystemTime(PTIMSTM pt, LPSYSTEMTIME pst);
+extern void		SystemTimeToDBTime(LPSYSTEMTIME pst, PTIMSTM pt);
+extern void		UnixTimeToDBTime(time_t* pt, PTIMSTM pst);
+extern void		DBTimeToUnixTime(PTIMSTM pst, time_t* pt);
+extern time_t	LocalTimeToGlobalTime(time_t& nTime);
+extern time_t	GlobalTimeToLocalTime(time_t& nTime);
+extern void		GetDateTimeByIndex(INT32 nIndex, OUT LPTSTR lpBuf);
+extern void		GetCurrentDateTime(INT32 nDateTime, OUT LPTSTR lpBuf);
 extern UINT32	GetCurrentDateTimeInt();
 extern UINT32	GetCurrentTimeZone();
-extern INT32 GetFileTimeInfo(LPCSTR pcPath, UINT32 *pdwCreateTime, UINT32 *pdwModifyTime, UINT32 *pdwAccessTime);
+extern INT32	GetFileTimeInfo(LPCSTR pcPath, UINT32 *pdwCreateTime, UINT32 *pdwModifyTime, UINT32 *pdwAccessTime);
 extern UINT32	GetCurrentYearMon();
 extern UINT32	GetCurrentYearMon(UINT32 nTime);
 extern UINT32	GetCurrentYearMonDay(UINT32 nShort = 0);
@@ -81,7 +81,8 @@ extern LPCTSTR	GetFormatTime(UINT32 nTime, LPTSTR lpBuf, LPTSTR lpFormat = 0);
 extern LPTSTR	GetDateTimeFmt(UINT32 nTime, OUT LPTSTR lpBuf, INT32 nFormat = 0);
 extern UINT32	GetWeekCntToday();
 extern UINT32	GetWeekCntToday(UINT32 nStartDoW);
-extern int uptime();
+extern int		uptime();
+extern double	diff_time(struct timeval stStartTime);
 
 #endif /*_AS_TIME_H__*/
 

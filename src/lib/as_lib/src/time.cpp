@@ -700,5 +700,17 @@ int uptime()
 	return (int)dStartTime;
 }
 
+double diff_time(struct timeval stStartTime)
+{
+	struct timeval stEndTime;
+	double fDiffTime = 0;
+	if(stStartTime.tv_sec > 1)
+	{
+		gettimeofday(&stEndTime, NULL);
+		fDiffTime = ( stEndTime.tv_sec - stStartTime.tv_sec )*1000000 + ( stEndTime.tv_usec - stStartTime.tv_usec );
+	}
+	return fDiffTime;
+}
+
 //-------------------------------------------------------------------------
 
