@@ -206,9 +206,6 @@ typedef map<UINT32, stlMapStrMapStrMapID>::iterator	TMapIDMapStrMapStrMapIDItor;
 typedef map<UINT32, TVectID>			TMapIDVect;
 typedef TMapIDVect::iterator			TMapIDVectItor;
 
-typedef list<RECT>						TListRect;
-typedef TListRect::iterator				TListRectItor;
-
 typedef list<StringW>					TListStrW;
 typedef TListStrW::iterator    		 	TListStrWItor;
 typedef map<String, UINT32>    			TMapStrID;
