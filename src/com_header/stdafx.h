@@ -180,7 +180,7 @@ typedef wstring StringW;
 #define WM_CLOSE	0x0010
 #define WM_QUIT		0x0012
 
-#define NANNY_AGENT_VERSION		"2.0.0.14"
+#define NANNY_AGENT_VERSION		"2.0.0.15"
 #define NANNY_AGENT_IDENT		"nannysvc"
 #define NANNY_UPDATE_IDENT		"update"
 #define NANNY_AGENT_DIR			"nanny"
@@ -233,14 +233,6 @@ typedef struct _GUID {
     unsigned short Data3;
     unsigned char  Data4[ 8 ];
 } GUID;
-
-typedef struct tagRECT
-{
-    LONG    left;
-    LONG    top;
-    LONG    right;
-    LONG    bottom;
-} RECT, *PRECT, *NPRECT, *LPRECT;
 
 typedef struct _FILETIME {
     DWORD dwLowDateTime;
