@@ -111,7 +111,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_RS_BK pdata)
 				LPCTSTR lpBkFileName = pdata->strBkFileName.c_str();					
 				String strShortPath = LPCTSTR(lpBkFileName + (pdata->strBkFileName.length() - 2));
 					
-				strTarFile = SPrintf("%s/%s", strBkDir, strShortPath.c_str());
+				strTarFile = SPrintf("%s/%s", strBkDir.c_str(), strShortPath.c_str());
 				if(tFileUtil.DirectoryExists(strTarFile.c_str()) == FALSE)
 					tFileUtil.ForceDirectory(strTarFile.c_str());
 
