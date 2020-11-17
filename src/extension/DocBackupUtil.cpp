@@ -292,8 +292,6 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_DOC pdld, UINT32 nDelMethod, UINT32 nD
 			pdld->nRemoveTime = t_ValidTimeUtil->GetValidTime();
 		}
 
-		nDelTime = GetTickCount();
-
 		t_FileDeleteUtil->SecureDeleteFile(strFullPath.c_str(), nDelMethod,  nDelCnt, TRUE, TRUE, nLimitSize, nLimitDelCnt);
 
 		if(tFileUtil.FileExists(strFullPath.c_str()) == TRUE)
