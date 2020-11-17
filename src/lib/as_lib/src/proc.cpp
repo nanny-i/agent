@@ -94,9 +94,12 @@ int get_proc_info_by_pid(int pid, proc_info_t *pProcInfo)
  *
  * @return
  *
- * -1 : 프로세스 정보를 얻는데 실패함
+ * -1 : 유효하지 않은 인자 값
+ * -2 : 존재하지 않은 pid_file
+ * -3 : 파일에서 데이터 조회 실패
+ * -4 : 유효하지 않은 숫자
  * ASI_PROC_NOT_EXIST : 해당 프로세스 존재하지 않음
- * asi_PROC_EXIST : 해당 프로세스 존재
+ * ASI_PROC_EXIST : 해당 프로세스 존재
  */
 int check_proc_exist_by_pid_file(const char *acPidPath, const char *acProcName)
 {
