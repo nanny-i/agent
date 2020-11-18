@@ -198,7 +198,6 @@ String					CManagePoInRsOp::GetObjExtList(UINT32 nID, TListStr& tExtList)
 		{
 			String strPkgValue;
 			UINT8 nKey = pdata_unit->tDPH._get_id_to_key(begin_unit->first);
-			UINT32 nSubID = pdata_unit->tDPH._get_id_to_subid(begin_unit->first);
 
 			switch(nKey)
 			{
