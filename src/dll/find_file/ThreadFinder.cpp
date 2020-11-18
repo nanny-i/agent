@@ -126,14 +126,12 @@ INT32		CThreadFinder::ChkWorkFindFile()
 	TListFindDirItem tSFDIList;
 	if(tFFU->GetFindFileDirItem(tSFDIList, nOrderID))
 	{
-		INT32 nOldNum = 0;
 		TListFindFileItem tAFFIList;
 		TListFindDirItemItor begin, end;
 		begin = tSFDIList.begin();	end = tSFDIList.end();
 		for(begin; begin != end && m_nContinue; begin++)
 		{
 			tFFU->Recursive_SearchFile(begin->nOrderID, begin->strSearchDir, tAFFIList, &m_nContinue);
-			nOldNum = (UINT32)tAFFIList.size();
 		}				
 				
 		if(m_nContinue)
