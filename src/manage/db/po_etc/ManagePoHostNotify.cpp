@@ -93,7 +93,7 @@ INT32					CManagePoHostNotify::InitHash(UINT32 nID)
 	{
 		strOrgValue = SPrintf("%s,"
 							"%u,",
-							GetHdrHashInfo(pdphn),
+							GetHdrHashInfo(pdphn).c_str(),
 							pdphn->nMsgType);
 
 		{
