@@ -186,7 +186,7 @@ void		CLogicMgrLogRsBk::SetLogRsBk(DB_LOG_RS_BK& data)
 			data.strSubjectPath.find("%") == string::npos  && data.strSubjectName.find("%") == string::npos )
 		{
 
-			WriteLogN("[%s] remain evt log to file : op[%d]:bs[%d]:bk[%d]:fi[%s\\%s:%s\\%s][%s]", 
+			WriteLogN("[%s] remain evt log to file : op[%d]:bs[%d]:bk[%d]:fi[%s/%s:%s/%s][%s]", 
 				m_strLogicName.c_str(),
 				data.nOpType, data.nBackupSize, data.nBackupTime,
 				data.strSubjectPath.c_str(), data.strSubjectName.c_str(), 
