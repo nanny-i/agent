@@ -641,7 +641,7 @@ INT32		CThreadPoFaOp::CheckNotifyFile()
 		return -2;
 	}
 
-	pBuffer = (char *)calloc( nLength+1, sizeof(char *) );
+	pBuffer = (char *)calloc( nLength+1, sizeof(char) );
 	if(pBuffer == NULL)
 	{
 		WriteLogE("fail to allocate memory (%d) : [%s]", errno, m_strThreadName.c_str());
