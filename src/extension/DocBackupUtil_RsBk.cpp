@@ -60,7 +60,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_RS_BK pdata)
 	}
 
 	{
-		strBkDir = SPrintf("%s\\%s", t_EnvInfo->m_strRootPath.c_str(), STR_BACKUP_RS_BK);
+		strBkDir = SPrintf("%s/%s", t_EnvInfo->m_strRootPath.c_str(), STR_BACKUP_RS_BK);
 		if(tFileUtil.DirectoryExists(strBkDir.c_str()) == FALSE)	
 		{				
 			tFileUtil.ForceDirectory(strBkDir.c_str());
@@ -103,7 +103,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_RS_BK pdata)
 				pdata->strBkFileName = GetGUID();
 
 			UINT32 nCompTime = GetTickCount();
-			WriteLogN("[%s] rs bk file backup start: [%d][%s\\%s]:[%s]", m_strUtilName.c_str(), nRtn, pdata->strObjectPath.c_str(), pdata->strObjectName.c_str(), pdata->strBkFileName.c_str());
+			WriteLogN("[%s] rs bk file backup start: [%d][%s/%s]:[%s]", m_strUtilName.c_str(), nRtn, pdata->strObjectPath.c_str(), pdata->strObjectName.c_str(), pdata->strBkFileName.c_str());
 
 			//nRtn = t_ASICOMPDLLUtil->ASICOMP_CompFileW(pdata->strObjectPathW, W2A(strBkDir), pdata->strBkFileName);
 			String strTarFile;
@@ -125,7 +125,7 @@ INT32		CDocBackupUtil::BackupFile(PDB_LOG_RS_BK pdata)
 
 				nRtn = t_ASICOMPDLLUtil->ASICOMP_S_CompFile(&tACS, sizeof(tACS));
 			}
-			if(nRemainLog)	WriteLogN("[%s] rs bk file backup end: [%d]: opt[%u]:[%s\\%s]:[%s]", m_strUtilName.c_str(), nRtn, GetTickCount() - nCompTime, pdata->strObjectPath.c_str(), pdata->strObjectName.c_str(), pdata->strBkFileName.c_str());
+			if(nRemainLog)	WriteLogN("[%s] rs bk file backup end: [%d]: opt[%u]:[%s/%s]:[%s]", m_strUtilName.c_str(), nRtn, GetTickCount() - nCompTime, pdata->strObjectPath.c_str(), pdata->strObjectName.c_str(), pdata->strBkFileName.c_str());
 
 			pdata->nBackupSize	= tFileUtil.GetFileSizeExt(strTarFile.c_str());
 			pdata->nBackupType	= SS_PO_IN_RS_BK_BACKUP_TYPE_COMP_SEED;
@@ -155,7 +155,7 @@ INT32		CDocBackupUtil::RecoveryFile(PDB_LOG_RS_BK pdata)
 
 		if(strlen(lpBkFileName) < 2)
 		{
-			WriteLogE("[%s] rs bk file recovery empty backup file name : [%d][%s\\%s]:[%s]", m_strUtilName.c_str(), errno, pdata->strObjectPath.c_str(), pdata->strObjectName.c_str(), pdata->strBkFileName.c_str());
+			WriteLogE("[%s] rs bk file recovery empty backup file name : [%d][%s/%s]:[%s]", m_strUtilName.c_str(), errno, pdata->strObjectPath.c_str(), pdata->strObjectName.c_str(), pdata->strBkFileName.c_str());
 			return 2;
 		}
 
@@ -186,7 +186,7 @@ INT32		CDocBackupUtil::RecoveryFile(PDB_LOG_RS_BK pdata)
 				nRtn = t_ASICOMPDLLUtil->ASICOMP_S_DecompFile(&tACS, sizeof(tACS));
 			}				
 
-			WriteLogN("[%s] rs bk file recovery(decomp) end: [%d][%d:%d][%s]->[%s\\%s]", m_strUtilName.c_str(), nRtn, pdata->nID, pdata->nRegSvrID, pdata->strBkFileName.c_str(), 
+			WriteLogN("[%s] rs bk file recovery(decomp) end: [%d][%d:%d][%s]->[%s/%s]", m_strUtilName.c_str(), nRtn, pdata->nID, pdata->nRegSvrID, pdata->strBkFileName.c_str(), 
 																			strSvFilePath.c_str(), strNewFileName.c_str());
 		}
 	}
