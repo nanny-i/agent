@@ -215,7 +215,7 @@ typedef wstring StringW;
 #define DRIVE_RAMDISK     6
 #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD)(b)) & 0xff))) << 8))
 #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD)(b)) & 0xffff))) << 16))
-#define MAKELONGLONG(a, b)  ((LONGLONG)(((DWORD)(((DWORD)(a)) & 0xffffffff)) | ((LONGLONG)((DWORD)(((DWORD)(b)) & 0xffffffff))) * 0x0000000100000000))
+#define MAKELONGLONG(a, b)  ((LONGLONG)(((DWORD)(((DWORD)(a)))) | ((LONGLONG)((DWORD)(((DWORD)(b)) & 0xffffffff))) * 0x0000000100000000))
 
 #define LOWORD(l)           ((WORD)(((DWORD)(l)) & 0xffff))
 #define HIWORD(l)           ((WORD)((((DWORD)(l)) >> 16) & 0xffff))
