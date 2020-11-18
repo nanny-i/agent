@@ -565,7 +565,6 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 	String strFileNameA;
 	UINT32 nMatchType = ASI_FF_FILE_FIND_TYPE_PATTERN;
 	UINT32 dwFileLen = 0;
-	BOOL bMatchCaseRetrun = FALSE;
 	BOOL nContinue = TRUE;
 	FIND_FILE_ITEM tAFFI;	
 	String strFindDirA;
@@ -642,9 +641,6 @@ INT32		CFindFileUtil::Recursive_SearchDir(UINT32 nOrderID, String strRootPath, S
 			}
 			else if(tFindFileItemList)
 			{
-				if (nExceptAllPath)
-					bMatchCaseRetrun = TRUE;
-				
 				if(!nExceptAllPath && IsExistExceptDirFileMask(nOrderID, strChkDirA, strFileNameA) || (nExceptAllPath && !IsExistExceptDir(nOrderID, strChkDirA.c_str())))
 				{
 					continue;
