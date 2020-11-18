@@ -345,7 +345,7 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltLgnSID(INT32 nSSLMode)
 
 		if(tMemSvrInfoMap.size() == 0)
 		{
-			WriteLogE("invalid lgn svr info list : [%s]", strSvrInfoList);
+			WriteLogE("invalid lgn svr info list : [%s]", strSvrInfoList.c_str());
 			return tSID;
 		}
 
