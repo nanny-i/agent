@@ -76,7 +76,7 @@ INT32					CManagePoHostNotifyUnit::GetHash(UINT32 nID, String& strOrgValue)
 		strItemHash = SPrintf("%s,"
 			"%u,%u,%u,%u,%u,"
 			"%u,%s,", 
-			GetHdrHashInfo(pdphnu),
+			GetHdrHashInfo(pdphnu).c_str(),
 			pdphnu->nSchTime,
 			pdphnu->nPosType, pdphnu->nShowSize, pdphnu->nShowPos, pdphnu->nShowTime,
 			pdphnu->nMsgFmtType, pdphnu->strMsgInfo.c_str());
