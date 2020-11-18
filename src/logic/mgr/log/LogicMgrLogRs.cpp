@@ -148,7 +148,7 @@ void		CLogicMgrLogRs::SetLogRs(DB_LOG_RS& data)
 		if(data.strObjectPath.find("%") == string::npos && data.strObjectName.find("%") == string::npos &&
 			data.strSubjectPath.find("%") == string::npos && data.strSubjectName.find("%") == string::npos)
 		{
-			WriteLogN("[%s] remain evt log to file : pt[%d]:bt[%d]:ot:[%d]:sb[%s\\%s]:ob[%s\\%s]", 
+			WriteLogN("[%s] remain evt log to file : pt[%d]:bt[%d]:ot:[%d]:sb[%s/%s]:ob[%s/%s]", 
 							m_strLogicName.c_str(),
 							data.nPolicyType, data.nBlockType, data.nObjectType, 
 							data.strSubjectPath.c_str(), data.strSubjectName.c_str(), 
