@@ -352,7 +352,7 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltLgnSID(INT32 nSSLMode)
 		TMapMemSvrInfoItor find = tMemSvrInfoMap.find(m_nLgnSvrInfoIdx % tMemSvrInfoMap.size());
 		if(find == tMemSvrInfoMap.end())
 		{
-			WriteLogE("invalid lgn svr info list number : [%s][%d]/[%d]", strSvrInfoList, tMemSvrInfoMap.size(), m_nLgnSvrInfoIdx);
+			WriteLogE("invalid lgn svr info list number : [%s][%d]/[%d]", strSvrInfoList.c_str(), tMemSvrInfoMap.size(), m_nLgnSvrInfoIdx);
 			return tSID;
 		}
 
@@ -411,7 +411,7 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltMgrSID(INT32 nSSLMode)
 		TMapMemSvrInfoItor find = m_tMgrSvrInfoMap.find(m_nMgrSvrInfoIdx % m_tMgrSvrInfoMap.size());
 		if(find == m_tMgrSvrInfoMap.end())
 		{
-			WriteLogE("invalid mgr svr info list number : [%s][%d]/[%d]", m_tMgrSvrInfoMap.size(), m_nMgrSvrInfoIdx);
+			WriteLogE("invalid mgr svr info list number : [%d]/[%d]", m_tMgrSvrInfoMap.size(), m_nMgrSvrInfoIdx);
 			return tSID;
 		}
 
@@ -471,7 +471,7 @@ SOCK_INIT_DATA	CEnvironmentOp::GetCltUdtSID(INT32 nSSLMode)
 		TMapMemSvrInfoItor find = m_tUdtChkSvrInfoMap.find(m_nUdtChkSvrInfoIdx % m_tUdtChkSvrInfoMap.size());
 		if(find == m_tUdtChkSvrInfoMap.end())
 		{
-			WriteLogE("invalid udt info svr info list number : [%s][%d]/[%d]", m_tUdtChkSvrInfoMap.size(), m_nUdtChkSvrInfoIdx);
+			WriteLogE("invalid udt info svr info list number : [%d]/[%d]", m_tUdtChkSvrInfoMap.size(), m_nUdtChkSvrInfoIdx);
 			return tSID;
 		}
 
