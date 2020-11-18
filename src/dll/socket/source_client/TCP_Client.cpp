@@ -376,6 +376,7 @@ INT32	CTCP_Client::Send(UINT16 wType, UINT16 wCode, UINT32 dwLength, PVOID pData
 	if (bConnected == FALSE)
 	{
 		WriteLog("[Info] [%s] [Send] close to thread (-1)", m_acClassName);
+		safe_free(stPktData.body.data);
 		return -4;
 	}
 	
