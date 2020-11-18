@@ -92,7 +92,7 @@ INT32					CManagePoFaEnv::InitHash(UINT32 nID)
 	{
 		strOrgValue = SPrintf("%s,"
 							"%d,", 
-							GetHdrHashInfo(pdpfe),
+							GetHdrHashInfo(pdpfe).c_str(),
 							pdpfe->nSysOffMaxWorkTime);
 
 		{
