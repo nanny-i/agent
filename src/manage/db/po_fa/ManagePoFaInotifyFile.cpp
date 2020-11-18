@@ -67,7 +67,7 @@ INT32		CManagePoFaInotifyFile::LoadDBMS()
     	AddItem(begin->nID, *begin);
     }
 	nCount = GetInotifyPathCount();
-    return 0;
+    return nCount;
 }
 //---------------------------------------------------------------------------
 
@@ -163,6 +163,7 @@ INT32	CManagePoFaInotifyFile::InsertInotifyPath(PNOTIFY_PATH pNotifyPath)
 	{
 		WriteLogE("fail to insert inotify path %s (%d)", stLogNotify.strNotifyFilePath.c_str(), nRetVal);
 		nRetVal -= 10;
+		return nRetVal;
 	}
 	nRetVal = AddItem(stLogNotify.nID, stLogNotify);
 	if(nRetVal != 0)
