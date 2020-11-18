@@ -48,7 +48,7 @@ void FileTimeToUnixTime(LPFILETIME pFileTime, time_t* pTime)
 	LONGLONG llValue = 0; // 64 bit value
 	if(pTime == NULL || pFileTime == NULL)
 		return;
-	llValue = ((LONGLONG)pFileTime->dwHighDateTime << 32) + pFileTime->dwLowDateTime;
+	llValue = MAKELONGLONG(pFileTime->dwLowDateTime, pFileTime->dwHighDateTime);
 	*pTime = (time_t)((llValue - SECS_BETWEEN_EPOCHS)/SECS_TO_100NS);
 }
 //-------------------------------------------------------------------------
